@@ -4,9 +4,9 @@
 
 [submodule "aikg/thirdparty/KernelBench"]
 	path = aikg/thirdparty/KernelBench
-	url = https://github.com/ScalingIntelligence/KernelBench.git
-	branch = main
-	commit = 21fbe5a642898cd60b8f60c7aefb43d475e11f33
+	url = https://github.com/Zhang-kg/KernelBench.git
+	branch = init_weight
+	commit = 71f1bc708e8ba2122bb63e6e68bced2c839e7c59
 
 [submodule "aikg/thirdparty/MultiKernelBench"]
 	path = aikg/thirdparty/MultiKernelBench

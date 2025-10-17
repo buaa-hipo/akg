@@ -63,34 +63,76 @@ def get_init_inputs():
     return []  # No special initialization inputs needed
 '''
 
+def get_torch_task_desc():
+    return '''
+import torch
+import torch.nn as nn
+
+
+class Model(nn.Module):
+    """
+    ReLU激活函数模型
+    """
+    def __init__(self):
+        super(Model, self).__init__()
+        # PyTorch中可以直接使用nn.ReLU()层
+        self.relu = nn.ReLU()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        计算ReLU激活函数
+        Args:
+            x: 输入张量
+        Returns:
+            ReLU激活后的张量
+        """
+        return self.relu(x)
+        # 也可以使用函数式API: return torch.relu(x)
+
+
+batch_size = 16
+dim = 16384
+
+
+def get_inputs():
+    # 生成符合正态分布的随机张量，类型为float16
+    x = torch.randn(batch_size, dim, dtype=torch.float16)
+    return [x]
+
+
+def get_init_inputs():
+    return []  # 不需要特殊的初始化输入
+
+'''
 
 async def run_mindspore_triton_single():
     op_name = get_op_name()
-    task_desc = get_task_desc()
+    # task_desc = get_task_desc()
+    task_desc = get_torch_task_desc()
 
     task_pool = TaskPool()
     device_pool = DevicePool([0])
-    # config = load_config("triton")  # use offical deepseek api
+    # config = load_config(config_path="/home/zzz/akg/aikg/python/ai_kernel_generator/config/default_triton_config.yaml")  # use offical deepseek api
+    # config = load_config(config_path="./python/ai_kernel_generator/config/vllm_triton_coderonly_config.yaml")
     config = load_config(config_path="./python/ai_kernel_generator/config/vllm_triton_coderonly_config.yaml")
-
     # check_env_for_task("mindspore", "ascend", "triton", config)
-
+    
+    # check_env_for_task("torch", "cuda", "triton", config)
     task = Task(
         op_name=op_name,
         task_desc=task_desc,
         task_id="0",
         dsl="triton",
-        backend="ascend",
-        arch="ascend910b4",
+        backend="cuda",
+        arch="a100",
         config=config,
         device_pool=device_pool,
-        framework="mindspore",
+        framework="torch",
         workflow="coder_only_workflow"
     )
-
+    
     task_pool.create_task(task.run)
     results = await task_pool.wait_all()
-    print(results)
     for op_name, result, _ in results:
         if result:
             print(f"Task {op_name} passed")

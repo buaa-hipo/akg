@@ -77,11 +77,11 @@ async def run_torch_evolve_triton():
     config.arch = "a100"
 
     # 进化参数
-    config.max_rounds = 3
-    config.parallel_num = 4
+    config.max_rounds = 5
+    config.parallel_num = 1
 
     # 岛屿模型参数
-    config.num_islands = 2
+    config.num_islands = 1
     config.migration_interval = 2
     config.elite_size = 5
     config.parent_selection_prob = 0.5
@@ -91,7 +91,7 @@ async def run_torch_evolve_triton():
 
     # 配置文件路径
     config.config_path = str(Path(get_project_root()) / "config" / "vllm_triton_evolve_config.yaml")
-
+    print(config.config_path)
     # 选择要运行的任务
     config.op_name = get_op_name()
     config.task_desc = get_task_desc()
@@ -115,7 +115,7 @@ async def run_torch_evolve_triton():
         framework=config.framework,
         backend=config.backend,
         arch=config.arch,
-        config=config.config_path,
+        config=load_config(config_path=config.config_path),
         device_pool=device_pool,
         task_pool=task_pool,
         max_rounds=config.max_rounds,

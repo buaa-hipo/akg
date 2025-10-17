@@ -1,13 +1,26 @@
 # Model preset configuration
 agent_model_config:
-  designer: vllm_deepseek_r1_default
-  coder: vllm_deepseek_r1_default
-  conductor: vllm_deepseek_r1_default
-  api_generator: vllm_deepseek_r1_default
-  feature_extractor: vllm_deepseek_r1_default
+  designer: sflow_qwen_7B_coder_default
+  coder: sflow_qwen_7B_coder_default
+  conductor: sflow_qwen_7B_coder_default
+  api_generator: sflow_qwen_7B_coder_default
+  sketch: sflow_qwen_7B_coder_default
+
+# agent_model_config:
+#   designer: deepseek_r1_default
+#   coder: deepseek_r1_default
+#   conductor: deepseek_r1_default
+#   api_generator: deepseek_r1_default
+#   sketch: deepseek_r1_default
+# agent_model_config:
+#   designer: vllm_deepseek_r1_default
+#   coder: vllm_deepseek_r1_default
+#   conductor: vllm_deepseek_r1_default
+#   api_generator: vllm_deepseek_r1_default
+#   feature_extractor: vllm_deepseek_r1_default
 
 # Log configuration
-log_dir: "~/aikg_logs"
+log_dir: "/workspace/aikg_zkg/aikg_logs"
 
 # Workflow configuration
 workflow_config_path: "config/coder_only_workflow.yaml"

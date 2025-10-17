@@ -76,6 +76,7 @@ class Conductor(AgentBase):
 
         # 从config中获取需要的属性
         if config:
+            print("DEBUG", config)
             self.log_dir = config.get("log_dir")
             self.model_config = config.get("agent_model_config", {})
         else:

@@ -60,6 +60,7 @@ class ConfigValidator:
 
         root_dir = os.path.expanduser(self.config['log_dir'])
         self.config['log_dir'] = Path(root_dir) / f"Task_{next(tempfile._get_candidate_names())}"
+        print("write to" + str(self.config['log_dir']))
 
     def validate_docs_dir(self):
         if 'docs_dir' not in self.config:
