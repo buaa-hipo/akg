@@ -6,7 +6,7 @@
 	path = aikg/thirdparty/KernelBench
 	url = https://github.com/Zhang-kg/KernelBench.git
 	branch = init_weight
-	commit = 71f1bc708e8ba2122bb63e6e68bced2c839e7c59
+        commit = 807fcc59eb3d535087f4c0eb8630ec540c016b26
 
 [submodule "aikg/thirdparty/MultiKernelBench"]
 	path = aikg/thirdparty/MultiKernelBench
