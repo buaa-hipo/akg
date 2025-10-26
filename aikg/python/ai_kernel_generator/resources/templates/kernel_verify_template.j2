@@ -504,7 +504,7 @@ def verify_implementations():
     try:
         verify_result, framework_output = verify_case()
     except TimeoutError:
-        raise AssertionError(f"静态shape验证超时（{timeout}秒）")
+        raise AssertionError(f"静态shape验证超时（{{timeout}}秒）")
     {% endif %}
     
     # 构建验证成功信息
