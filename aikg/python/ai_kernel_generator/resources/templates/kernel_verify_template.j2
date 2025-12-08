@@ -390,6 +390,8 @@ def verify_implementations():
         """验证单个案例的公共逻辑"""
         {% if backend == "ascend" %}
         torch.npu.manual_seed(0)
+        {% else %}
+        torch.manual_seed(0)
         {% endif %}
         
         # 运行框架实现
@@ -456,6 +458,7 @@ def verify_implementations():
 
     # 获取初始化参数和输入数据
     init_params = get_init_inputs()
+    torch.manual_seed(0)
     framework_model = FrameworkModel(*init_params)
     
     {% if framework == "torch" %}
