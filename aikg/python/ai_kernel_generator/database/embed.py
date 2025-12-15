@@ -1,12 +1,7 @@
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import ast
-
-encoder = SentenceTransformer(
-    "microsoft/unixcoder-base",
-    cache_folder="/mnt/lustre-client/lutao/huggingface"
-)
-
+from typing import List, Dict, Any, Optional
 
 def split_python_file_into_chunks(code: str):
     lines = code.split("\n")
@@ -108,38 +103,43 @@ def split_python_file_into_chunks(code: str):
     extract_chunk(tree)
     return chunks
 
-def embed_single(texts):
+def _tail_lines(text: Optional[str], n: int = 10) -> str:
+    if not text:
+        return ""
+    lines = text.splitlines()
+    return "\n".join(lines[-n:])
+
+def embed_single(texts, encoder: SentenceTransformer):
+    texts = _tail_lines(texts, n=5)
     return encoder.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
 
-def embed_multivector(text: str) -> np.ndarray:
+
+def embed_multivector(text: str, encoder: SentenceTransformer) -> np.ndarray:
     """
     输入：一段代码字符串
     输出：形状 [num_tokens, dim] 的 ndarray，可以直接当作 multivector
     """
     token_emb = encoder.encode(
         text,
-        output_value="token_embeddings",      # 关键：拿 token  embeddings
+        output_value="token_embeddings",
         convert_to_numpy=True,
         normalize_embeddings=True,
         show_progress_bar=False,
     )
-    # 有些版本会返回 (seq_len, dim)，有些是 (1, seq_len, dim)，这里统一处理一下
     if token_emb.ndim == 3:
         token_emb = token_emb[0]
     return token_emb  # shape: (num_tokens, 768)
 
-def embed_py2vecs(code: str):
+
+def embed_py2vecs(code: str, encoder: SentenceTransformer):
     """
     输入：triton 文件内容
-    输出：每个函数的代码字符串的嵌入向量
+    输出：每个函数语句块的嵌入向量
     """
     funcs = split_python_file_into_chunks(code)
     res_list = []
     for func in funcs:
         for stmt in func["code_stmts"]:
-            to_embed = func["full_def"] + "\n" + stmt['stmt_type'] + " " + stmt['stmt_code']
-            # print(to_embed)
-            res_list.append(embed_single(to_embed))
-    
+            to_embed = func["full_def"] + "\n" + stmt["stmt_type"] + " " + stmt["stmt_code"]
+            res_list.append(embed_single(to_embed, encoder))
     return res_list
-

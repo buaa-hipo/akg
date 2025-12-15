@@ -6,6 +6,7 @@ from enum import Enum, auto
 from ai_kernel_generator.database.embed import embed_single, embed_py2vecs
 import uuid
 from datetime import datetime
+from sentence_transformers import SentenceTransformer
 
 class CollectorState(Enum):
     """PointCollector 的状态机枚举。
@@ -35,6 +36,11 @@ class PointCollector:
         self.collection_name = collection_name
         self.points: List[models.PointStruct] = []
         self.task_info = task_info
+        
+        self.encoder = SentenceTransformer(
+            "microsoft/unixcoder-base",
+            cache_folder="/mnt/lustre-client/lutao/huggingface"
+        )
 
         # 状态相关字段
         self.state: CollectorState = CollectorState.START
@@ -68,12 +74,18 @@ class PointCollector:
         - error_description: 错误描述文本, 用于初筛
         """
         # 1) 单向量：错误描述
-        err_vec = embed_single(error_description)           # shape=(dim,)
+        err_vec = embed_single(error_description, self.encoder)           # shape=(dim,)
 
         # 2) multivec：多个文件的所有语句
         code_multivec = []
         for code in code_contexts:
-            code_multivec += embed_py2vecs(code)  # shape=(N, dim)
+            # m = self.encoder._first_module().auto_model
+            # print("max_position_embeddings:", m.config.max_position_embeddings)
+            # tok = self.encoder.tokenizer
+            # ids = tok(code_contexts[0], truncation=False, return_tensors="pt")["input_ids"]
+            # print("seq_len:", ids.shape[1], "max_token_id:", int(ids.max()))
+            
+            code_multivec += embed_py2vecs(code, self.encoder)  # shape=(N, dim)
 
         # 3) named_vec / named_multivec 结构
         vectors = {
@@ -149,11 +161,14 @@ class PointCollector:
                     if v:
                         payload[k] = v
 
-                self.insert_error_point(
-                    code_contexts=[self.old_code],          # only old_code is the key
-                    error_description=self.error_description,
-                    payload_extra=payload
-                )
+                try:     
+                    self.insert_error_point(
+                        code_contexts=[self.old_code],          # only old_code is the key
+                        error_description=self.error_description,
+                        payload_extra=payload
+                    )
+                except Exception as e:
+                    print("[PointCollector] Qdrant upsert error:", repr(e))                
 
                 # 本轮 episode 完结，清空挂起失败，进入 SUCCEED
                 self.error_description = None
@@ -182,12 +197,15 @@ class PointCollector:
                     v = self.task_info.get(k)
                     if v:
                         payload[k] = v
+                try:
+                    self.insert_error_point(
+                        code_contexts=[self.old_code],          # only old_code is the key
+                        error_description=self.error_description,
+                        payload_extra=payload
+                    )
+                except Exception as e:
+                    print("[PointCollector] Qdrant upsert error:", repr(e))
 
-                self.insert_error_point(
-                    code_contexts=[self.old_code],          # only old_code is the key
-                    error_description=self.error_description,
-                    payload_extra=payload
-                )
                 # 将当前失败作为新的挂起失败，继续等待下一次
                 self.error_description = error_stack
                 self.old_code = code
@@ -230,7 +248,7 @@ class PointCollector:
 
 if __name__ == "__main__":
     client = QdrantClient("http://localhost:6333")  
-    collection_name = "your_collection_name"
+    collection_name = "error_cases"
     client.recreate_collection(
         collection_name=collection_name,
         vectors_config={
