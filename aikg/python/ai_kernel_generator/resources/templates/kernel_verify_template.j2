@@ -390,6 +390,8 @@ def verify_implementations():
         """验证单个案例的公共逻辑"""
         {% if backend == "ascend" %}
         torch.npu.manual_seed(0)
+        {% else %}
+        torch.manual_seed(0)
         {% endif %}
         
         # 运行框架实现
@@ -456,6 +458,7 @@ def verify_implementations():
 
     # 获取初始化参数和输入数据
     init_params = get_init_inputs()
+    torch.manual_seed(0)
     framework_model = FrameworkModel(*init_params)
     
     {% if framework == "torch" %}
@@ -504,7 +507,7 @@ def verify_implementations():
     try:
         verify_result, framework_output = verify_case()
     except TimeoutError:
-        raise AssertionError(f"静态shape验证超时（{timeout}秒）")
+        raise AssertionError(f"静态shape验证超时（{{timeout}}秒）")
     {% endif %}
     
     # 构建验证成功信息

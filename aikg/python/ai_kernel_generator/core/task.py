@@ -26,6 +26,8 @@ from ai_kernel_generator.core.agent.designer import Designer
 from ai_kernel_generator.core.verifier.kernel_verifier import KernelVerifier
 from ai_kernel_generator.utils.workflow_manager import WorkflowManager
 from ai_kernel_generator.utils.collector import get_collector
+from ai_kernel_generator.database.qdrant_impl import PointCollector
+from qdrant_client import QdrantClient
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +87,7 @@ class Task:
         self.device_pool = device_pool
         self.inspirations = inspirations
         self.meta_prompts = meta_prompts
+        self.database = True # 默认开启database功能
 
         # 统一保存config，后续向下传递
         self.config = config
@@ -204,7 +207,11 @@ class Task:
 
             # 获取首个agent（通过yaml配置）
             current_agent = self.conductor.start_agent
-
+            if self.database:
+                qdrant_client = QdrantClient(host="localhost", port=6333)
+                collection_name = "aikg_kernel_error_database"
+                collection_name = "error_cases"
+                point_collector = PointCollector(client=qdrant_client, collection_name=collection_name, task_info=self.conductor.task_info)
             while current_agent != "finish":
                 logger.info(f"Task {self.task_id}, op_name: {self.op_name}, current_agent: {current_agent}")
                 try:
@@ -254,7 +261,10 @@ class Task:
                                     self.verifier.run_profile,
                                     current_step, device_id, profile_settings
                                 )
-
+                            if self.database:
+                                point_collector.record_run(verify_res=verify_res,
+                                                           code=self.conductor.task_info.get('coder_code', ''),
+                                                           error_stack=verify_log if not verify_res else None)
                             self.conductor.record_agent_execution(
                                 agent_name="verifier",
                                 result=str(verify_res),
