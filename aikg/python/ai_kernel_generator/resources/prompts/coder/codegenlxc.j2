@@ -1,3 +1,182 @@
+{% if error_log %}
+{% if sketch %}
+# Sketch 到 {{dsl}} 代码转换
+你是一个专业的AI领域 Kernel编写专家Agent，熟悉各种硬件后端、各种DSL的Kernel编写。
+
+现在你需要修改代码错误，并生成正确的{{dsl}}代码。
+
+当前的任务是需要你按照现有的 Sketch 和上次生成的错误信息，修改代码，生成对应的正确 {{dsl}} Kernel代码。
+{% else %}
+# 任务需求到 {{dsl}} 代码生成
+你是一个专业的AI领域 Kernel编写专家Agent，熟悉各种硬件后端、各种DSL的Kernel编写。
+当前的任务是需要你根据任务需求直接生成高效的 {{dsl}} Kernel代码。
+{% endif %}
+## 当前Agent任务描述
+### 算子名称
+{{ op_name }}
+### 前端框架
+{{ framework }}
+{% if coder_code %}
+### 这是上一次生成的代码
+{{ coder_code }}
+{% endif %}
+{% if error_log %}
+### 错误日志
+当前任务执行失败，请分析错误原因
+{{ error_log }}
+{% endif %}
+{% if llm_suggestions %}
+### 通过LLM分析给出的建议
+{{ llm_suggestions }}
+请参考上述建议，生成对应的{{dsl}}代码
+{% endif %}
+### 算子任务描述
+{{ task_desc }}
+
+{% if expert_suggestion_debug %}
+## 专家建议
+{{ expert_suggestion_debug }}
+{% endif %}
+
+{% if api_debug_docs %}
+## API 文档
+{{api_debug_docs}}
+请严格按照API文档的方式生成对应的代码
+{% endif %}
+
+{% if hardware_docs %}
+## {{arch_name}} 硬件描述
+{{ hardware_docs }}
+{% endif %}
+
+## 自动调优（autotune）
+### 自动调优（autotune）指导原则
+- 仅在 @triton.autotune(configs=[...]) 中定义搜索空间。
+- 禁止在 Python 端显式传 BLOCK_*。
+- 代表性配置（覆盖 TensorCore 关键点）如下：
+
+@triton.autotune(
+    configs=[
+        triton.Config({'BLOCK_M': bm, 'BLOCK_N': bn, 'BLOCK_K': bk},
+                      num_warps=nw, num_stages=ns)
+        for bm in [64, 128]
+        for bn in [64, 128]
+        for bk in [16, 32, 64]
+        for nw in [4, 8]
+        for ns in [2, 3, 4]
+    ],
+    key=['Mdim', 'Ndim', 'Kdim']
+)
+@triton.jit
+def {{ op_name }}_kernel(...,
+                         BLOCK_M: tl.constexpr,
+                         BLOCK_N: tl.constexpr,
+                         BLOCK_K: tl.constexpr):
+    ...
+
+- 性能优先级（从高到低）：
+  1. BLOCK_K 对齐 16（触发 TensorCore）
+  2. 访存连续性（coalesced load/store）
+  3. warp/stage 组合（num_warps∈{4,8}, num_stages∈{2,3,4}）
+  4. grid 填充完整：grid = lambda META: (triton.cdiv(Mdim, META['BLOCK_M']), triton.cdiv(Ndim, META['BLOCK_N']), 1)
+- 若无法确定最优配置，请保留上述模板并说明“可由 autotune 自动选择最佳配置”。
+
+###  命名与作用域 
+
+- 维度命名：N, C, H, W, (D)；输出通道 K；卷积核 R,S,(T)；输出空间 P,Q,(D_out)
+- GEMM 维命名：Mdim = N * (P*Q*[*D_out*]); Ndim = K; Kdim = C * (R*S*[*T*])
+- 输出通道绝对索引命名为 c_out_abs，在主循环外定义。
+- 启动端仅使用位置参数，避免关键字与 key 冲突。
+
+### 正确性与性能验证 
+
+- 所有 tl.load/tl.store 必须使用 mask。
+- 累加使用 fp32：tl.dot(a16, b16, out_dtype=tl.float32)。
+- BLOCK_K 为 16 的倍数时触发 TensorCore。
+- 对比 torch 参考实现验证 allclose(rtol=1e-1, atol=1e-1)。
+- 使用 triton.testing.do_bench 进行基准计时。
+
+### 回退策略 
+
+若 autotune 中位耗时 > 最快配置 ×1.2：
+- 回退到保守配置 (BLOCK_M,BLOCK_N,BLOCK_K,num_warps,num_stages)=(128,64,32,4,3)
+- 打印告警，不扩展搜索空间。
+----
+
+{% if sketch %}
+## 设计草图
+以下是为此算子设计的实现草图，请严格按照此草图生成{{dsl}}代码
+{{ sketch }}
+{% endif %}
+
+### 代码生成格式规范
+
+1. 参考《算子任务描述》中的 get_inputs() 及其调用方式，确保 {{ func_name }} 函数入参数量、含义、顺序正确；
+包含 `{{ op_name }}_kernel` 函数，以及 `{{ func_name }}` 启动函数。
+```python
+inputs = get_inputs()
+{% if "triton" in dsl %}
+# 运行Triton实现
+output = {{ func_name }}(*inputs)
+{% elif dsl == "swft" %}
+# 运行SWFT实现
+# 在公共流程内设置 kernel inputs
+{{ func_name }}(devide_id=device_id)
+# 在公共流程内获取 kernel outputs
+{% endif %}
+```
+
+2. 参考《算子任务描述》中的 get_init_inputs() 中的参数，要在{{ func_name }}函数内部以硬编码的常量形式体现：
+```
+def {{ func_name }}(...):
+  # 根据 get_init_inputs() 生成参数
+  param0 = ... # 参考《算子任务描述》中 get_init_inputs() 中获取的参数，硬编码于此
+  param1 = ... # 参考《算子任务描述》中 get_init_inputs() 中获取的参数，硬编码于此
+  ...
+  # 执行 kernel 函数
+  ...
+```
+
+{% if "triton" in dsl %}
+3. 含参数算子生成注意事项：
+请严格按照提供的“算子任务描述”中含参数算子初始化方法对参数进行初始化，包括使用相同的初始化函数和初始seed,注意请先生成CPU上的tensor，再转移到GPU上，例如
+weight = torch.randn(out_channels, in_channels, kernel_size, kernel_size, kernel_size, dtype=x.dtype).to(x.device), 同时注意初始化的顺序按照示例代码的顺序进行，因为torch.manual_seed(42)重置初始化seed后必须按照顺序初始化才能得到正确的结果
+
+例如卷积算子中：
+
+```
+self.conv3d = nn.Conv3d(in_channels, out_channels, (kernel_size, kernel_size, kernel_size), stride=stride, padding=padding, dilation=dilation, groups=groups, bias=bias)
+# Deterministic initialization for benchmarking
+with torch.no_grad():
+    torch.manual_seed(42)
+    for name in ['conv3d']:
+        attr = getattr(self, name, None)
+        if attr is None:
+            continue
+        if hasattr(attr, 'weight'):
+            attr.weight.copy_(torch.randn_like(attr.weight))
+            attr.weight.requires_grad = False
+            bias_attr = getattr(attr, 'bias', None)
+            if bias_attr is not None:
+                bias_attr.zero_()
+                bias_attr.requires_grad = False
+        elif isinstance(attr, torch.nn.Parameter):
+            attr.copy_(torch.randn_like(attr))
+            attr.requires_grad = False
+        elif isinstance(attr, torch.Tensor):
+            attr.copy_(torch.randn_like(attr))
+            attr.requires_grad = False
+```
+
+4. Triton 额外要求  
+- 禁止在 Python 端传递 BLOCK_M/N/K；  
+- grid 必须为 lambda META；  
+- K 维尾块使用掩码；  
+- bias 可为 None；  
+- 累加精度必须为 fp32。  
+{% endif %}
+
+{% else %}
 {% if sketch %}
 # Sketch 到 {{dsl}} 代码转换
 
@@ -31,11 +210,6 @@
 请严格按照API文档的方式生成对应的代码
 {% endif %}
 
-{% if dsl_examples %}
-## 示例代码-基础
-{{ dsl_examples }}
-请参考上述{{dsl}} 示例代码， 格式、import、调用函数方式等；确保生成可直接接入验证流程的{{ dsl }}代码
-{% endif %}
 
 ----
 
@@ -144,7 +318,6 @@ def {{ op_name }}_kernel(...,
 请参考上述建议，生成对应的{{dsl}}代码
 {% endif %}
 
-### 注意：如果存在错误日志，算子草图是根据错误日志进行修正后的版本
 
 
 ### 代码生成格式规范
@@ -215,6 +388,13 @@ with torch.no_grad():
 
 
 {% endif %}
+
+
+{% endif %}
+
+
+
+
 
 **请尽可能使用中文进行思考分析**
 

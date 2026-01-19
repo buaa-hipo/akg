@@ -179,7 +179,61 @@ class ResultProcessor:
             Tuple[Optional[str], str]: (决策的agent名称, suggestion信息)
         """
         try:
-            parsed_result = conductor_parser.parse(content)
+            
+            import json
+            import re
+
+            def extract_nested_json(text):
+                """
+                提取 ```json ... ``` 包裹的内容，支持内部嵌套 ``` 标记。
+                通过寻找最外层的 {} 来定位。
+                """
+                # 1. 找到所有 ```json 的起始位置
+                start_marker = "```json"
+                starts = [m.start() for m in re.finditer(re.escape(start_marker), text)]
+                
+                results = ""
+                if len(starts) > 1:
+                    logger.warning(f"Multiple ```json blocks found: {len(starts)}")
+                for start_idx in starts:
+                    # 从 ```json 之后开始寻找第一个 {
+                    json_start = text.find("{", start_idx)
+                    if json_start == -1:
+                        continue
+                        
+                    # 使用大括号计数法提取完整的 JSON 对象
+                    balance = 0
+                    json_end = -1
+                    
+                    for i in range(json_start, len(text)):
+                        char = text[i]
+                        if char == "{":
+                            balance += 1
+                        elif char == "}":
+                            balance -= 1
+                            if balance == 0:
+                                json_end = i + 1
+                                break
+                    
+                    if json_end != -1:
+                        json_str = text[json_start:json_end]
+                        try:
+                            # 验证是否为有效 JSON
+                            # 注意：LLM 生成的 JSON 内部字符串如果包含换行，可能需要 strict=False
+                            # obj = json.loads(json_str, strict=False)
+                            results += json_str
+                        except json.JSONDecodeError:
+                            pass
+                if results == "":
+                    # 如果没有找到任何有效的 JSON，返回原始文本以供调试
+                    return text
+                return "```json\n"+results+"```"
+
+
+            # 然后把这个 dict 交给你的 Pydantic 模型
+            filter_content = extract_nested_json(content)
+
+            parsed_result = conductor_parser.parse(filter_content)
             if parsed_result and hasattr(parsed_result, 'decision'):
                 decision = parsed_result.decision.strip().lower()
                 suggestion = getattr(parsed_result, 'suggestion', '')
@@ -194,7 +248,7 @@ class ResultProcessor:
                 logger.warning(f"LLM decision '{decision}' not in valid agents {valid_next_agents}")
                 return None, suggestion
             else:
-                logger.warning(f"Failed to parse LLM decision: {content}")
+                logger.warning(f"Failed to parse LLM decision: {filter_content}")
                 return None, ""
 
         except Exception as parse_error:

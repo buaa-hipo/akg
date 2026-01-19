@@ -111,7 +111,7 @@ def _tail_lines(text: Optional[str], n: int = 10) -> str:
 
 def embed_single(texts, encoder: SentenceTransformer):
     texts = _tail_lines(texts, n=5)
-    return encoder.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
+    return encoder.encode(texts, convert_to_numpy=True, normalize_embeddings=True, show_progress_bar=False)
 
 
 def embed_multivector(text: str, encoder: SentenceTransformer) -> np.ndarray:

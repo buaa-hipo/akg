@@ -17,7 +17,7 @@ import logging
 from abc import ABC
 from typing import Dict, Any
 
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 from ai_kernel_generator import get_project_root
 from ai_kernel_generator.core.llm.model_loader import create_model
@@ -310,7 +310,83 @@ class AgentBase(ABC):
                             print(chunk_reasoning, end='', flush=True)
                             reasoning_content += chunk_reasoning
                     response_metadata = ""
+            elif model_name.startswith("claude_"):
+                """
+                Claude 模型分支（基于 LangChain ChatAnthropic）
+                自动处理：
+                - 普通 Claude 模型（content: str）
+                - Claude Thinking 模型（content: list[ {type,text} ]）
+                - LangChain additional_kwargs["reasoning_content"]
+                """
 
+                # LangChain 统一调用方式
+                chain = prompt | model
+
+                if not aikg_stream_output:
+                    # ---------- 非流式 ----------
+                    raw_result = await chain.ainvoke(input)
+
+                    # 来自 LangChain 的基础字段
+                    raw_content = raw_result.content
+                    reasoning_content = raw_result.additional_kwargs.get("reasoning_content", "")
+
+                    content = ""
+
+                    # ========== 关键：处理 Claude Thinking 返回的 list ==========
+                    if isinstance(raw_content, list):
+                        # Claude-like structured output:
+                        # [
+                        #   {"type": "thinking", "text": "..."},
+                        #   {"type": "text", "text": "..."}
+                        # ]
+                        for block in raw_content:
+                            if not isinstance(block, dict):
+                                continue
+
+                            btype = block.get("type")
+                            btext = block.get("text", "")
+
+                            if btype in ("text", "final", None):
+                                content += btext
+                            elif btype in ("thinking", "reasoning", "chain_of_thought", "cot"):
+                                reasoning_content += btext
+
+                    else:
+                        # 普通 Claude（如 claude-3-opus），content 是纯字符串
+                        content = raw_content
+
+                else:
+                    # ---------- 流式处理 ----------
+                    content = ""
+                    reasoning_content = ""
+
+                    async for raw_result in chain.astream(input):
+                        raw_content = raw_result.content
+
+                        if isinstance(raw_content, list):
+                            for block in raw_content:
+                                if not isinstance(block, dict):
+                                    continue
+                                btype = block.get("type")
+                                btext = block.get("text", "")
+
+                                if btype in ("text", "final", None):
+                                    print(btext, end="", flush=True)
+                                    content += btext
+                                elif btype in ("thinking", "reasoning", "cot"):
+                                    print(btext, end="", flush=True)
+                                    reasoning_content += btext
+                        else:
+                            # 普通输出
+                            print(raw_content, end="", flush=True)
+                            content += raw_content
+
+                # 统一记录元信息
+                response_metadata = (
+                    f"response_metadata: {raw_result.response_metadata}\n"
+                    f"usage_metadata: {raw_result.usage_metadata}"
+                )
+                logger.info(response_metadata)
             else:
                 # 其他模型使用原来的chain方式
                 chain = prompt | model

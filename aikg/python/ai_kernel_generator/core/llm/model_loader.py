@@ -25,6 +25,8 @@ from langchain_ollama import ChatOllama
 from langchain_core.embeddings import Embeddings
 from langchain_community.embeddings import OpenAIEmbeddings
 import openai
+from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
 
 
 # 配置文件路径
@@ -38,7 +40,7 @@ OLLAMA_API_BASE_ENV = "AIKG_OLLAMA_API_BASE"
 VLLM_API_BASE_ENV = "AIKG_VLLM_API_BASE"
 
 
-def create_model(name: Optional[str] = None, config_path: Optional[str] = None) -> Union[ChatDeepSeek, ChatOllama]:
+def create_model(name: Optional[str] = None, config_path: Optional[str] = None) -> Union[ChatDeepSeek, ChatOllama, ChatAnthropic]:
     """
     根据预设名称创建模型
 
@@ -145,6 +147,94 @@ def create_model(name: Optional[str] = None, config_path: Optional[str] = None) 
         model.max_tokens = model_params.get("max_tokens", 8192)
         model.top_p = model_params.get("top_p", 0.95)
         model.other_params = model_params
+    elif name.startswith("claude_"):
+        # Claude模型
+        preset_config = config[name]
+        api_key_env = preset_config.get("api_key_env")
+        if not api_key_env:
+            raise ValueError(f"预设 '{name}' 未配置 api_key_env")
+        api_key = os.getenv(api_key_env)
+        if not api_key:
+            raise ValueError(f"API密钥未找到。请设置环境变量 {api_key_env}")
+        
+        model_params = {
+            k: v for k, v in preset_config.items()
+            if k not in ("api_key_env", "api_base")
+        }
+        # 记录
+        logger.info(f"创建Claude模型 '{name}': model={model_params.get('model')}, api_base={model_params.get('api_base', 'https://ai98.vip/v1')}")
+        masked = api_key[:8] + "*" * (len(api_key) - 12) + api_key[-4:] if len(api_key) > 12 else "***"
+        logger.info(f"  环境变量 {api_key_env}: {masked}")
+
+        # ChatAnthropic 接口参数
+        timeout = httpx.Timeout(60, read=60 * 10)
+        model = ChatAnthropic(
+            api_key=api_key,
+            base_url=model_params.get("api_base", "https://ai98.vip"),
+            # http_client=httpx.Client(verify=False, timeout=timeout),
+            # http_async_client=httpx.AsyncClient(verify=False, timeout=timeout),
+            **model_params
+        )
+    elif name.startswith("gpt_"):
+        # OpenAI模型
+        preset_config = config[name]
+        api_key_env = preset_config.get("api_key_env")
+        if not api_key_env:
+            raise ValueError(f"预设 '{name}' 未配置 api_key_env")
+        api_key = os.getenv(api_key_env)
+        if not api_key:
+            raise ValueError(f"API密钥未找到。请设置环境变量 {api_key_env}")
+        
+        model_params = {
+            k: v for k, v in preset_config.items()
+            if k not in ("api_key_env", "api_base")
+        }
+        # 记录
+        logger.info(f"创建OpenAI模型 '{name}': model={model_params.get('model')}, api_base={model_params.get('api_base', 'https://ai98.vip/v1')}")
+        masked = api_key[:8] + "*" * (len(api_key) - 12) + api_key[-4:] if len(api_key) > 12 else "***"
+        logger.info(f"  环境变量 {api_key_env}: {masked}")
+
+        # 设置20分钟的timeout
+        timeout = httpx.Timeout(60, read=60 * 10)
+        model = ChatOpenAI(
+            api_key=api_key,
+            base_url="https://ai98.vip/v1",
+            http_client=httpx.Client(verify=False, timeout=timeout),
+            http_async_client=httpx.AsyncClient(verify=False, timeout=timeout),
+            **model_params
+        )
+    elif name.startswith("gemini_"):
+        # Gemini模型 (通过OpenAI兼容接口)
+        preset_config = config[name]
+        api_key_env = preset_config.get("api_key_env")
+        if not api_key_env:
+            raise ValueError(f"预设 '{name}' 未配置 api_key_env")
+        api_key = os.getenv(api_key_env)
+        if not api_key:
+            raise ValueError(f"API密钥未找到。请设置环境变量 {api_key_env}")
+        
+        model_params = {
+            k: v for k, v in preset_config.items()
+            if k not in ("api_key_env", "api_base")
+        }
+        
+        # 获取 api_base，默认为 ai98.vip，允许配置文件覆盖
+        api_base = preset_config.get("api_base", "https://ai98.vip/v1")
+
+        # 记录
+        logger.info(f"创建Gemini模型 '{name}': model={model_params.get('model')}, api_base={api_base}")
+        masked = api_key[:8] + "*" * (len(api_key) - 12) + api_key[-4:] if len(api_key) > 12 else "***"
+        logger.info(f"  环境变量 {api_key_env}: {masked}")
+
+        # 设置20分钟的timeout
+        timeout = httpx.Timeout(60, read=60 * 10)
+        model = ChatOpenAI(
+            api_key=api_key,
+            base_url=api_base,
+            http_client=httpx.Client(verify=False, timeout=timeout),
+            http_async_client=httpx.AsyncClient(verify=False, timeout=timeout),
+            **model_params
+        )
 
     else:
         # 获取API密钥

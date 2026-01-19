@@ -1,6 +1,52 @@
 # 模型预设配置
 # 每个预设包含完整的模型参数
 
+# Gemini
+gemini_3_pro:
+  api_base: "https://ai98.vip/v1"
+  model: "gemini-3-pro-preview-11-2025"
+  api_key_env: "AIKG_ANTHROPIC_API_KEY"
+  max_tokens: 16384
+
+gemini_3_pro_thinking:
+  api_base: "https://ai98.vip/v1"
+  model: "gemini-3-pro-preview-11-2025-thinking"
+  api_key_env: "AIKG_ANTHROPIC_API_KEY"
+  max_tokens: 16384
+
+# OpenAI
+gpt_5_codex:
+  api_base: "https://ai98.vip/v1"
+  model: "gpt-5-codex"
+  api_key_env: "AIKG_ANTHROPIC_API_KEY"
+  max_tokens: 16384
+
+gpt_5_thinking_all:
+  api_base: "https://ai98.vip/v1"
+  model: "gpt-5-thinking-all"
+  api_key_env: "AIKG_ANTHROPIC_API_KEY"
+  max_tokens: 16384
+
+# Claude
+claude_sonnet_4_thinking:
+  api_base: "https://ai98.vip/v1"
+  model: "claude-sonnet-4-20250514-thinking"
+  api_key_env: "AIKG_ANTHROPIC_API_KEY"
+  max_tokens: 16384
+
+claude_haiku_4_5_thinking:
+  api_base: "https://ai98.vip/v1"
+  model: "claude-haiku-4-5-20251001-thinking"
+  api_key_env: "AIKG_ANTHROPIC_API_KEY"
+  max_tokens: 16384
+
+claude_sonnet_4_5_thinking_all:
+  api_base: "https://ai98.vip/v1"
+  model: "claude-sonnet-4-5-thinking-all"
+  api_key_env: "AIKG_ANTHROPIC_API_KEY"
+  max_tokens: 16384
+
+
 # 火山引擎 DeepSeek-R1
 volc_ds_r1_default:
   api_base: "https://ark.cn-beijing.volces.com/api/v3"
@@ -55,6 +101,34 @@ volc_doubao_1_5_thinking_pro:
   api_key_env: "AIKG_HUOSHAN_API_KEY"
 
 # 硅流平台的模型
+sflow_pro_moonshotai_kimi_k2_thinking:
+  api_base: "https://api.siliconflow.cn/v1/"
+  model: "Pro/moonshotai/Kimi-K2-Thinking"
+  api_key_env: "AIKG_SILICONFLOW_API_KEY"
+  max_tokens: 16384
+  temperature: 0.6
+  top_p: 0.9
+  frequency_penalty: 0.5
+  presence_penalty: 0.5
+
+sflow_moonshotai_kimi_k2_thinking:
+  api_base: "https://api.siliconflow.cn/v1/"
+  model: "moonshotai/Kimi-K2-Thinking"
+  api_key_env: "AIKG_SILICONFLOW_API_KEY"
+  max_tokens: 16384
+  temperature: 0.6
+  top_p: 0.9
+  frequency_penalty: 0.5
+  presence_penalty: 0.5
+
+
+sflow_qwen3_Coder_480B_A35B_Instruct:
+  api_base: "https://api.siliconflow.cn/v1/"
+  model: "Qwen/Qwen3-Coder-480B-A35B-Instruct"
+  api_key_env: "AIKG_SILICONFLOW_API_KEY"
+  max_tokens: 16384
+
+  
 sflow_qwen_7B_coder_default:
   api_base: "https://api.siliconflow.cn/v1/"
   model: "Qwen/Qwen2.5-Coder-7B-Instruct"
@@ -152,11 +226,11 @@ sflow_qwen_7b:
 
 # DeepSeek官方API
 deepseek_r1_default:
-  api_base: "https://api.deepseek.com/beta"
+  api_base: "https://api.deepseek.com/v1"
   model: "deepseek-reasoner"
   api_key_env: "AIKG_DEEPSEEK_API_KEY"
   max_tokens: 16384
-  temperature: 0.6
+  temperature: 0.1
   top_p: 0.9
   frequency_penalty: 0.5
   presence_penalty: 0.5
@@ -172,7 +246,7 @@ deepseek_r1_precise:
   presence_penalty: 0.5
 
 deepseek_v3_default:
-  api_base: "https://api.deepseek.com/beta"
+  api_base: "https://api.deepseek.com/v1"
   model: "deepseek-chat"
   api_key_env: "AIKG_DEEPSEEK_API_KEY"
   max_tokens: 8192
@@ -278,6 +352,16 @@ vllm_deepseek_v31_default:
 
 
 # MOONSHOT 模型配置
+moonshot_kimi_k2_thinking:
+  api_base: "https://api.moonshot.cn/v1"
+  model: "kimi-k2-thinking"
+  api_key_env: "AIKG_MOONSHOT_API_KEY"
+  max_tokens: 16384
+  temperature: 1.0
+
+
+
+
 # kimi-k2-0711-preview 模型，官方推荐 temperature: 0.6
 moonshot_kimi_k2:
   api_base: "https://api.moonshot.cn/v1"

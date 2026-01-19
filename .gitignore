@@ -71,3 +71,6 @@ mindspore/default_config.py
 
 aikg_logs/
 aikg/logs/
+
+implicit_gemm.triton/
+scripts/

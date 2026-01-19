@@ -17,6 +17,25 @@
 {{ dsl_basic_docs }}
 {% endif %}
 
+{% if sketch %}
+## 这是上一次生成的草图
+{{ sketch }}
+{% endif %}
+
+{% if error_log %}
+## 错误日志
+当前任务执行失败，请分析错误原因
+{{ error_log }}
+{% endif %}
+
+{% if llm_suggestions %}
+## 通过LLM分析给出的建议
+{{ llm_suggestions }}
+请参考上述建议，生成草图修改意见，并生成对应的算子草图sketch
+{% endif %}
+
+
+
 {% if inspirations %}
 ## 进化探索方案
 **重要须知**：下面是一些过往经验生成的草图，以及对应草图生成的代码的性能指标，请参考这些信息，分析可用的优化方案，并生成对应的优化后的草图

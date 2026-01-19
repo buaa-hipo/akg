@@ -88,6 +88,7 @@ class Task:
         self.inspirations = inspirations
         self.meta_prompts = meta_prompts
         self.database = True # 默认开启database功能
+        # self.database = False # 默认开启database功能
 
         # 统一保存config，后续向下传递
         self.config = config
@@ -208,9 +209,8 @@ class Task:
             # 获取首个agent（通过yaml配置）
             current_agent = self.conductor.start_agent
             if self.database:
-                qdrant_client = QdrantClient(host="localhost", port=6333)
-                collection_name = "aikg_kernel_error_database"
-                collection_name = "error_cases"
+                qdrant_client = QdrantClient(host="172.17.0.1", port=6333)
+                collection_name = "lxc_error_cases"
                 point_collector = PointCollector(client=qdrant_client, collection_name=collection_name, task_info=self.conductor.task_info)
             while current_agent != "finish":
                 logger.info(f"Task {self.task_id}, op_name: {self.op_name}, current_agent: {current_agent}")
@@ -230,7 +230,33 @@ class Task:
 
                     elif current_agent == "coder":
                         coder = self.get_agent('coder')
+                        flag = False
+                        if not self.conductor.task_info.get("designer_code"):
+                            flag = True
+                            # provide sketch file
+                            sketch_file_dir = "/workspace/aikg_zkg/aikg_logs/stdIR"
+                            sketch_file_path = ""
+                            for folder_name in os.listdir(sketch_file_dir):
+                                if self.conductor.task_info.get("op_name") == folder_name:
+                                    sketch_file_dir = os.path.join(sketch_file_dir, folder_name, "recorder")
+                                    break
+                                
+                            # print(sorted(os.listdir(sketch_file_dir)))
+                            for file_name in sorted(os.listdir(sketch_file_dir))[::-1]:
+                                if "designer" in file_name:
+                                    sketch_file_path = os.path.join(sketch_file_dir, file_name)
+                                    break
 
+                            if not sketch_file_path:
+                                logger.warning(f"Task {self.task_id} Warning: coder agent is running without designer_code.")
+
+                            with open(sketch_file_path, "r") as f:
+                                tmp_content = f.read()
+                                marker = "=== change_suggestion ==="
+                                if marker in tmp_content:
+                                    self.conductor.task_info["designer_code"] = tmp_content.split(marker)[0].strip()
+                                else:
+                                    self.conductor.task_info["designer_code"] = tmp_content
                         coder_res, coder_prompt, coder_reasoning = await coder.run(
                             task_info=self.conductor.task_info
                         )
@@ -241,6 +267,9 @@ class Task:
                             prompt=coder_prompt,
                             reasoning=coder_reasoning
                         )
+                        if flag:
+                            self.conductor.task_info["designer_code"] = ""  # reset
+                            
 
                     elif current_agent == "verifier":
                         device_id = await self.device_pool.acquire_device()

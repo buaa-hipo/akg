@@ -62,7 +62,7 @@ agent_model_config:
 log_dir: "/workspace/aikg_zkg/aikg_logs"
 
 # Workflow configuration
-workflow_config_path: "config/default_workflow.yaml"
+workflow_config_path: "config/default_workflow2.yaml"
 
 # Documentation directory configuration
 docs_dir:

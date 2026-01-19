@@ -77,7 +77,7 @@ async def run_torch_evolve_triton():
     config.arch = "a100"
 
     # 进化参数
-    config.max_rounds = 5
+    config.max_rounds = 1
     config.parallel_num = 1
 
     # 岛屿模型参数

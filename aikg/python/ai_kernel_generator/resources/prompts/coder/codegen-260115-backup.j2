@@ -63,6 +63,8 @@
 - **数据访问**: load/store → tl.load/tl.store with mask
 - **计算实现**: 自然语言描述 → tl.函数 (如tl.maximum, tl.dot)
 - **循环结构**: pipeline_range → for循环 with tl.cdiv
+- 输入布局：默认 NCHW（或在入口转换）
+- 隐式 GEMM 映射由外部 Python 提供（Mdim/Ndim/Kdim 在 kernel 外部计算）
 
 # ------------------ 自动调优（autotune） ------------------
 

@@ -82,7 +82,7 @@ async def run_torch_evolve_triton(args):
         config.elite_size = args.elite_size
         config.parent_selection_prob = args.parent_selection_prob
         config.device_list = [args.device]
-        config.config_path = str(Path(get_project_root()) / "config" / "vllm_triton_evolve_config.yaml")
+        config.config_path = str(Path(get_project_root()) / "config" / "vllm_triton_evolve_config2.yaml")
 
         config.op_name = op_name
         config.task_desc = task_desc

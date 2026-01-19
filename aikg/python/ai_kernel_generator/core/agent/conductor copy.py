@@ -251,13 +251,15 @@ class Conductor(AgentBase):
             input_data = {
                 'dsl': self.dsl,
                 'expert_suggestion': self.task_info.get('expert_suggestion', ''),
-                'expert_suggestion_debug': self.task_info.get('expert_suggestion_debug', ''),
                 'op_name': self.op_name,
                 'framework': self.framework,
                 'task_desc': self.task_desc,
                 'agent_name': current_agent,
                 'agent_result': agent_result,
-                'error_log': error_log if error_log else None,
+                'designer_code': designer_code,
+                # 'error_log': error_log[:5000] if error_log else None,
+                # 'error_log': error_log[-5000:] if error_log else None,  # 取最后5000字符，保留最新错误信息
+                'error_log': error_log if error_log else None,  # 取最后5000字符，保留最新错误信息
                 'valid_next_agents': ', '.join(sorted(valid_next_agents)),
                 'format_instructions': format_instructions,
             }

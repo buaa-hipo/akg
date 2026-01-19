@@ -1,17 +1,18 @@
-# Model preset configuration
-# agent_model_config:
-#   designer: deepseek_v3_default
-#   coder: deepseek_v3_default
-#   conductor: deepseek_v3_default
-#   api_generator: deepseek_v3_default
-#   sketch: deepseek_v3_default
+#Model preset configuration
 
 agent_model_config:
-  designer: deepseek_r1_default
-  coder: deepseek_r1_default
-  conductor: deepseek_r1_default
-  api_generator: deepseek_r1_default
-  sketch: deepseek_r1_default
+  designer: sflow_qwen3_Coder_480B_A35B_Instruct
+  coder: sflow_qwen3_Coder_480B_A35B_Instruct
+  conductor: sflow_qwen3_Coder_480B_A35B_Instruct
+  api_generator: sflow_qwen3_Coder_480B_A35B_Instruct
+  sketch: sflow_qwen3_Coder_480B_A35B_Instruct
+
+# agent_model_config:
+#   designer: deepseek_r1_default
+#   coder: deepseek_r1_default
+#   conductor: deepseek_r1_default
+#   api_generator: deepseek_r1_default
+#   sketch: deepseek_r1_default
 # agent_model_config:
 #   designer: vllm_deepseek_r1_default
 #   coder: vllm_deepseek_r1_default

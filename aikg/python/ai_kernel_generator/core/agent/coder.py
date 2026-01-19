@@ -22,6 +22,7 @@ from ai_kernel_generator.utils.hardware_utils import get_hardware_doc
 from ai_kernel_generator.utils.swft_docs_loader import get_swft_docs_content
 from ai_kernel_generator.core.agent.agent_base import AgentBase
 from ai_kernel_generator import get_project_root
+from ai_kernel_generator.core.extractor_torch import extract_kernelbench_shapes_dtypes
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +78,7 @@ class Coder(AgentBase):
             self.func_name = f"{self.op_name}_{self.dsl}_{self.framework}"
 
         # 初始化coder生成模板
-        self.coder_prompt = self.load_template("coder/codegen.j2")
+        self.coder_prompt = self.load_template("coder/codegenlxc.j2")
         self.api_docs_prompt = self.load_template("utils/api_gen_template.j2")
         self.user_examples_prompt = self.load_template("utils/examples_compression_template.j2")
 
@@ -91,13 +92,37 @@ class Coder(AgentBase):
             "format_instructions": self.format_instructions,
 
             "api_docs": self.load_doc("api/api.md"),
+            "api_debug_docs": self.load_doc("api/api_debug.md"),
             "dsl_basic_docs": self.load_doc("basic_docs.md"),
-            "expert_suggestion": self.load_doc("suggestion_docs.md"),
+            # "expert_suggestion": self.load_doc("suggestion_docs.md"),
+            "expert_suggestion": self.load_doc("suggestion_docs-260115-refine-for-conv.md"),
+            "expert_suggestion_debug": self.load_doc("suggestion_docsdebug.md"),
 
             # 可选参数
             "hardware_docs": get_hardware_doc(self.backend, self.arch),
             "arch_name": self.arch,
         }
+        
+        ## 添加详细算子信息
+        meta = extract_kernelbench_shapes_dtypes(self.base_doc["task_desc"], device="cuda")
+        add_info = ""
+        print("=== Inputs ===")
+        for x in meta["inputs"]:
+            print(x)
+            add_info += x.__str__() + "\n"
+
+        print("=== Parameters ===")
+        for k, v in meta["parameters"].items():
+            print(k, v)
+            add_info += f"{k}: {v}\n"
+
+        print("=== Graph tensors (node outputs) ===")
+        for t in meta["graph_tensors"][:20]:
+            print(t)
+            add_info += t.__str__() + "\n"
+
+        self.base_doc["task_desc"] += "\n\n\n## 算子参数信息\n" + add_info
+
 
     def _load_user_examples(self) -> str:
         """
@@ -374,7 +399,7 @@ class Coder(AgentBase):
                 "sketch": sketch,  # AUL代码作为sketch
                 "llm_suggestions": conductor_suggestion,  # Conductor建议
                 "coder_code": task_info.get('coder_code', ''),
-                "error_log": task_info.get('verifier_error', '')[:5000],
+                "error_log": task_info.get('verifier_error', ''),
                 "api_docs_suitable": api_docs_suitable,
                 "dsl_examples": dsl_examples
             }

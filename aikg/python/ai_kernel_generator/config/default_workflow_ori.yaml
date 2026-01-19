@@ -22,7 +22,8 @@ agent_info:
             mandatory: true
             field_description: "Complete executable code implementation"
   verifier:
-    possible_next_agent: [finish, coder]
+    # possible_next_agent: [finish, coder]
+      possible_next_agent: [finish, designer]
     # verifier is programmatic verification, returns structured data directly, no parser needed
 
 start_agent: designer
@@ -34,4 +35,4 @@ mandatory_llm_analysis: [verifier]
 limitation_info:
   # Required limitation settings
   required:
-    max_step: 7    # Maximum execution steps to prevent infinite loops
+    max_step: 20    # Maximum execution steps to prevent infinite loops

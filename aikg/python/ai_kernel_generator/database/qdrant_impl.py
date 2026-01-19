@@ -247,8 +247,8 @@ class PointCollector:
 
 
 if __name__ == "__main__":
-    client = QdrantClient("http://localhost:6333")  
-    collection_name = "error_cases"
+    client = QdrantClient("http://172.17.0.1:6333")  
+    collection_name = "lxc_error_cases"
     client.recreate_collection(
         collection_name=collection_name,
         vectors_config={

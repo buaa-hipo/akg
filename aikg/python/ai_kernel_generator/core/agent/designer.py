@@ -21,6 +21,7 @@ from ai_kernel_generator.utils.markdown_utils import extract_function_details
 from ai_kernel_generator.utils.hardware_utils import get_hardware_doc
 from ai_kernel_generator.utils.parser_registry import create_step_parser
 from ai_kernel_generator.database.database import Database
+from ai_kernel_generator.core.extractor_torch import extract_kernelbench_shapes_dtypes
 
 logger = logging.getLogger(__name__)
 
@@ -144,8 +145,28 @@ class Designer(AgentBase):
             "task_desc": remove_copyright_from_text(self.task_desc),
             "hardware_docs": get_hardware_doc(self.backend, self.arch),
             "format_instructions": self.format_instructions,
-            "sketch_guide": self.load_doc("SKETCH_DESIGN_v2.md")
+            "sketch_guide": self.load_doc("SKETCH_DESIGN_v2-260115-refine-for-conv.md")
         }
+
+        ## 添加详细算子信息
+        meta = extract_kernelbench_shapes_dtypes(self.base_doc["task_desc"], device="cuda")
+        add_info = ""
+        print("=== Inputs ===")
+        for x in meta["inputs"]:
+            print(x)
+            add_info += x.__str__() + "\n"
+
+        print("=== Parameters ===")
+        for k, v in meta["parameters"].items():
+            print(k, v)
+            add_info += f"{k}: {v}\n"
+
+        print("=== Graph tensors (node outputs) ===")
+        for t in meta["graph_tensors"][:20]:
+            print(t)
+            add_info += t.__str__() + "\n"
+
+        self.base_doc["task_desc"] += "\n\n\n## 算子参数信息\n" + add_info
 
         # 为SWFT实现类型添加支持的API
         if self.dsl == "swft":
@@ -167,6 +188,7 @@ class Designer(AgentBase):
         """
         # 从task_info中获取conductor的建议
         conductor_suggestion = task_info.get("conductor_suggestion", "")
+        sketch = task_info.get('designer_code', '')
 
         # 基于aul_base_doc构建输入，只更新变化的部分
         input_data = {
@@ -174,6 +196,8 @@ class Designer(AgentBase):
             "llm_suggestions": conductor_suggestion,  # Conductor建议
             "inspirations": get_inspirations(task_info.get('inspirations', [])),
             "meta_prompts": task_info.get("meta_prompts", ""),
+            "sketch": sketch,
+            "error_log": task_info.get('verifier_error', ''),  # 取最后500字符，保留最新错误信息
         }
 
         # 执行LLM生成前更新context，确保正确性

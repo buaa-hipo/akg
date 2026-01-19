@@ -1,0 +1,8 @@
+{
+  "execution_time_ms": 1.798143982887268,
+  "execution_time_us": 1798.143982887268,
+  "warmup_times": 5,
+  "run_times": 50,
+  "method": "triton_do_bench",
+  "shape_type": "static"
+}
