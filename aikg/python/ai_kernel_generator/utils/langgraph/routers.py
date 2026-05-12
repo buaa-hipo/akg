@@ -27,12 +27,12 @@ class RouterFactory:
     def create_filter_router(config: dict):
         """Filter 后的路由（决定是否进入 Coder）"""
         
-        async def route_after_designer(state: KernelGenState) -> str:
+        async def route_after_filter(state: KernelGenState) -> str:
             # 1. Filter 决定过滤 → Designer重新生成
             max_rounds = 3
             if state.get("filter_or_not"):
-                prune_count = int(state.get("filter_retry_count") or 0)
-                if prune_count < max_rounds:
+                filter_count = int(state.get("filter_retry_count") or 0)
+                if filter_count < max_rounds:
                     logger.info("Filter decided to filter, routing back to designer")
                     return "designer"
             
