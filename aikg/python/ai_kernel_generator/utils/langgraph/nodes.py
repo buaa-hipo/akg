@@ -122,17 +122,17 @@ class NodeFactory:
                 "code_feat": code_feat
             }
 						# 新加的代码
-            # 限制“剪枝回退”次数
-            current_retry = state.get("prune_retry_count", 0) or 0
+            # 限制“过滤重试IR”次数
+            current_retry = state.get("filter_retry_count", 0) or 0
 
-            if prun_or_not: # 需要剪枝
+            if filter_or_not: # 需要过滤
                 new_retry = current_retry + 1
                 updates.update({
                     "filter_retry_count": new_retry,
                     "last_filtered_sketch": designer_code,
                 })
                 logger.info(
-                    f"[Task {task_id}] Pruner 决定剪枝，重试次数：{new_retry}，剪枝代码片段: {designer_code[:100]}...",
+                    f"[Task {task_id}] Filter 决定过滤，重试次数：{new_retry}，剪枝代码片段: {designer_code[:100]}...",
                 )
             else:
                 updates.update({

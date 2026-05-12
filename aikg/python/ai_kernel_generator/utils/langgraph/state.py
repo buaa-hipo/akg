@@ -108,6 +108,6 @@ class KernelGenState(TypedDict, total=False):
     backend_api_doc: Optional[str]
     workflow_name: Optional[str]
 
-    # === Pruner 相关字段 ===
+    # === Filter 相关字段 ===
     last_filtered_sketch: Optional[str]
     filter_retry_count: int

@@ -329,7 +329,7 @@ class LangGraphTask:
             "optimize_history": self.optimize_history,
             "handwrite_suggestions": self.handwrite_suggestions,
             "last_filtered_sketch": "",
-            "prune_retry_count": 0,
+            "filter_retry_count": 0,
         }
         
         # 合并初始代码（如果有）
