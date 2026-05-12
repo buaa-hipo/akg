@@ -513,6 +513,15 @@ class TaskCreationProcessor:
                             parent_implementation = self.init_data['program_database'].get_island(island_idx).find_program_by_id(
                                 self.init_data['parent_candidate']
                             ).get_impl_info()
+                            # 查看【父代待选】的收敛情况
+                            early_stopping_reason = parent_implementation.get("early_stopping_reason", None)
+                            if early_stopping_reason:
+                                # Fallback 回退选出父代
+                                self.init_data['fallback_id'] = self.init_data['parent_candidate']
+                                logger.info(f"Fallback to get parent ... ")
+                                self.init_data['parent_candidate'] = self.init_data['program_database'].fallback_search_parent_candidate(
+                                    island_idx, self.init_data['parent_candidate']
+                                )
                         else:
                             raise ValueError("回退搜索停止，进化停止，没有可以进化的父代了！")
                 

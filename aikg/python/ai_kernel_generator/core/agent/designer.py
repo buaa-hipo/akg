@@ -247,6 +247,7 @@ class Designer(AgentBase):
             "enable_llm_range_inference": self.config.get("enable_llm_range_inference", False),  # LLM推理模式
             "enable_hint_mode": enable_hint_mode,  # Hint模式
             "has_hint": has_hint,  # 是否检测到hint
+            "filter_retry_count": task_info.get("filter_retry_count", 0), # 从task_info获取剪枝重试次数
             "inefficiency_programs": get_inefficiency_programs(task_info.get('inefficiency_programs', [])),  # 低效算子
             "last_filtered_sketch": task_info.get("last_filtered_sketch", ""), # 从task_info获取上一次草图
         }

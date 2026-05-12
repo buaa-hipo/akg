@@ -121,14 +121,24 @@ class NodeFactory:
                 "filter_or_not": filter_or_not,
                 "code_feat": code_feat
             }
-            # 新加的代码
-            if filter_or_not: # 需要过滤
-                updates["last_filtered_sketch"] = designer_code
+						# 新加的代码
+            # 限制“剪枝回退”次数
+            current_retry = state.get("prune_retry_count", 0) or 0
+
+            if prun_or_not: # 需要剪枝
+                new_retry = current_retry + 1
+                updates.update({
+                    "filter_retry_count": new_retry,
+                    "last_filtered_sketch": designer_code,
+                })
                 logger.info(
-                    f"[Task {task_id}] Filter 决定过滤，过滤代码片段: {designer_code[:100]}...",
+                    f"[Task {task_id}] Pruner 决定剪枝，重试次数：{new_retry}，剪枝代码片段: {designer_code[:100]}...",
                 )
             else:
-                updates["last_filtered_sketch"] = ""
+                updates.update({
+                    "filter_retry_count": 0,
+                    "last_filtered_sketch": "",
+                })
                 logger.info(
                     f"[Task {task_id}] Filter 决定保留，重试次数清零"
                 )
