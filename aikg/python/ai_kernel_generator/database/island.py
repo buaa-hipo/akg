@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import shutil
 import random
 from pathlib import Path
 
@@ -16,6 +17,7 @@ class Island(Database):
     def __init__(self, island_id: int, pd_path: str, database_config: dict, evolve_shortcut: list[str], evolve_database: str):
         self.evolve_database_suffix = evolve_database
         self.island_database_path = pd_path + '/island_' + str(island_id)
+        self.island_id = island_id
         os.makedirs(self.island_database_path, exist_ok=True)
         
         # maintain an online list
@@ -24,7 +26,7 @@ class Island(Database):
         # maintain an program list of current task round
         self.program_list_current_round: list[Program] = []
         
-        self.move_evolve_shortcut(evolve_shortcut, evolve_database)
+        self.move_evolve_shortcut(evolve_shortcut)
         
         self.basic_vector_store = EvolveVectorStore(
             database_path=self.island_database_path,
@@ -58,11 +60,17 @@ class Island(Database):
         
         logger.info(f'Island {island_id} was created, has {len(evolve_shortcut)} evolve shortcuts.\n')
     
-    def move_evolve_shortcut(self, evolve_shortcut: list[str], evolve_database: str):
+    def move_evolve_shortcut(self, evolve_shortcut: list[str]):
+        if len(evolve_shortcut) == 0:
+            return
+        checkpoint_parent_id = open(Path(self.get_checkpoint_path()) / "checkpoint.txt", "r").readline().strip()
         for es in evolve_shortcut:
-            src_dir = Path(self.island_database_path).parent.parent.parent / "evolve_database" / evolve_database / es
+            src_dir = Path(self.get_checkpoint_path()) / es
             if os.path.exists(src_dir) and os.path.isdir(src_dir):
                 des_dir = Path(self.island_database_path) / es
+                # 剔除检查点parent_id下面的算子（在上一次检查点后没有被完整记录）
+                if Program(str(src_dir)).get_parent_id() == checkpoint_parent_id:
+                    continue
                 os.system(f"cp -r {src_dir} {des_dir}")      
                 # maintain an online list
                 self.program_list.append(Program(str(des_dir)))    
@@ -109,11 +117,11 @@ class Island(Database):
         if file_path.exists():
             self.program_list.remove(Program(file_path))
 
-        # import os
-        # if os.environ.get('AIKG_DEBUG_MODE', False):
-        #     features = json.load(open('/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/debug_io/example_output/20c850f9/island_0/metadata.json', 'r'))
-        # else:
-        features = await self.extract_features(impl_code, framework_code, backend, arch, dsl, '', profile)
+        import os
+        if os.environ.get('AIKG_DEBUG_MODE', False):
+            features = json.load(open('/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/debug_io/example_output/20c850f9/island_0/metadata.json', 'r'))
+        else:
+            features = await self.extract_features('', impl_code, framework_code, backend, arch, dsl, '', profile)
             
         file_path.mkdir(parents=True, exist_ok=True)
         metadata_file = file_path / "metadata.json"
@@ -135,10 +143,11 @@ class Island(Database):
         # maintain an online list
         self.program_list.append(Program(file_path))
         
-        # add program to offline evolve database
+        # add program to offline evolve database (checkpoint)
         src_dir = file_path
-        des_dir = Path(self.island_database_path).parent.parent.parent / "evolve_database" / self.evolve_database_suffix
-        os.system(f"cp -rf {src_dir} {des_dir}")       
+        des_dir = Path(self.get_checkpoint_path()) / os.path.basename(src_dir)
+        shutil.copytree(src_dir, des_dir, dirs_exist_ok=True) 
+            
         
         logger.info(f"Operator implementation inserted successfully, file path: {file_path}")
     
@@ -147,7 +156,7 @@ class Island(Database):
         if program:
             impl_info = program.get_impl_info()
             impl_info["early_stopping_reason"] = reason
-            with open(program.file_dir / "impl_info.json", 'w', encoding='utf-8') as f:
+            with open(Path(program.file_dir) / "impl_info.json", 'w', encoding='utf-8') as f:
                 json.dump(impl_info, f, ensure_ascii=False, indent=2)
 
     def find_program_by_id(self, id: str) -> Program:
@@ -233,4 +242,11 @@ class Island(Database):
             # 去除有孩子节点的child node，因为其之前被探索过了已经（代表曾经回退过）
             return [c for c in child_list if self.has_child(c) is False]
             
-        
+    def get_inefficiency_programs(self) -> list[dict]:
+        # 低效算子是指 profile 中 speedup <= 1.1x 的算子
+        return [p.get_impl_info() for p in self.program_list if p.get_impl_info().get("profile", {}).get("speedup", 0) <= 1.1]
+
+    def get_checkpoint_path(self) -> str:
+        return str(
+            Path(self.island_database_path).parent.parent.parent / "evolve_database" / self.evolve_database_suffix / f"island_{self.island_id}"
+        )

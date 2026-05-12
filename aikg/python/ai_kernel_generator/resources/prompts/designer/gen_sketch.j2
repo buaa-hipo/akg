@@ -22,14 +22,14 @@ BLOCK_SIZE = 128, PARALLEL_NUM = 8
 ## 任务描述
 {{ task_desc }}
 
-{% if last_pruned_sketch %}
+{% if last_filtered_sketch %}
 ---
 
-## 上一次被剪枝的草图（已探索，不要重复）
+## 上一次被过滤的草图（已探索，不要重复）
 
-下面是上一次 Designer 生成且被 Pruner 判定为需要剪枝的草图片段（仅供参考，不要复制粘贴）：
+下面是上一次 Designer 生成且被 Filter 判定为需要过滤的草图片段（仅供参考，不要复制粘贴），也就是说该草图已经被探索过了，请生成其他更具有创新性的草图：
 ```sketch
-{{ last_pruned_sketch }}
+{{ last_filtered_sketch }}
 ```
 
 请基于当前任务描述与上述失败样本，生成明显不同且更有优化空间的新草图，尤其在：
@@ -38,6 +38,13 @@ BLOCK_SIZE = 128, PARALLEL_NUM = 8
 内存访问模式（coalesced / cache 友好）
 算子融合顺序 / 计算重排 中至少做出两处实质性改变。
 {% endif %}
+
+{% if inefficiency_programs %}
+
+{{ inefficiency_programs }}
+
+{% endif %}
+
 
 {% if enable_hint_mode and has_hint %}
 ---

@@ -25,7 +25,7 @@ class EvolveWorkflow(BaseWorkflow):
     """进化 Workflow
     
     Flow:
-        designer -> pruner -> coder_0 -> verifier_0 -> profiler_0 -> END
+        designer -> filter -> coder_0 -> verifier_0 -> profiler_0 -> END
             |_________|    -> coder_1 -> verifier_1 -> profiler_1 -> END
                            -> coder_n -> verifier_n -> profiler_n -> END
                                 ^            |
@@ -40,7 +40,7 @@ class EvolveWorkflow(BaseWorkflow):
         workflow = StateGraph(KernelGenState)
         
         # 检查必需的 Agent
-        required_agents = ['designer', 'pruner', 'coder', 'verifier']
+        required_agents = ['designer', 'filter', 'coder', 'verifier']
         for agent_name in required_agents:
             if agent_name not in self.agents:
                 raise RuntimeError(f"Required agent '{agent_name}' is not available. "
@@ -54,13 +54,13 @@ class EvolveWorkflow(BaseWorkflow):
             self.config,
             para_coge_gen_num
         )
-        pruner_node = NodeFactory.create_pruner_node(
-            self.agents['pruner']
+        filter_node = NodeFactory.create_filter_node(
+            self.agents['filter']
         )
         
         # 添加节点
         workflow.add_node("designer", designer_node)
-        workflow.add_node("pruner", pruner_node)
+        workflow.add_node("filter", filter_node)
         for i in range(para_coge_gen_num):
             coder_node = NodeFactory.create_coder_node(
                 self.agents['coder'], 
@@ -89,13 +89,13 @@ class EvolveWorkflow(BaseWorkflow):
             workflow.add_node(f"conductor_{i}", conductor_node)
         
         # 添加边
-        workflow.add_edge("designer", "pruner")
+        workflow.add_edge("designer", "filter")
         
-        # 条件边：pruner 后的路由（选择 designer 或者 coder）
-        pruner_router = RouterFactory.create_pruner_router(self.config)
+        # 条件边：filter 后的路由（选择 designer 或者 coder）
+        filter_router = RouterFactory.create_filter_router(self.config)
         workflow.add_conditional_edges(
-            "pruner",
-            pruner_router,
+            "filter",
+            filter_router,
             {
                 "designer": "designer",  # 需要重新设计
                 "coder": [ f"coder_{i}" for i in range(para_coge_gen_num) ]       # 直接进入编码
@@ -136,4 +136,3 @@ class EvolveWorkflow(BaseWorkflow):
         workflow.set_entry_point("designer")
         
         return workflow
-

@@ -25,7 +25,7 @@ class DesignerOnlyWorkflow(BaseWorkflow):
     """进化 Designer Only Workflow
     
     Flow:
-        designer -> pruner 
+        designer -> filter 
             |_________|    
     """
     
@@ -34,7 +34,7 @@ class DesignerOnlyWorkflow(BaseWorkflow):
         workflow = StateGraph(KernelGenState)
         
         # 检查必需的 Agent
-        required_agents = ['designer', 'pruner']
+        required_agents = ['designer', 'filter']
         for agent_name in required_agents:
             if agent_name not in self.agents:
                 raise RuntimeError(f"Required agent '{agent_name}' is not available. "
@@ -46,22 +46,22 @@ class DesignerOnlyWorkflow(BaseWorkflow):
             self.trace,
             self.config
         )
-        pruner_node = NodeFactory.create_pruner_node(
-            self.agents['pruner']
+        filter_node = NodeFactory.create_filter_node(
+            self.agents['filter']
         )
         
         # 添加节点
         workflow.add_node("designer", designer_node)
-        workflow.add_node("pruner", pruner_node)
+        workflow.add_node("filter", filter_node)
         
         # 添加边
-        workflow.add_edge("designer", "pruner")
+        workflow.add_edge("designer", "filter")
         
-        # 条件边：pruner 后的路由（选择 designer 或者 coder）
-        pruner_router = RouterFactory.create_pruner_router(self.config)
+        # 条件边：filter 后的路由（选择 designer 或者 coder）
+        filter_router = RouterFactory.create_filter_router(self.config)
         workflow.add_conditional_edges(
-            "pruner",
-            pruner_router,
+            "filter",
+            filter_router,
             {
                 "designer": "designer",  # 需要重新设计
                 "coder": END       # 直接进入编码  Designer Only 里直接结束
@@ -72,4 +72,3 @@ class DesignerOnlyWorkflow(BaseWorkflow):
         workflow.set_entry_point("designer")
         
         return workflow
-

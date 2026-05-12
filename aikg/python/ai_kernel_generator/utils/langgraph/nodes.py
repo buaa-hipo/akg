@@ -109,31 +109,41 @@ class NodeFactory:
         return designer_node
 
     @staticmethod
-    def create_pruner_node(pruner_instance):
-        async def pruner_node(state: KernelGenState) -> dict:
+    def create_filter_node(filter_instance):
+        async def filter_node(state: KernelGenState) -> dict:
             task_id = state.get('task_id', '0')
             op_name = state.get('op_name', 'unknown')
-            logger.info(f"Task {task_id}, op_name: {op_name}, current_agent: pruner")
+            logger.info(f"Task {task_id}, op_name: {op_name}, current_agent: filter")
             designer_code = state.get("designer_code", "")
-            prun_or_not, code_feat = await pruner_instance.run(designer_code)
+            filter_or_not, code_feat = await filter_instance.run(designer_code)
 
             updates = {
-                "prun_or_not": prun_or_not,
+                "filter_or_not": filter_or_not,
                 "code_feat": code_feat
             }
 						# 新加的代码
+            # 限制“剪枝回退”次数
+            current_retry = state.get("prune_retry_count", 0) or 0
+
             if prun_or_not: # 需要剪枝
-                updates["last_pruned_sketch"] = designer_code
+                new_retry = current_retry + 1
+                updates.update({
+                    "filter_retry_count": new_retry,
+                    "last_filtered_sketch": designer_code,
+                })
                 logger.info(
-                    f"[Task {task_id}] Pruner 决定剪枝，剪枝代码片段: {designer_code[:100]}...",
+                    f"[Task {task_id}] Pruner 决定剪枝，重试次数：{new_retry}，剪枝代码片段: {designer_code[:100]}...",
                 )
             else:
-                updates["last_pruned_sketch"] = ""
+                updates.update({
+                    "filter_retry_count": 0,
+                    "last_filtered_sketch": "",
+                })
                 logger.info(
-                    f"[Task {task_id}] Pruner 决定保留，重试次数清零"
+                    f"[Task {task_id}] Filter 决定保留，重试次数清零"
                 )
             return updates
-        return pruner_node
+        return filter_node
     
     @staticmethod
     def create_coder_node(coder_instance, trace_instance):

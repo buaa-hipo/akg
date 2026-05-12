@@ -37,6 +37,14 @@
 请参考上述{{dsl}} 示例代码， 格式、import、调用函数方式等；确保生成可直接接入验证流程的{{ dsl }}代码
 {% endif %}
 
+
+{% if triton_database_examples %}
+## Triton 代码库示例代码
+下面是一些人工手写的，能够用于实际生产应用的 Triton 算子代码，其计算方式、调度策略、访存特征等都和本次需要生成的 Triton 算子近似，供你参考。
+{{ triton_database_examples }}
+请参考上述 {{dsl}} 示例代码， 格式、import、调用函数方式等；确保生成可直接接入验证流程的{{ dsl }}代码
+{% endif %}
+
 ----
 
 ## 当前Agent任务描述

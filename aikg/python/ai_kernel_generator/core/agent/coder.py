@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+import random
 from typing import Tuple, List
 from pathlib import Path
 from ai_kernel_generator.database.coder_database import CoderDatabase
@@ -259,7 +260,7 @@ class Coder(AgentBase):
 
         return "\n".join(all_code)
 
-    async def _samples_database_examples(self):
+    async def _samples_database_examples(self, sketch: str, code_feat: str) -> str:
         """
         根据算子特征从Database检索并加载对应的DSL示例代码
 
@@ -302,21 +303,23 @@ class Coder(AgentBase):
             try:
                 db_system = CoderDatabase(config=self.config)
                 docs = await db_system.samples(
-                    output_content=["op_name", "impl_code"],
+                    output_content=["basic", "impl_code"],
+                    code_feat=code_feat,
                     framework_code=self.task_desc,
                     framework=self.framework,
                     backend=self.backend,
                     arch=self.arch,
                     dsl=self.dsl,
-                    sample_num=3
+                    sketch_code=sketch,
+                    sample_num=2
                     # sample_num=self.database_config["sample_num"]
                 )
 
                 for doc in docs:
-                    file_name = doc["op_name"] + f"_{self.dsl}.py"
-                    content = doc["impl_code"]
-                    all_code.append(f"# Python File: {file_name}\n{content}\n")
-
+                    file_name = doc.get("basic", {}).get("op_name", "") + f"_{self.dsl}.py"
+                    content = doc.get("impl_code", "")
+                    all_code.append(f"# Python File: {file_name}\n```\n{content}\n```\n")
+                logger.info(f"从离线 triton 数据库中匹配到 {len(all_code)} 份代码")
             except Exception as e:
                 logger.warning(f"从数据库获取示例代码失败: {e}")
 
@@ -405,7 +408,7 @@ class Coder(AgentBase):
             # 对于其他后端，使用父类的标准方法
             return super().load_doc(doc_path)
 
-    async def _select_optimal_examples(self) -> str:
+    async def _select_optimal_examples(self, sketch: str, code_feat: str) -> str:
         """
         智能选择最优的示例代码，避免prompt过长
 
@@ -417,7 +420,7 @@ class Coder(AgentBase):
         Returns:
             str: 选择后的示例代码
         """
-        database_examples = await self._samples_database_examples()
+        database_examples = await self._samples_database_examples(sketch, code_feat)
 
         # user_examples = self._load_user_examples()
         user_examples = ''
@@ -463,6 +466,7 @@ class Coder(AgentBase):
         try:
             # 从task_info中获取代码信息
             sketch = task_info.get('designer_code', '')
+            code_feat = task_info.get('code_feat', "")
 
             # 从task_info中获取conductor的建议
             conductor_suggestion = task_info.get('conductor_suggestion', '')
@@ -471,14 +475,13 @@ class Coder(AgentBase):
             api_docs_suitable = await self._generate_api_docs(sketch, conductor_suggestion, task_info)
 
             # 智能选择最优的示例代码
-            dsl_examples = await self._select_optimal_examples()
+            triton_database_examples = await self._select_optimal_examples(sketch, code_feat)
 
             # ============ Hint模式：参数范围已在sketch的"设计适用范围"注释中 ============
             enable_hint_mode = self.config.get("enable_hint_mode", False)
             has_space_config = "space_config_code" in task_info and task_info.get("space_config_code")
             has_param_space = enable_hint_mode and has_space_config
             
-            logger.info(f"coder dsl example {dsl_examples if get_parent_ncu_profile_result(task_info.get('inspirations', [])) == '' else ''}")
             # 基于base_doc构建输入，只更新变化的部分
             input_data = {
                 **self.base_doc,
@@ -489,7 +492,7 @@ class Coder(AgentBase):
                 "inspirations": get_inspirations(task_info.get('inspirations', [])),
                 "parent_ncu_profile_result": get_parent_ncu_profile_result(task_info.get('inspirations', [])),
                 "api_docs_suitable": api_docs_suitable,
-                "dsl_examples": dsl_examples if get_parent_ncu_profile_result(task_info.get('inspirations', [])) == "" else "",
+                "triton_database_examples": triton_database_examples,
                 "enable_llm_range_inference": self.config.get("enable_llm_range_inference", False),  # LLM推理模式
                 "enable_hint_mode": enable_hint_mode,  # Hint模式
                 "has_param_space": has_param_space,  # 是否有参数空间
@@ -515,7 +518,7 @@ class Coder(AgentBase):
                 standard_result = example_res['task_info']['coder_code']
                 formatted_prompt = example_res['task_info']['coder_prompt']
                 reasoning = example_res['task_info']['coder_reasoning']
-                return standard_result + ' ' * int(task_info.get("task_id", 1)), formatted_prompt, reasoning
+                return standard_result + '\n\n#  ' + str(random.randint(0, 1000000)), formatted_prompt, reasoning
 
             # 执行LLM生成
             return await self.run_llm(self.coder_prompt, input_data, self.model_config.get("coder", "default"))

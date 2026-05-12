@@ -40,7 +40,7 @@ class CrossEncoderSimilarity:
         
         return score
 
-class Pruner(AgentBase):
+class Filter(AgentBase):
     def __init__(
         self,
         op_name: str,
@@ -68,7 +68,7 @@ class Pruner(AgentBase):
         self.cross_encoder = CrossEncoderSimilarity()
 
         context = {
-            "agent_name": "pruner",
+            "agent_name": "filter",
             "dsl": self.dsl,
             "op_name": self.op_name,
             "backend": self.backend,
@@ -96,15 +96,15 @@ class Pruner(AgentBase):
         exist_code_ir = self.island.get_exist_code_ir()
         exist_code_feat = self.island.get_exist_code_feat()
         
-        # 使用CrossEncoder计算相似度，判断是否需要剪枝
+        # 使用CrossEncoder计算相似度，判断是否需要过滤
         # 计算 IR 和 特征 相似度分数
         ir_similarity_scores = [self.cross_encoder.calculate_similarity(designer_ir, exist_ir) for exist_ir in exist_code_ir]
         feat_similarity_scores = [self.cross_encoder.calculate_similarity(code_feat, exist_feat) for exist_feat in exist_code_feat]
         # 计算加权相似度分数，IR相似度权重为0.3，特征相似度权重为0.7
         weighted_similarity_scores = [0.3 * ir_score + 0.7 * feat_score for ir_score, feat_score in zip(ir_similarity_scores, feat_similarity_scores)]
-        # 如果存在相似度分数超过0.75，则认为生成的代码与历史代码过于相似，需要剪枝
-        prun_or_not = any(score > 0.75 for score in weighted_similarity_scores)
-        logger.info(f"Pruner Score of current IR: {weighted_similarity_scores}")
-        # prun_or_not = False  # TODO: 目前先关闭剪枝功能，后续根据实际效果调整
+        # 如果存在相似度分数超过0.75，则认为生成的代码与历史代码过于相似，需要过滤
+        filter_or_not = any(score > 0.75 for score in weighted_similarity_scores)
+        logger.info(f"Filter Score of current IR: {weighted_similarity_scores}")
+        # filter_or_not = False  # TODO: 目前先关闭过滤功能，后续根据实际效果调整
 
-        return prun_or_not, code_feat
+        return filter_or_not, code_feat

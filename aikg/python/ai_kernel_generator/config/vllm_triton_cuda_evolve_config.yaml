@@ -1,14 +1,14 @@
 # Model preset configuration
-# agent_model_config:
-#   designer: deepseek_r1_default
-#   coder: deepseek_r1_default
-#   profiler: deepseek_r1_default
-#   conductor: deepseek_r1_default
-#   feature_extractor: deepseek_r1_default
-#   api_generator: deepseek_r1_default
-#   sketch: deepseek_r1_default
-#   selector: deepseek_r1_default
-#   test_case_generator: deepseek_r1_default
+agent_model_config:
+  designer: deepseek_v4_flash
+  coder: deepseek_v4_flash
+  profiler: deepseek_v4_flash
+  conductor: deepseek_v4_flash
+  feature_extractor: deepseek_v4_flash
+  api_generator: deepseek_v4_flash
+  sketch: deepseek_v4_flash
+  selector: deepseek_v4_flash
+  test_case_generator: deepseek_v4_flash
 
 # agent_model_config:
 #   designer: smallai_o3
@@ -21,17 +21,17 @@
 #   selector: smallai_o3
 #   test_case_generator: smallai_o3
 
-agent_model_config:
-  designer: claude-sonnet-4-6
-  coder: claude-sonnet-4-6
-  profiler: claude-sonnet-4-6
-  conductor: claude-sonnet-4-6
-  feature_extractor: claude-sonnet-4-6
-  api_generator: claude-sonnet-4-6
-  sketch: claude-sonnet-4-6
-  selector: claude-sonnet-4-6
-  test_case_generator: claude-sonnet-4-6
-  default: claude-sonnet-4-6
+# agent_model_config:
+#   designer: deepseek_r1_default
+#   coder: claude-sonnet-4-6
+#   profiler: deepseek_r1_default
+#   conductor: deepseek_r1_default
+#   feature_extractor: deepseek_r1_default
+#   api_generator: deepseek_r1_default
+#   sketch: deepseek_r1_default
+#   selector: deepseek_r1_default
+#   test_case_generator: deepseek_r1_default
+#   default: deepseek_r1_default
 
 # Log configuration
 log_dir: "~/aikg_logs"
@@ -69,7 +69,7 @@ sampling_strategy: "mixed"  # Sampling strategy: random/boundary/mixed
 sampling_seed: 42  # Random seed for reproducibility
 
 # triton 数据库配置
-# database_config:
-#   enable_rag: True          # Whether to enable RAG functionality
-#   sample_num: 4             # Default sampling number
-#   embedding_device: "cpu"    # Embedding model device: cpu or cuda
+database_config:
+  enable_rag: True          # Whether to enable RAG functionality
+  sample_num: 4             # Default sampling number
+  embedding_device: "cpu"    # Embedding model device: cpu or cuda

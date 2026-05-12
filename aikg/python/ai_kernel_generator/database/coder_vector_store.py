@@ -30,7 +30,7 @@ class CoderVectorStore(VectorStore):
                  database_path: str, 
                  embedding_model_name: str = "GanymedeNil/text2vec-large-chinese", 
                  index_name: str = "coder_vector_store",
-                 features: List[str] = ["op_name", "op_type", "input_specs", "output_specs", "computation"],
+                 features: List[str] = ["basic", "schedule", "memory"],
                  config: dict = None):
         super().__init__(database_path, embedding_model_name, index_name, features, config)
     

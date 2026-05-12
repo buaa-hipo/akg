@@ -1,0 +1,29 @@
+{
+    "basic": {
+        "op_name": "min_reduction",
+        "op_type": "reduce",
+        "input_specs": "输入 input0: shape (128, 4096, 4095), dtype float32",
+        "output_specs": "输出 output0: shape (128, 4095), dtype float32",
+        "computation": "output0 = np.min(input0, axis=1)"
+    },
+    "schedule": {
+        "tiling": "dim1_0=256",
+        "parallel": "dim0 parallel 128, dim2 parallel 4095",
+        "pipeline": "num_stages=2, num_warps=4"
+    },
+    "memory": {
+        "flatten": false,
+        "multi_buffer": 1,
+        "vectorize": {
+            "enabled": true,
+            "vector_width": 256,
+            "axis": "dim1"
+        },
+        "layout": {
+            "input0": "row_major",
+            "output0": "row_major",
+            "special": "对于dim=0和dim=2的情况，输入张量会进行permute转置操作以统一归约逻辑"
+        },
+        "swizzle": "NONE"
+    }
+}

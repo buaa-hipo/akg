@@ -1,29 +1,28 @@
 {
     "basic": {
-        "op_name": "min_reduction",
-        "op_type": "reduce",
-        "input_specs": "输入 input0: shape (128, 4096, 4095), dtype float32",
-        "output_specs": "输出 output0: shape (128, 4095), dtype float32",
-        "computation": "output0 = np.min(input0, axis=1)"
+      "op_name": "matmul",
+      "op_type": "matmul",
+      "input_specs": "输入 input0: shape (8192, 2048), dtype float16; 输入 input1: shape (4096, 8192), dtype float16",
+      "output_specs": "输出 output0: shape (2048, 4096), dtype float32",
+      "computation": "output0 = np.matmul(np.transpose(input0), np.transpose(input1))"
     },
     "schedule": {
-        "tiling": "dim1_0=256",
-        "parallel": "dim0 parallel 128, dim2 parallel 4095",
-        "pipeline": "num_stages=2, num_warps=4"
+      "tiling": "dim0_0=128, dim1_0=256, dim2_0=64",
+      "parallel": "dim0 parallel 16, dim1 parallel 16",
+      "pipeline": false
     },
     "memory": {
-        "flatten": false,
-        "multi_buffer": 1,
-        "vectorize": {
-            "enabled": true,
-            "vector_width": 256,
-            "axis": "dim1"
-        },
-        "layout": {
-            "input0": "row_major",
-            "output0": "row_major",
-            "special": "对于dim=0和dim=2的情况，输入张量会进行permute转置操作以统一归约逻辑"
-        },
-        "swizzle": "NONE"
+      "flatten": false,
+      "multi_buffer": 1,
+      "vectorize": {
+        "enabled": true
+      },
+      "layout": {
+        "input0": "row_major",
+        "input1": "row_major",
+        "output0": "row_major",
+        "special": "两个输入均以转置分块方式加载，等效于加载A^T和B^T的瓦片"
+      },
+      "swizzle": "NONE"
     }
-}
+  }

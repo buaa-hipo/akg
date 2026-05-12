@@ -104,6 +104,17 @@ def get_inspirations(inspirations: List[dict]) -> str:
 
     return "\n".join(result_parts)
 
+def get_inefficiency_programs(inefficiency_programs: List[dict]) -> str:
+    if not inefficiency_programs:
+        return ""
+    prompt = "下面是之前进化生成过程中生成的一些低效的算子草图和Triton算子实现，请你发现并规避其中的低效操作来完成本次生成。\n\n"
+    for idx, program in enumerate(inefficiency_programs):
+        prompt += f"第 {idx+1} 个低效算子:\n"
+        prompt += f"算法草图:\n```\n{program.get('sketch', '')}\n```\n"
+        prompt += f"代码实现:\n```\n{program.get('impl_code', '')}\n```\n\n"
+        prompt += f"加速比: {program.get('profile', {}).get('speedup', 0.0)}x\n"
+    return prompt
+
 def get_parent_ncu_profile_result(inspirations: List[dict]) -> str:
     if not inspirations:
         return ""
@@ -236,7 +247,9 @@ class Designer(AgentBase):
             "enable_llm_range_inference": self.config.get("enable_llm_range_inference", False),  # LLM推理模式
             "enable_hint_mode": enable_hint_mode,  # Hint模式
             "has_hint": has_hint,  # 是否检测到hint
-            "last_pruned_sketch": task_info.get("last_pruned_sketch", ""), # 从task_info获取上一次草图
+            "filter_retry_count": task_info.get("filter_retry_count", 0), # 从task_info获取剪枝重试次数
+            "inefficiency_programs": get_inefficiency_programs(task_info.get('inefficiency_programs', [])),  # 低效算子
+            "last_filtered_sketch": task_info.get("last_filtered_sketch", ""), # 从task_info获取上一次草图
         }
 
         # 执行LLM生成前更新context，确保正确性

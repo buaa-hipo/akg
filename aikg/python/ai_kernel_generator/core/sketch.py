@@ -137,7 +137,7 @@ class Sketch(AgentBase):
                 example_res = json.load(
                     open('/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/debug_io/example_output/20c850f9/island_0/impl_1_1_1_0_5e9f6847.json', 'r'))
                 sketch_res = example_res['sketch']
-                return sketch_res, '', ''
+                return sketch_res
             
             # 获取大模型输出的完整信息
             content, _, _ = await self.run_llm(

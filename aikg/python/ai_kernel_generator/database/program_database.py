@@ -49,41 +49,39 @@ class ProgramDatabase():
             
             self.database_path = get_database_dir(database_path, evolve_config)
             database_config = evolve_config.config
-            # island_evolve_shortcut = self.evolve_from_shortcut(evolve_config.evolve_database, evolve_config.num_islands)
-            island_evolve_shortcut = [[] * evolve_config.num_islands] # disable evolve from checkpoint/shortcut
-            self.island_list = [Island(i, self.database_path, database_config, island_evolve_shortcut[i], evolve_config.evolve_database) for i in range(evolve_config.num_islands)]
+            self.evolve_database_suffix = evolve_config.evolve_database
+            self.island_evolve_shortcut = self.evolve_from_shortcut(evolve_config.num_islands)
+            # self.island_evolve_shortcut = [[] * evolve_config.num_islands] # disable evolve from checkpoint/shortcut
+            self.island_list: List[Island] = [Island(i, self.database_path, database_config, self.island_evolve_shortcut[i], self.evolve_database_suffix) for i in range(evolve_config.num_islands)]
             self.fallback_depth = 3    # 回退深度
             
             self._initialized = True
         finally:
             self.__class__._lock = False
     
-    def evolve_from_shortcut(self, evolve_database: str, num_islands: int) -> List[List[str]]:
-        shortcut_path = Path(get_project_root()).parent.parent / "evolve_database" / evolve_database
-        if not os.path.exists(shortcut_path):
-            os.makedirs(shortcut_path, exist_ok=True)
+    def evolve_from_shortcut(self, num_islands: int) -> List[List[str]]:
+        checkpoint_dir = DEFAULT_PROGRAM_DATABASE_PATH.parent / "evolve_database" / self.evolve_database_suffix
+        # 1. 检查checkpoint_dir 是否存在
+        if not os.path.exists(checkpoint_dir):
+            logger.info(f"检查点文件夹 {checkpoint_dir} 不存在")
             return [[] * num_islands]
-        all_seeds = [seed for seed in os.listdir(shortcut_path) if os.path.isdir(os.path.join(shortcut_path, seed)) and 'vector_store' not in seed]
-        if len(all_seeds) == 0:
-            return [[] * num_islands]
-        
-        random.shuffle(all_seeds)
-        n = len(all_seeds)
-        base_size = n // num_islands
-        remainder = n % num_islands
-        
+        # 2. 检查checkpoint_dir 下面的文件夹数量是否和 num_islands 一致
+        if len(os.listdir(checkpoint_dir)) != num_islands:
+            logger.error(f"checkpoint_dir 下面的文件夹数量 {len(os.listdir(checkpoint_dir))} 不等于 num_islands {num_islands}")
+            raise ValueError(f"checkpoint_dir 下面的文件夹数量 {len(os.listdir(checkpoint_dir))} 不等于 num_islands {num_islands}")
+        # 3. 从 checkpoint_dir/island_{idx} 下面的文件夹中读取 shortcut
         result = []
-        start = 0
-        for i in range(num_islands):
-            # 计算当前份的大小
-            current_size = base_size + (1 if i < remainder else 0)
-            
-            if current_size > 0:
-                result.append(all_seeds[start:start + current_size])
-            else:
-                result.append([])  # 不够分则返回空列表
-            start += current_size
-        
+        for island_idx in range(num_islands):
+            island_dir = checkpoint_dir / f"island_{island_idx}"
+            if not os.path.exists(island_dir):
+                logger.error(f"island_dir {island_dir} 不存在")
+                raise FileNotFoundError(f"island_dir {island_dir} 不存在")
+            shortcut = []
+            for file in os.listdir(island_dir):
+                # 如果file 是文件夹则添加到返回结果里
+                if os.path.isdir(os.path.join(island_dir, file)):
+                    shortcut.append(file)
+            result.append(shortcut)
         return result
         
     def get_island(self, island_idx: int) -> Island:
@@ -93,7 +91,7 @@ class ProgramDatabase():
         return len(self.island_list[island_idx].program_list) == 0
     
     def is_evolve_from_shortcut(self) -> bool:
-        return any(len(island.program_list) > 0 for island in self.island_list)
+        return any(len(shortcut) > 0 for shortcut in self.island_evolve_shortcut)
     
     def die_programs(self):
         # TODO
@@ -102,6 +100,29 @@ class ProgramDatabase():
     def migration(self):
         # TODO
         logger.info("pd migration")
+        
+    def sample_inefficiency_programs(self, sample_num: int=2) -> List[dict]:
+        # 低效算子是指 profile 中 speedup <= 1.1x 的算子
+        # 在**所有**岛屿范围内搜索 低效算子
+        # 如果数量不满足 k 个，则返回尽可能多
+        # 如果数量满足 k 个，则返回*随机* k 个低效算子
+        
+        # 1. 获取所有低效算子
+        inefficiency_programs = []
+        for island in self.island_list:
+            inefficiency_programs.extend(island.get_inefficiency_programs())
+        
+        # 2. 随机采样 k 个
+        random.shuffle(inefficiency_programs)
+        if len(inefficiency_programs) == 0:
+            logger.info(f"当前没有低效算子")
+            return []
+        elif len(inefficiency_programs) < sample_num:
+            logger.info(f"当前只有 {len(inefficiency_programs)} 个低效算子，只能采样 {len(inefficiency_programs)} 个")
+            return inefficiency_programs
+        logger.info(f"采样 {sample_num} 个低效算子")
+        return inefficiency_programs[:sample_num]
+        
     
     def sample_island_parent(self, island_idx: int):
         # TODO
@@ -166,7 +187,7 @@ class ProgramDatabase():
         # 若回退到的【父代候选】收敛，则持续回退；持续回退时，步长固定为1；
         while len(fallback_candidate_list) != 0:
             for candidate in fallback_candidate_list:
-                if self.get_island(island_idx).get_program_by_id(candidate).get_impl_info().get("early_stopping_reason", None):
+                if self.get_island(island_idx).find_program_by_id(candidate).get_impl_info().get("early_stopping_reason", None):
                     return candidate
             fallback_depth = 1
             fallback_candidate_list = self.island_list[island_idx].get_fallback_candidate_list(stop_program_id, fallback_depth)
@@ -220,6 +241,19 @@ class ProgramDatabase():
             op_temp += f"针对第{i+1}次迭代的优化方向建议如下，该优化方向会在下一次算子实现中被应用:\n" + op[2] + "\n"
             optimize_history_str += op_temp
         return optimize_history_str
+
+    def get_checkpoint_path(self, island_idx: int) -> str:
+        return self.island_list[island_idx].get_checkpoint_path()
+    
+    def save_checkpoint(self, island_idx: int, parent_id: str):
+        checkpoint_path = Path(self.get_checkpoint_path(island_idx)) / "checkpoint.txt"
+        with open(checkpoint_path, "w") as f:
+            f.write(parent_id)
+    
+    def get_checkpoint_parent_id(self, island_idx: int) -> str:
+        checkpoint_path = Path(self.get_checkpoint_path(island_idx)) / "checkpoint.txt"
+        with open(checkpoint_path, "r") as f:
+            return f.read().strip()
         
         
 def get_database_dir(database_dir: str='', evolve_config=None):

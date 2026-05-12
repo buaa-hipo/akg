@@ -24,20 +24,23 @@ class RouterFactory:
     """路由工厂：实现智能决策逻辑"""
     
     @staticmethod
-    def create_pruner_router(config: dict):
-        """Pruner 后的路由（决定是否进入 Coder）"""
+    def create_filter_router(config: dict):
+        """Filter 后的路由（决定是否进入 Coder）"""
         
         async def route_after_designer(state: KernelGenState) -> str:
-            # 1. Pruner 决定剪枝 → Designer重新生成
-            if state.get("prun_or_not"):
-                logger.info("Pruner decided to prune, routing back to designer")
-                return "designer"
+            # 1. Filter 决定过滤 → Designer重新生成
+            max_rounds = 3
+            if state.get("filter_or_not"):
+                prune_count = int(state.get("filter_retry_count") or 0)
+                if prune_count < max_rounds:
+                    logger.info("Filter decided to filter, routing back to designer")
+                    return "designer"
             
-            # 2. Pruner 决定保留 → 进入 Coder
-            logger.info("Pruner decided to keep, routing to coder")
+            # 2. Filter 决定保留 → 进入 Coder
+            logger.info("Filter decided to keep, routing to coder")
             return "coder"
         
-        return route_after_designer
+        return route_after_filter
     
     @staticmethod
     def create_verifier_router_with_conductor(config: dict):
@@ -265,4 +268,3 @@ class RouterFactory:
             )
         
         return smart_route
-

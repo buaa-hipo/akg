@@ -64,8 +64,8 @@ class KernelGenState(TypedDict, total=False):
     designer_prompt: Optional[str]
     designer_reasoning: Optional[str]
     
-    prun_or_not: Optional[bool]  # pruner 的决策结果
-    code_feat: Optional[str]  # pruner 中 feature extractor 的输出特征信息
+    filter_or_not: Optional[bool]  # filter 的决策结果
+    code_feat: Optional[str]  # filter 中 feature extractor 的输出特征信息
     
     coder_code: Optional[str]
     coder_prompt: Optional[str]
@@ -91,6 +91,7 @@ class KernelGenState(TypedDict, total=False):
     # === 历史记录（累积）===
     history_attempts: Annotated[List[Dict[str, Any]], add]
     agent_history: Annotated[List[str], add]
+    inefficiency_programs: Optional[List[dict[str, Any]]]
     
     # === Conductor 建议 ===
     conductor_suggestion: Optional[str]
@@ -108,4 +109,5 @@ class KernelGenState(TypedDict, total=False):
     workflow_name: Optional[str]
 
     # === Pruner 相关字段 ===
-    last_pruned_sketch: Optional[str]
+    last_filtered_sketch: Optional[str]
+    filter_retry_count: int

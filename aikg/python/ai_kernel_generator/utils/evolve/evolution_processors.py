@@ -296,6 +296,7 @@ class TaskCreationProcessor:
             
             # island_inspirations shape 岛屿数 岛内并行code数(对于designer来说就是1) 采样得到inspir数(0号是父节点)
             update_task_info = {
+                "inefficiency_programs": self.init_data.get('program_database').sample_inefficiency_programs(),
                 "parent_id": island_inspirations[island_idx][0][0]["id"] if len(island_inspirations[island_idx][0]) != 0 else None,
                 "fallback_id": self.init_data.get("fallback_id", ""),
             }
@@ -443,6 +444,7 @@ class TaskCreationProcessor:
         
         # 是否从检查点重启
         evolve_from_checkpoint = round_idx == 1 and self.init_data['program_database'].is_evolve_from_shortcut()
+        logger.info(f"当前 {'是' if evolve_from_checkpoint else '不是'} 从检查点开始进化")
         
         if round_idx == 1 and not evolve_from_checkpoint:
             # 第一轮：初始化空灵感
@@ -478,29 +480,14 @@ class TaskCreationProcessor:
                             )
                         if parent_implementation is None and stored_implementations:
                             parent_implementation = random.choice(stored_implementations)
-                    
-                    # parent_implementation = self.init_data['program_database'].sample_island_parent(island_idx)
-                    
-                    # 第一轮迭代
-                    # if not self.init_data['parent_candidate']:
-                    #     # 是否从检查点重启进化
-                    #     if self.init_data['program_database'].is_island_empty(island_idx):
-                    #         # 未从检查点重启，进化第一轮，无父代
-                    #         parent_implementation = None
-                    #     else:
-                    #         # 从检查点重启，需要从树结构中直接搜索出父代
-                    #         self.init_data['parent_candidate'] = self.init_data['program_database'].search_parent(island_idx)
-                    #         if self.init_data['parent_candidate'] is not None:
-                    #             parent_implementation = self.init_data['program_database'].get_island(island_idx).find_program_by_id(
-                    #                 self.init_data['parent_candidate']
-                    #             ).get_impl_info()
-                    #         else:
-                    #             raise ValueError("回退搜索停止，进化停止，没有可以进化的父代了！")                            
-                    # else:
+                            
                     if evolve_from_checkpoint:
-                        # 从检查点重启，需要从树结构中直接搜索出父代
-                        self.init_data['parent_candidate'] = self.init_data['program_database'].search_parent(island_idx)
+                        # 从检查点重启，需要从检查点文件中读取父代ID
+                        self.init_data['parent_candidate'] = self.init_data['program_database'].get_checkpoint_parent_id(island_idx)
                         if self.init_data['parent_candidate'] is not None:
+                            # 保存父代ID到检查点
+                            self.init_data['program_database'].save_checkpoint(island_idx, self.init_data['parent_candidate'])
+                           
                             parent_implementation = self.init_data['program_database'].get_island(island_idx).find_program_by_id(
                                 self.init_data['parent_candidate']
                             ).get_impl_info()
@@ -520,9 +507,21 @@ class TaskCreationProcessor:
                                 island_idx, self.init_data['parent_candidate']
                             )
                         if self.init_data['parent_candidate'] is not None:
+                            # 保存父代ID到检查点
+                            self.init_data['program_database'].save_checkpoint(island_idx, self.init_data['parent_candidate'])
+                            
                             parent_implementation = self.init_data['program_database'].get_island(island_idx).find_program_by_id(
                                 self.init_data['parent_candidate']
                             ).get_impl_info()
+                            # 查看【父代待选】的收敛情况
+                            early_stopping_reason = parent_implementation.get("early_stopping_reason", None)
+                            if early_stopping_reason:
+                                # Fallback 回退选出父代
+                                self.init_data['fallback_id'] = self.init_data['parent_candidate']
+                                logger.info(f"Fallback to get parent ... ")
+                                self.init_data['parent_candidate'] = self.init_data['program_database'].fallback_search_parent_candidate(
+                                    island_idx, self.init_data['parent_candidate']
+                                )
                         else:
                             raise ValueError("回退搜索停止，进化停止，没有可以进化的父代了！")
                 
@@ -1183,6 +1182,7 @@ class ResultProcessor:
                 "designer_code": task_info.get("designer_code", ""),
                 "designer_prompt": task_info.get("designer_prompt", ""),
                 "designer_reasoning": task_info.get("designer_reasoning", ""),
+                "code_feat": task_info.get("code_feat", ""),
             })
         
         return designer_data

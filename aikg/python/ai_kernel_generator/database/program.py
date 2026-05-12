@@ -4,7 +4,10 @@ from pathlib import Path
 
 class Program:
     def __init__(self, file_dir: str):
-        self.file_dir = file_dir
+        self.file_dir = str(file_dir)
+    
+    def get_parent_id(self) -> str:
+        return self.get_impl_info()["parent_id"]
     
     def get_impl_code(self) -> str:
         return ''.join(open(str(Path(self.file_dir) / 'impl_code.py'), 'r').readlines())

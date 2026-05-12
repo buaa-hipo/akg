@@ -114,11 +114,11 @@ topk = 2048
 def get_inputs():
     device = 'cuda'
     
-    q_index_fp8 = torch.load("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/flashinfer_dsa/q_index_fp8.pt").to(device)
-    k_index_cache_fp8 = torch.load("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/flashinfer_dsa/k_index_cache_fp8.pt").to(device)
-    weights = torch.load("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/flashinfer_dsa/weights.pt").to(device)
-    seq_lens = torch.load("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/flashinfer_dsa/seq_lens.pt").to(device)
-    block_table = torch.load("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/flashinfer_dsa/block_table.pt").to(device)
+    q_index_fp8 = torch.load("/mnt/lustre-client/zhangzizheng/AIKG/dsa_input/q_index_fp8.pt").to(device)
+    k_index_cache_fp8 = torch.load("/mnt/lustre-client/zhangzizheng/AIKG/dsa_input/k_index_cache_fp8.pt").to(device)
+    weights = torch.load("/mnt/lustre-client/zhangzizheng/AIKG/dsa_input/weights.pt").to(device)
+    seq_lens = torch.load("/mnt/lustre-client/zhangzizheng/AIKG/dsa_input/seq_lens.pt").to(device)
+    block_table = torch.load("/mnt/lustre-client/zhangzizheng/AIKG/dsa_input/block_table.pt").to(device)
     return [q_index_fp8, k_index_cache_fp8, weights, seq_lens, block_table]
 
 def get_init_inputs():

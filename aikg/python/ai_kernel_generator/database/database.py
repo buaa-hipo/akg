@@ -48,17 +48,20 @@ class Database():
         else:
             raise ValueError("config is required for Database")
 
-    async def extract_features(self,impl_code: str, framework_code:str, backend:str, arch: str, dsl:str, sketch_code: str,  profile=float('inf')):
+    async def extract_features(self, code_feat: str, impl_code: str, framework_code:str, backend:str, arch: str, dsl:str, sketch_code: str,  profile=float('inf')):  
         """提取任务特征"""
         # 特征提取
+        
         feature_extractor = FeatureExtractor(
             model_config=self.model_config,
             impl_code=impl_code,
             framework_code=framework_code,
+            dsl=dsl,
             sketch_code=sketch_code
         )
-        feature_content, _, _ = await feature_extractor.run()
-        parsed_content = feature_extractor.feature_parser.parse(feature_content)
+        if not code_feat:
+            code_feat, _, _ = await feature_extractor.run()
+        parsed_content = feature_extractor.feature_parser.parse(code_feat)
         extracted_features = {
             "basic": parsed_content.basic,
             "schedule": parsed_content.schedule,
@@ -74,8 +77,7 @@ class Database():
         res_dict = {"strategy_mode": strategy_mode}
         for content in output_content:
             if content == "impl_code" and dsl:
-                    # code_file_path = case_path / f"{dsl}.py"
-                    code_file_path = case_path / "triton.py"
+                    code_file_path = case_path / f"{dsl}.py"
                     if not code_file_path.exists():
                         raise FileNotFoundError(f"Code file not found: {code_file_path}")
                     with open(code_file_path, "r", encoding="utf-8") as f:
@@ -146,7 +148,7 @@ class Database():
                 break
 
         if need_extract_features:
-            features = await self.extract_features(impl_code, framework_code, backend, arch, dsl)
+            features = await self.extract_features('', impl_code, framework_code, backend, arch, dsl)
             features_str = ", ".join([f"{k}: {v}" for k, v in features.items()])
             feature_invariants = get_md5_hash(backend=backend, arch=arch, dsl=dsl)
 
@@ -169,8 +171,11 @@ class Database():
         """
         md5_hash = get_md5_hash(impl_code=impl_code, backend=backend, arch=arch, dsl=dsl)
         file_path = Path(self.database_path) / arch / dsl / md5_hash
+        if file_path.exists():
+            logger.info(f"Kernel implementation already exists: {file_path}")
+            return
 
-        features = await self.extract_features(impl_code, framework_code, backend, arch, dsl, '', profile)
+        features = await self.extract_features('', impl_code, framework_code, backend, arch, dsl, '', profile)
         file_path.mkdir(parents=True, exist_ok=True)
         metadata_file = file_path / "metadata.json"
         with open(metadata_file, "w", encoding="utf-8") as f:

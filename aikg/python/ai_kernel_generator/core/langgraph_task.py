@@ -18,7 +18,7 @@ import logging
 from typing import Optional, Dict, Any, Tuple
 from ai_kernel_generator.core.trace import Trace
 from ai_kernel_generator.core.agent.designer import Designer
-from ai_kernel_generator.core.agent.pruner import Pruner
+from ai_kernel_generator.core.agent.filter import Filter
 from ai_kernel_generator.core.agent.coder import Coder
 from ai_kernel_generator.core.verifier.kernel_verifier import KernelVerifier
 from ai_kernel_generator.core.async_pool.device_pool import DevicePool
@@ -205,9 +205,9 @@ class LangGraphTask:
             import traceback
             logger.debug(traceback.format_exc())
         
-        # Pruner
+        # Filter
         try:
-            agents['pruner'] = Pruner(
+            agents['filter'] = Filter(
                 op_name=self.op_name,
                 task_desc=self.task_desc,
                 dsl=self.dsl,
@@ -217,7 +217,7 @@ class LangGraphTask:
                 config=self.config
             )
         except Exception as e:
-            logger.warning(f"Failed to initialize Pruner: {e}")
+            logger.warning(f"Failed to initialize Filter: {e}")
             import traceback
             logger.debug(traceback.format_exc())
         
@@ -328,7 +328,8 @@ class LangGraphTask:
             "meta_prompts": self.meta_prompts,
             "optimize_history": self.optimize_history,
             "handwrite_suggestions": self.handwrite_suggestions,
-            "last_pruned_sketch": "",
+            "last_filtered_sketch": "",
+            "prune_retry_count": 0,
         }
         
         # 合并初始代码（如果有）
@@ -353,4 +354,3 @@ class LangGraphTask:
             return f"Workflow visualization saved to {output_path}"
         else:
             return WorkflowVisualizer.generate_mermaid(self.app)
-

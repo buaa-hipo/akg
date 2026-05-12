@@ -224,7 +224,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--evolve-database",
         type=str,
-        default="test",
+        default="test",     # 同样会被用作检查点路径名 evolve_database/xxx
     )
     
     args = parser.parse_args()
