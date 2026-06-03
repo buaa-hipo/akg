@@ -20,6 +20,12 @@ from ai_kernel_generator.core.trace import Trace
 from ai_kernel_generator.core.agent.designer import Designer
 from ai_kernel_generator.core.agent.filter import Filter
 from ai_kernel_generator.core.agent.coder import Coder
+from ai_kernel_generator.core.agent.shared_resources import (
+    get_required_agents_for_workflow,
+    get_coder_database,
+    get_cross_encoder,
+    warmup_for_workflow,
+)
 from ai_kernel_generator.core.verifier.kernel_verifier import KernelVerifier
 from ai_kernel_generator.core.async_pool.device_pool import DevicePool
 from ai_kernel_generator.core.utils import check_task_config, check_task_type
@@ -156,6 +162,9 @@ class LangGraphTask:
         # 初始化 Trace
         log_dir = config.get("log_dir")
         self.trace = Trace(op_name, task_id, log_dir)
+
+        # 进程级资源预热（按最终 workflow 需求选择）
+        warmup_for_workflow(self.workflow, self.config)
         
         # 初始化 Agents
         self.agents = self._init_agents()
@@ -188,6 +197,15 @@ class LangGraphTask:
         
         # 获取 parser 配置路径（从 config 中读取，或使用默认）
         parser_config_path = self.config.get("parser_config_path")
+        database_config = self.config.get("database_config", {})
+        shared_cross_encoder = None
+        shared_coder_database = None
+
+        required_agents = get_required_agents_for_workflow(self.workflow)
+        if "filter" in required_agents:
+            shared_cross_encoder = get_cross_encoder(config=self.config)
+        if "coder" in required_agents and database_config.get("enable_rag", False):
+            shared_coder_database = get_coder_database(config=self.config)
         
         # Designer
         try:
@@ -214,7 +232,8 @@ class LangGraphTask:
                 backend=self.backend,
                 arch=self.arch,
                 island=self.island,
-                config=self.config
+                config=self.config,
+                cross_encoder=shared_cross_encoder
             )
         except Exception as e:
             logger.warning(f"Failed to initialize Filter: {e}")
@@ -231,7 +250,8 @@ class LangGraphTask:
                 backend=self.backend,
                 arch=self.arch,
                 parser_config_path=parser_config_path,  # 使用新的配置
-                config=self.config
+                config=self.config,
+                coder_database=shared_coder_database
             )
         except Exception as e:
             logger.warning(f"Failed to initialize Coder: {e}")
@@ -282,8 +302,8 @@ class LangGraphTask:
             
             logger.info(f"Task {self.task_id}, op_name: {self.op_name}")
             
-            # 执行图
-            final_state = await self.app.ainvoke(initial_state)
+            # 执行图（增加递归限制）
+            final_state = await self.app.ainvoke(initial_state, config={"recursion_limit": 100})
             
             # 处理结果
             success = final_state.get("verifier_result", False)

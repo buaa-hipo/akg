@@ -394,6 +394,10 @@ class AgentBase(ABC):
                 # 其他模型使用原来的chain方式
                 chain = prompt | model
 
+                # 记录请求开始时间
+                import time
+                start_time = time.time()
+                
                 if not aikg_stream_output:
                     raw_result = await chain.ainvoke(input)
                     content = raw_result.content
@@ -410,20 +414,37 @@ class AgentBase(ABC):
                             reasoning_content += raw_result.additional_kwargs.get("reasoning_content")
                     print()
 
+                # 记录请求结束时间并计算总体时间
+                end_time = time.time()
+                total_time = end_time - start_time
+                
                 response_metadata = f"response_metadata: {raw_result.response_metadata}\n" + \
                     f"usage_metadata: {raw_result.usage_metadata}"
                 logger.info(response_metadata)
+                
+                # 计算输出输出吞吐速度和LLM请求时间
+                output_tokens =  raw_result.usage_metadata.get('output_tokens', 0)
+                output_throughput = output_tokens / total_time if total_time > 0 else 0.0
+                time_info = f"LLM Request Time: {total_time:.2f}s, " + \
+                    f"Output Throughput: {output_throughput:.2f} tokens/s"
+                logger.info(time_info)
+                
                 with open('tokens_cnt.csv', 'a') as tokens_cnt_f:
-                    line = f"{self.context.get('agent_name', 'null_name')},{raw_result.usage_metadata.get('input_tokens', '0')},{raw_result.usage_metadata.get('output_token_details', {}).get('reasoning', '0')},{raw_result.usage_metadata.get('output_tokens', '0')}\n"
+                    line = f"{self.context.get('agent_name', 'null_name')},{raw_result.usage_metadata.get('input_tokens', '0')},{raw_result.usage_metadata.get('output_token_details', {}).get('reasoning', '0')},{raw_result.usage_metadata.get('output_tokens', '0')},{total_time:.2f}\n"
                     tokens_cnt_f.write(line)
 
             logger.debug(f"LLM End:    [status] %s -- [model] %s",
                          self.context.get('agent_name', ''), effective_model_name)
 
             # 后处理：从 content 中剥离可能包含的 reasoning 片段
-            content, extracted_reasoning = self.split_think(content)
-            if extracted_reasoning:
-                reasoning_content = extracted_reasoning
+            if 'claude' in model_name:
+                raw_content = content
+                content = raw_content[1].get("text")
+                reasoning_content = raw_content[0].get("thinking")
+            else:
+                content, extracted_reasoning = self.split_think(content)
+                if extracted_reasoning:
+                    reasoning_content = extracted_reasoning
 
             if os.getenv("AIKG_DATA_COLLECT", "off").lower() == "on":
                 # 使用collector收集数据
@@ -451,6 +472,7 @@ class AgentBase(ABC):
 
             return content, formatted_prompt, reasoning_content
         except Exception as e:
+            import pdb;pdb.set_trace()
             logger.error(f"LLM Failed: [status] %s -- [model] %s -- [error] %s",
                          self.context.get('agent_name', ''), effective_model_name, e)
             logger.error(f"Exception in run_llm: {type(e).__name__}: {e}")

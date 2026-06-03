@@ -250,12 +250,10 @@ def create_model(name: Optional[str] = None, config_path: Optional[str] = None) 
         thinking_mode = model_params.pop("thinking_mode", None)
         extra_body = model_params.pop("extra_body", None)
         extra_body = _build_thinking_extra_body(thinking_mode, extra_body)
-        if extra_body:
-            model_params["extra_body"] = extra_body
 
         # 记录连接信息
         logger.info(
-            f"创建Langchain模型 '{name}': api_base={model_params.get('api_base', 'N/A')}, model={model_params.get('model', 'N/A')}")
+            f"创建Langchain模型 '{name}': api_base={model_params.get('anthropic_api_url', 'N/A')}, model={model_params.get('model', 'N/A')}")
         # 显示环境变量信息
         if api_key_env in os.environ:
             api_key_value = os.environ[api_key_env]
@@ -267,9 +265,14 @@ def create_model(name: Optional[str] = None, config_path: Optional[str] = None) 
             logger.info(f"  环境变量 {api_key_env}: 未设置")
 
         timeout = httpx.Timeout(60, read=60 * 10)
-        # 创建DeepSeek模型实例
+        
+        thinking = extra_body['thinking']
+        output_config = extra_body['output_config']
+        # 创建Claude模型实例
         model = ChatAnthropic(
             api_key=api_key,
+            thinking=thinking,
+            output_config=output_config,
             **model_params
         )
     else:

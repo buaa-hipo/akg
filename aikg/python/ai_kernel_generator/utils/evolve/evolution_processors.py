@@ -106,7 +106,7 @@ class EvolveRuntimeConfig:
         # 设置存储目录
         random_hash = uuid.uuid4().hex[:8]
         self.storage_dir = os.path.expanduser(
-            f"~/aikg_evolve/{self.op_name}_{self.dsl}_{self.framework}_{self.backend}_{self.arch}/{random_hash}/"
+            f"/ssd/zhangzizheng/aikg_evolve/{self.op_name}_{self.dsl}_{self.framework}_{self.backend}_{self.arch}/{random_hash}/"
         )
         os.makedirs(self.storage_dir, exist_ok=True)
         
@@ -241,7 +241,8 @@ class TaskCreationProcessor:
         round_idx: int,
         device_pool,
         task_pool,
-        round_implementations: List[Dict[str, Any]] = None
+        round_implementations: List[Dict[str, Any]] = None,
+        evolve_from_checkpoint: bool = False
     ) -> List[AIKGTask]:
         """为当前轮次创建 Designer 任务
         
@@ -259,7 +260,7 @@ class TaskCreationProcessor:
         all_tasks = []
         task_mapping = []
         
-        inspirations_data = self._prepare_island_inspirations(round_idx, round_implementations)
+        inspirations_data = self._prepare_island_inspirations(round_idx, round_implementations, evolve_from_checkpoint)
         
         island_inspirations = inspirations_data['inspirations']
         island_meta_prompts = inspirations_data['meta_prompts']
@@ -314,7 +315,8 @@ class TaskCreationProcessor:
         task_pool,
         designer_data: list[dict],
         round_implementations: List[Dict[str, Any]] = None,
-        para_code_num: int = 3
+        para_code_num: int = 3,
+        evolve_from_checkpoint: bool = False
     ) -> List[AIKGTask]:
         """为当前轮次创建并行任务（Coder/Verifier/Profiler
         
@@ -329,7 +331,7 @@ class TaskCreationProcessor:
         all_tasks = []
         task_mapping = []
         
-        inspirations_data = self._prepare_island_inspirations(round_idx, round_implementations)
+        inspirations_data = self._prepare_island_inspirations(round_idx, round_implementations, evolve_from_checkpoint)
         
         island_inspirations = inspirations_data['inspirations']
         island_meta_prompts = inspirations_data['meta_prompts']
@@ -435,7 +437,8 @@ class TaskCreationProcessor:
     def _prepare_island_inspirations(
         self,
         round_idx: int,
-        round_implementations: List[Dict[str, Any]]
+        round_implementations: List[Dict[str, Any]],
+        evolve_from_checkpoint: bool = False
     ) -> Dict[str, Any]:
         """为岛屿模式准备灵感数据"""
         island_inspirations = [[] for _ in range(self.config.num_islands)]
@@ -443,7 +446,6 @@ class TaskCreationProcessor:
         island_handwrite_suggestions = [[] for _ in range(self.config.num_islands)]
         
         # 是否从检查点重启
-        evolve_from_checkpoint = round_idx == 1 and self.init_data['program_database'].is_evolve_from_shortcut()
         logger.info(f"当前 {'是' if evolve_from_checkpoint else '不是'} 从检查点开始进化")
         
         if round_idx == 1 and not evolve_from_checkpoint:
@@ -480,13 +482,13 @@ class TaskCreationProcessor:
                             )
                         if parent_implementation is None and stored_implementations:
                             parent_implementation = random.choice(stored_implementations)
-                            
+                    # import pdb;pdb.set_trace()
                     if evolve_from_checkpoint:
                         # 从检查点重启，需要从检查点文件中读取父代ID
                         self.init_data['parent_candidate'] = self.init_data['program_database'].get_checkpoint_parent_id(island_idx)
                         if self.init_data['parent_candidate'] is not None:
                             # 保存父代ID到检查点
-                            self.init_data['program_database'].save_checkpoint(island_idx, self.init_data['parent_candidate'])
+                            self.init_data['program_database'].save_checkpoint(island_idx, self.init_data['parent_candidate'], round_idx)
                            
                             parent_implementation = self.init_data['program_database'].get_island(island_idx).find_program_by_id(
                                 self.init_data['parent_candidate']
@@ -508,7 +510,7 @@ class TaskCreationProcessor:
                             )
                         if self.init_data['parent_candidate'] is not None:
                             # 保存父代ID到检查点
-                            self.init_data['program_database'].save_checkpoint(island_idx, self.init_data['parent_candidate'])
+                            self.init_data['program_database'].save_checkpoint(island_idx, self.init_data['parent_candidate'], round_idx)
                             
                             parent_implementation = self.init_data['program_database'].get_island(island_idx).find_program_by_id(
                                 self.init_data['parent_candidate']
@@ -856,18 +858,66 @@ class ResultProcessor:
                 if sketch_tasks:
                     sketch_results = await task_pool.wait_all()
                     task_pool.tasks.clear()
-                    
+
+                    # 并行提取特征（失败时回退到 insert 阶段重提取）
+                    feature_tasks = []
+                    feature_task_ids = []
+                    island_db = self.init_data['program_database'].get_island(island_idx)
                     for i, impl_info in enumerate(sketch_tasks):
                         if impl_info['impl_code'] and i < len(sketch_results):
                             sketch_content = sketch_results[i]
                             impl_info['sketch'] = sketch_content if not isinstance(sketch_content, Exception) else ""
-                        
+                        if impl_info['impl_code']:
+                            feature_task = partial(
+                                island_db.extract_features,
+                                "",
+                                impl_info['impl_code'],
+                                impl_info['framework_code'],
+                                impl_info['backend'],
+                                impl_info['arch'],
+                                impl_info['dsl'],
+                                impl_info.get('sketch', ''),
+                                impl_info['profile']
+                            )
+                            task_pool.create_task(feature_task)
+                            feature_tasks.append(impl_info)
+                            feature_task_ids.append(impl_info['id'])
+                    feature_results = []
+                    if feature_tasks:
+                        try:
+                            feature_results = await task_pool.wait_all()
+                        except Exception as e:
+                            logger.warning(f"Parallel feature extraction failed, fallback to insert-time extraction: {e}")
+                            feature_results = []
+                        finally:
+                            task_pool.tasks.clear()
+
+                    precomputed_features = {}
+                    for i, impl_id in enumerate(feature_task_ids):
+                        if i >= len(feature_results):
+                            continue
+                        feat = feature_results[i]
+                        if isinstance(feat, Exception):
+                            logger.warning(f"Feature extraction failed for impl_id={impl_id}, fallback to insert-time extraction")
+                            continue
+                        precomputed_features[impl_id] = feat
+                    
+                    for i, impl_info in enumerate(sketch_tasks):
                         all_implementations.append(impl_info)
                         
                         # 保存到岛屿存储
                         save_implementation(impl_info, self.config.islands_storage_dirs[island_idx])
-                        await self.init_data['program_database'].insert_island(island_idx, impl_info['impl_code'], impl_info['framework_code'], impl_info['profile'],
-                                                                            impl_info['backend'], impl_info['arch'], impl_info['dsl'], impl_info)
+                        await self.init_data['program_database'].insert_island(
+                            island_idx,
+                            impl_info['impl_code'],
+                            impl_info['framework_code'],
+                            impl_info['profile'],
+                            impl_info['backend'],
+                            impl_info['arch'],
+                            impl_info['dsl'],
+                            impl_info,
+                            features=precomputed_features.get(impl_info['id'])
+                        )
                         
                         # 添加到全局最佳实现列表
                         self.init_data['best_implementations'].append(impl_info)

@@ -41,8 +41,13 @@ class Profiler(AgentBase):
         super().__init__(context=context)
 
         # 初始化解析器
-        self.feature_parser = ParserFactory.get_feature_parser()
-        self.format_instructions = self.feature_parser.get_format_instructions()
+        from ai_kernel_generator.utils.parser_loader import create_agent_parser
+        self.code_parser = create_agent_parser("profiler")
+        if not self.code_parser:
+            raise ValueError(
+                "Failed to create Profiler parser. Please check your parser_config.yaml configuration."
+            )
+        self.format_instructions = self.code_parser.get_format_instructions()
 
         # 初始化模板
         self.gen_profile_suggestion_template = self.load_template("profiler/gen_profile_suggestion.j2")
@@ -54,6 +59,7 @@ class Profiler(AgentBase):
             "impl_code": self.impl_code,
             "dsl": self.dsl,
             "ncu_profile_res": self.ncu_json.strip(),
+            "format_instructions": self.format_instructions,
         }
 
     async def run(self) -> Tuple[str, str, str]:
@@ -70,7 +76,23 @@ class Profiler(AgentBase):
         # DEBUG MODE
         import os
         if os.environ.get("AIKG_DEBUG_MODE", False):
-            example_res = ''.join(open('/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/debug_io/example_output/ncu_profile_res.txt', 'r').readlines())
-            return example_res, '', ''
+            llm_content = ''.join(open('/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/debug_io/example_output/ncu_profile_res.txt', 'r').readlines())
+            formatted_prompt = ''
+            reasoning = ''
         else:
-            return await self.run_llm(self.gen_profile_suggestion_template, self.gen_profile_suggestion_input, self.model_config.get("profiler", "deepseek_r1_default"))
+            llm_content, formatted_prompt, reasoning = await self.run_llm(self.gen_profile_suggestion_template, self.gen_profile_suggestion_input, self.model_config.get("profiler", "deepseek_r1_default"))
+        
+        try:
+            if self.code_parser:
+                parsed_result = ParserFactory.robust_parse(llm_content, self.code_parser)
+                if parsed_result:
+                    llm_content = getattr(parsed_result, 'code', llm_content)
+        except Exception as e:
+            logger.warning(f"Profiler LLM 解析 parser 失败 {e}，使用原始输出")
+
+        # import json
+        # suggestion = json.loads(llm_content).get("code", "No LLM profile suggestion.")
+        # if suggestion == "No LLM profile suggestion.":
+        #     logger.warning("Profiler LLM has no suggestions")
+        return llm_content, formatted_prompt, reasoning
+        # return await self.run_llm(self.gen_profile_suggestion_template, self.gen_profile_suggestion_input, self.model_config.get("profiler", "deepseek_r1_default"))

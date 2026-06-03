@@ -16,12 +16,12 @@ import logging
 import random
 from typing import Tuple, List
 from pathlib import Path
-from ai_kernel_generator.database.coder_database import CoderDatabase
 from ai_kernel_generator.utils.common_utils import ParserFactory, remove_copyright_from_text
 from ai_kernel_generator.utils.parser_registry import create_step_parser
 from ai_kernel_generator.utils.hardware_utils import get_hardware_doc
 from ai_kernel_generator.utils.swft_docs_loader import get_swft_docs_content
 from ai_kernel_generator.core.agent.agent_base import AgentBase
+from ai_kernel_generator.core.agent.shared_resources import get_coder_database
 from ai_kernel_generator import get_project_root
 
 logger = logging.getLogger(__name__)
@@ -123,7 +123,8 @@ class Coder(AgentBase):
                  arch: str = "",
                  workflow_config_path: str = None,  # 已废弃，保留用于向后兼容
                  parser_config_path: str = None,    # 新的 parser 配置路径
-                 config: dict = None):
+                 config: dict = None,
+                 coder_database=None):
         self.op_name = op_name
         self.task_desc = remove_copyright_from_text(task_desc)
         self.dsl = dsl
@@ -142,6 +143,7 @@ class Coder(AgentBase):
             self.database_config = config.get("database_config", {})
         else:
             raise ValueError("config is required for Coder")
+        self.coder_database = coder_database
 
         context = {
             "agent_name": "coder",
@@ -301,7 +303,10 @@ class Coder(AgentBase):
 
         if self.database_config and self.database_config.get("enable_rag", False):
             try:
-                db_system = CoderDatabase(config=self.config)
+                import time
+                start = time.time()
+                db_system = self.coder_database or get_coder_database(config=self.config)
+                self.coder_database = db_system
                 docs = await db_system.samples(
                     output_content=["basic", "impl_code"],
                     code_feat=code_feat,
@@ -320,6 +325,7 @@ class Coder(AgentBase):
                     content = doc.get("impl_code", "")
                     all_code.append(f"# Python File: {file_name}\n```\n{content}\n```\n")
                 logger.info(f"从离线 triton 数据库中匹配到 {len(all_code)} 份代码")
+                logger.info(f"从离线 triton 数据库匹配代码用时 {time.time() - start:.02f}s")
             except Exception as e:
                 logger.warning(f"从数据库获取示例代码失败: {e}")
 

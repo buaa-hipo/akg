@@ -52,6 +52,8 @@ class Database():
         """提取任务特征"""
         # 特征提取
         
+        if sketch_code:
+            logger.info(f"extract features with sketch_code: {sketch_code[:20]}")
         feature_extractor = FeatureExtractor(
             model_config=self.model_config,
             impl_code=impl_code,

@@ -108,7 +108,7 @@ class Island(Database):
             exist_code_feat.append(json.dumps(code_feat, ensure_ascii=False))
         return exist_code_feat
     
-    async def insert(self, impl_code: str, framework_code: str, profile: str, backend: str, arch: str, dsl: str, impl_info: dict):
+    async def insert(self, impl_code: str, framework_code: str, profile: str, backend: str, arch: str, dsl: str, impl_info: dict, features: dict = None):
         
         # insert into FAISS
         md5_hash = get_md5_hash(impl_code=impl_code)
@@ -117,11 +117,11 @@ class Island(Database):
         if file_path.exists():
             self.program_list.remove(Program(file_path))
 
-        import os
-        if os.environ.get('AIKG_DEBUG_MODE', False):
-            features = json.load(open('/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/debug_io/example_output/20c850f9/island_0/metadata.json', 'r'))
-        else:
-            features = await self.extract_features('', impl_code, framework_code, backend, arch, dsl, '', profile)
+        if features is None:
+            if os.environ.get('AIKG_DEBUG_MODE', False):
+                features = json.load(open('/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/debug_io/example_output/20c850f9/island_0/metadata.json', 'r'))
+            else:
+                features = await self.extract_features('', impl_code, framework_code, backend, arch, dsl, impl_info.get('sketch', ''), profile)
             
         file_path.mkdir(parents=True, exist_ok=True)
         metadata_file = file_path / "metadata.json"

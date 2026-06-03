@@ -137,10 +137,19 @@ class ProgramDatabase():
         
         return self.island_list[island_idx].random_sample_others(parent_idx, sample_num)
     
-    async def insert_island(self, island_idx: int, impl_code: str, framework_code: str, profile: str, backend: str, arch: str, dsl: str, impl_info: dict):
+    async def insert_island(self, island_idx: int, impl_code: str, framework_code: str, profile: str, backend: str, arch: str, dsl: str, impl_info: dict, features: dict = None):
         # TODO
         logger.info(f"insert program into island_{island_idx}")
-        await self.island_list[island_idx].insert(impl_code, framework_code, profile, backend, arch, dsl, impl_info)
+        await self.island_list[island_idx].insert(
+            impl_code,
+            framework_code,
+            profile,
+            backend,
+            arch,
+            dsl,
+            impl_info,
+            features=features
+        )
         # 判断是否收敛
         early_stopping_decision = self.judge_early_stopping(island_idx, impl_info['id'])
         # 如果收敛就更新 impl_info 里面的收敛原因
@@ -245,10 +254,19 @@ class ProgramDatabase():
     def get_checkpoint_path(self, island_idx: int) -> str:
         return self.island_list[island_idx].get_checkpoint_path()
     
-    def save_checkpoint(self, island_idx: int, parent_id: str):
+    def get_checkpoint_round(self, island_idx: int=0) -> int:
+        checkpoint_round_path = Path(self.get_checkpoint_path(island_idx)) / "checkpoint_round.txt"
+        with open(checkpoint_round_path, "r") as f:
+            return int(f.read().strip())
+    
+    def save_checkpoint(self, island_idx: int, parent_id: str, round_idx: int):
         checkpoint_path = Path(self.get_checkpoint_path(island_idx)) / "checkpoint.txt"
         with open(checkpoint_path, "w") as f:
             f.write(parent_id)
+        
+        checkpoint_round_path = Path(self.get_checkpoint_path(island_idx)) / "checkpoint_round.txt"
+        with open(checkpoint_round_path, "w") as f:
+            f.write(str(round_idx))
     
     def get_checkpoint_parent_id(self, island_idx: int) -> str:
         checkpoint_path = Path(self.get_checkpoint_path(island_idx)) / "checkpoint.txt"

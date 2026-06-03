@@ -9,6 +9,7 @@ agent_model_config:
   sketch: deepseek_v4_flash
   selector: deepseek_v4_flash
   test_case_generator: deepseek_v4_flash
+  default: deepseek_v4_flash
 
 # agent_model_config:
 #   designer: smallai_o3
@@ -22,19 +23,19 @@ agent_model_config:
 #   test_case_generator: smallai_o3
 
 # agent_model_config:
-#   designer: deepseek_r1_default
-#   coder: claude-sonnet-4-6
-#   profiler: deepseek_r1_default
-#   conductor: deepseek_r1_default
-#   feature_extractor: deepseek_r1_default
-#   api_generator: deepseek_r1_default
-#   sketch: deepseek_r1_default
-#   selector: deepseek_r1_default
-#   test_case_generator: deepseek_r1_default
-#   default: deepseek_r1_default
+#   designer: claude-opus-4-6
+#   coder: claude-opus-4-6
+#   profiler: claude-opus-4-6
+#   conductor: claude-opus-4-6
+#   feature_extractor: claude-opus-4-6
+#   api_generator: claude-opus-4-6
+#   sketch: claude-opus-4-6
+#   selector: claude-opus-4-6
+#   test_case_generator: claude-opus-4-6
+#   default: claude-opus-4-6
 
 # Log configuration
-log_dir: "~/aikg_logs"
+log_dir: "/ssd/zhangzizheng/aikg_logs"
 
 # Workflow configuration
 workflow_config_path: "config/default_workflow.yaml"  # 原 Task 使用
@@ -72,4 +73,4 @@ sampling_seed: 42  # Random seed for reproducibility
 database_config:
   enable_rag: True          # Whether to enable RAG functionality
   sample_num: 4             # Default sampling number
-  embedding_device: "cpu"    # Embedding model device: cpu or cuda
+  embedding_device: "cuda"    # Embedding model device: cpu or cuda

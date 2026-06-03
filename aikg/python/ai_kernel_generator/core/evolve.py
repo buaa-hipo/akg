@@ -318,19 +318,26 @@ async def new_evolve(
     
     # 用于跟踪当前轮次的实现
     round_implementations = []
+    
+    # 从检查点开始衔接进化轮数
+    evolve_from_checkpoint = task_processor.init_data['program_database'].is_evolve_from_shortcut()
+    checkpoint_round_idx = 1
+    if evolve_from_checkpoint:
+        checkpoint_round_idx = task_processor.init_data['program_database'].get_checkpoint_round()
+        logger.info(f"当前从检查点 第{checkpoint_round_idx}轮 开始进化")
 
     # ========== 4. 进化主循环 ==========
-    for round_idx in range(1, max_rounds + 1):
+    for round_idx in range(checkpoint_round_idx, max_rounds + 1):
         
         # designer 阶段
-        tasks, task_mapping = task_processor.create_evolve_designer_tasks_for_round(round_idx, device_pool, task_pool, round_implementations)
+        tasks, task_mapping = task_processor.create_evolve_designer_tasks_for_round(round_idx, device_pool, task_pool, round_implementations, evolve_from_checkpoint)
         results = await task_pool.wait_all()
         task_pool.tasks.clear()
         designer_data = result_processor.process_eolve_designer_results(results, round_idx, task_pool, task_mapping)
         
         # 并行 coder - verifier - profiler 阶段
         tasks, task_mapping = task_processor.create_evolve_para_tasks_for_round(round_idx, device_pool, task_pool, 
-                                                                                designer_data, round_implementations, coder_parallel_num)
+                                                                                designer_data, round_implementations, coder_parallel_num, evolve_from_checkpoint)
         results = await task_pool.wait_all()
         task_pool.tasks.clear()
         
@@ -361,6 +368,8 @@ async def new_evolve(
             (f"failed_task_{i}", False) 
             for i in range(round_result['total_tasks'] - round_result['successful_tasks'])
         ])
+        
+        evolve_from_checkpoint = False
 
     # ========== 5. 构建最终结果 ==========
     # 按性能排序最佳实现（gen_time越小越好）
