@@ -7,10 +7,10 @@ Rules:
   stalls, tensor-core underutilisation, etc.).
 - Keep fields brief; avoid lists of alternatives, disclaimers, or generic advice.
 
-Output format (output in plain text):
-- Bottleneck of this triton kernel is: ... <max 50 words>.
-- Optimization method is: ... <max 95 words>.
-- Modification plan is: ... <max 95 words>.
+Output content (output in json format "code" content):
+1. Bottleneck of this triton kernel is: ... <max 50 words>.
+2. Optimization method is: ... <max 95 words>.
+3. Modification plan is: ... <max 95 words>.
 
 ### Kernel name:
 {{ op_name }}
@@ -32,3 +32,12 @@ Output format (output in plain text):
 ### Kernel historical optimization try:
 {{ optimize_history }}
 {% endif %}
+
+**请按照以下格式输出你的结果，仅返回json格式，不要在json外部有任何解释或补充说明：**
+
+严格要求：
+- 只输出 JSON，不要任何前缀说明或后缀总结
+- 不要用 Markdown 代码块（不要 ```json``` 包裹）
+- 严格遵守以下 schema，不增减任何字段
+
+{{ format_instructions }}

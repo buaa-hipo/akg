@@ -75,10 +75,16 @@ def get_evolution_trajectories(base_path):
 
     return trajectories
 
+# def export_folder(folder_path: str):
+    
+
 # 使用示例
 if __name__ == "__main__":
     # 替换为你实际的文件夹路径
-    folder_path = "/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/test_bk" 
+    folder_path = "/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level2/59_Matmul_Swish_Scaling/island_0" 
+    # 执行 rm evolve_*
+    os.system(f"rm evolve_*.json")
+    
     results = get_evolution_trajectories(folder_path)
     results.sort(key=lambda x: len(x), reverse=True)
     print(f"一共有 {len(results)} 条进化轨迹 (叶子节点)")

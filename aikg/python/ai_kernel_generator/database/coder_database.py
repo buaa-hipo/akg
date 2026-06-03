@@ -86,6 +86,7 @@ class CoderDatabase(Database):
             )
             self.vector_stores = [self.basic_vector_store, self.schedule_vector_store, self.memory_vector_store]
             super().__init__(self.database_path, self.vector_stores, config)    
+            logger.info("Coder Database Initialized.")
             
             self._initialized = True
         finally:

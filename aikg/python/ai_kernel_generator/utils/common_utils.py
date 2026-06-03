@@ -307,6 +307,7 @@ class ParserFactory:
 
         # 所有策略都失败
         logger.warning("无法从内容中提取有效的JSON格式")
+        logger.warning(f"原始内容前50个字符: {content[:50]}")
         return ""
 
     @staticmethod

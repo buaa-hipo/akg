@@ -257,7 +257,7 @@ class LocalWorker(WorkerInterface):
 
     def waiting_for_resources(self):
         # disable waiting 
-        return
+        # return
     
         import time
         cnt = 0
@@ -298,7 +298,7 @@ class LocalWorker(WorkerInterface):
         try:
             with ExitStack() as stack:
                 if isinstance(package_data, (bytes, bytearray)):
-                    temp_dir = stack.enter_context(tempfile.TemporaryDirectory())
+                    temp_dir = stack.enter_context(tempfile.TemporaryDirectory(dir=os.getcwd()))
                     tar_path = os.path.join(temp_dir, "package.tar")
                     with open(tar_path, "wb") as f:
                         f.write(package_data)
@@ -378,7 +378,7 @@ class LocalWorker(WorkerInterface):
         self.waiting_for_resources()
         try:
             # 2. Create temp directory and extract
-            with tempfile.TemporaryDirectory() as temp_dir:
+            with tempfile.TemporaryDirectory(dir=os.getcwd()) as temp_dir:
                 # Extract package
                 tar_path = os.path.join(temp_dir, "package.tar")
                 with open(tar_path, "wb") as f:

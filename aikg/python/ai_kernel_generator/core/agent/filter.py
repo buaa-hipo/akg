@@ -4,6 +4,7 @@ from typing import Tuple, List
 from ai_kernel_generator.core.agent.agent_base import AgentBase
 from ai_kernel_generator.database.island import Island
 from ai_kernel_generator.core.agent.utils.feature_extractor import FeatureExtractor
+from ai_kernel_generator.core.agent.shared_resources import get_cross_encoder
 
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -17,9 +18,10 @@ class CrossEncoderSimilarity:
         初始化Cross-Encoder模型
         :param model_name: 预训练模型名称或路径
         """
-        self.device = "cpu"
+        self.device = "cuda"
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(self.device)
+        logger.info(f"Initialized Cross-Encoder model from {model_name} on {self.device}") 
     
     def calculate_similarity(self, text1, text2):
         """
@@ -50,6 +52,7 @@ class Filter(AgentBase):
         arch: str = "",
         island: Island = None,
         config: dict = None,
+        cross_encoder=None,
     ):
         self.op_name = op_name
         self.task_desc = task_desc
@@ -65,7 +68,7 @@ class Filter(AgentBase):
         else:
             raise ValueError("config is required for Designer")
 
-        self.cross_encoder = CrossEncoderSimilarity()
+        self.cross_encoder = cross_encoder or get_cross_encoder(config=config)
 
         context = {
             "agent_name": "filter",
@@ -87,10 +90,6 @@ class Filter(AgentBase):
         )
         code_feat, _, _ = await feature_extractor.run()
         
-        # DEBUG MODE
-        import os
-        if os.environ.get("AIKG_DEBUG_MODE", False):
-            return False, code_feat
         
         # 获取历史生成的代码 IR 和 特征
         exist_code_ir = self.island.get_exist_code_ir()
@@ -98,6 +97,8 @@ class Filter(AgentBase):
         
         # 使用CrossEncoder计算相似度，判断是否需要过滤
         # 计算 IR 和 特征 相似度分数
+        import time
+        start = time.time()
         ir_similarity_scores = [self.cross_encoder.calculate_similarity(designer_ir, exist_ir) for exist_ir in exist_code_ir]
         feat_similarity_scores = [self.cross_encoder.calculate_similarity(code_feat, exist_feat) for exist_feat in exist_code_feat]
         # 计算加权相似度分数，IR相似度权重为0.3，特征相似度权重为0.7
@@ -105,6 +106,11 @@ class Filter(AgentBase):
         # 如果存在相似度分数超过0.75，则认为生成的代码与历史代码过于相似，需要过滤
         filter_or_not = any(score > 0.75 for score in weighted_similarity_scores)
         logger.info(f"Filter Score of current IR: {weighted_similarity_scores}")
-        # filter_or_not = False  # TODO: 目前先关闭过滤功能，后续根据实际效果调整
-
+        logger.info(f"Filter cross-encoder cost time: {time.time() - start:.2f}s")
+        
+        # DEBUG MODE
+        import os
+        if os.environ.get("AIKG_DEBUG_MODE", False):
+            return False, code_feat
+        
         return filter_or_not, code_feat

@@ -34,6 +34,14 @@ parsers:
           field_type: str
           mandatory: true
           field_description: "Complete executable code implementation"
+  profiler:
+    parser_name: profiler_parser
+    parser_definition:
+      output_fields:
+        code:
+          field_type: str
+          mandatory: true
+          field_description: "Output Text of Bottleneck, Optimization method and Modification plan"
 
   # verifier does not need a parser (programmatic verification)
   # verifier returns structured data directly

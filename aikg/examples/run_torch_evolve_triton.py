@@ -85,7 +85,7 @@ async def run_torch_evolve_triton(op_name: str, task_desc: str, evolve_database:
     config.arch = "a100"
 
     # 进化参数
-    config.max_rounds = 20
+    config.max_rounds = 10
     config.parallel_num = 1         # coder_parallel_num 和 parallel_num 不可同时选，当前开发 coder_parallel_num
     config.coder_parallel_num = 3   # 每次岛屿任务并行探索Coder的数量
 
@@ -211,20 +211,21 @@ if __name__ == "__main__":
         help="远程 Worker Service 的 URL（仅 remote 模式需要）。也可通过环境变量 AIKG_WORKER_URL 设置"
     )
     
+    aikg_debug_mode = os.environ.get("AIKG_DEBUG_MODE", False) is not False
     parser.add_argument(
         "--op-name",
         type=str,
-        default="Matmul_with_transposed_both",
+        default="Gemm_Add_ReLU" if aikg_debug_mode is False else "Matmul_with_transposed_both",
     )
     parser.add_argument(
         "--task-desc",
         type=str,
-        default="/mnt/lustre-client/zhangzizheng/AIKG/KernelBench/KernelBench/level1/18_Matmul_with_transposed_both.py",
+        default="/mnt/lustre-client/zhangzizheng/AIKG/KernelBench/KernelBench/level2/76_Gemm_Add_ReLU.py" if aikg_debug_mode is False else "/mnt/lustre-client/zhangzizheng/AIKG/KernelBench/KernelBench/level1/18_Matmul_with_transposed_both.py",
     )
     parser.add_argument(
         "--evolve-database",
         type=str,
-        default="test",     # 同样会被用作检查点路径名 evolve_database/xxx
+        default="level2/76_Gemm_Add_ReLU" if aikg_debug_mode is False else "test",     # 同样会被用作检查点路径名 evolve_database/xxx
     )
     
     args = parser.parse_args()
