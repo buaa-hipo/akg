@@ -713,7 +713,13 @@ if __name__ == "__main__":
             
             # worker.verify() 只是执行脚本，不需要管理 device
             # device 已经在生成脚本时设置好了
-            success, log, artifacts = await self.worker.verify(package_data, self.task_id, self.op_name, timeout)
+            success, log, artifacts = await self.worker.verify(
+                package_data,
+                self.task_id,
+                self.op_name,
+                timeout,
+                device_id=device_id
+            )
             
             # 同步 artifacts 到 verify_dir（用于 RemoteWorker 场景）
             if artifacts:
@@ -1072,7 +1078,14 @@ if __name__ == "__main__":
                 'op_name': self.op_name
             }
             
-            result = await self.worker.profile(package_data, self.task_id, self.op_name, full_settings)
+            self._last_profile_device_id = actual_device_id
+            result = await self.worker.profile(
+                package_data,
+                self.task_id,
+                self.op_name,
+                full_settings,
+                device_id=actual_device_id
+            )
             
             # 同步 artifacts 到 verify_dir（用于 RemoteWorker 场景）
             artifacts = result.get('artifacts', {})
@@ -1148,7 +1161,13 @@ if __name__ == "__main__":
             package_data = self._pack_directory(verify_dir)
         
         # 命令行跑 impl code 前面加上 ncu ...
-        success, log, artifacts, ncu_json = await self.worker.ncu_profile(package_data, self.task_id, self.op_name)
+        device_id = getattr(self, '_last_profile_device_id', 0)
+        success, log, artifacts, ncu_json = await self.worker.ncu_profile(
+            package_data,
+            self.task_id,
+            self.op_name,
+            device_id=device_id
+        )
         
         if success:
             logger.info(f"[{self.op_name}] NCU profile 执行成功")

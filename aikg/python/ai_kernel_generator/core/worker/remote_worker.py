@@ -2,7 +2,7 @@ import httpx
 import logging
 import io
 import json
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, Optional
 
 from .interface import WorkerInterface
 
@@ -66,7 +66,14 @@ class RemoteWorker(WorkerInterface):
         except Exception as e:
             logger.error(f"[{task_id}] Failed to release remote device: {e}")
 
-    async def verify(self, package_data: bytes, task_id: str, op_name: str, timeout: int = 300) -> Tuple[bool, str, Dict[str, Any]]:
+    async def verify(
+        self,
+        package_data: bytes,
+        task_id: str,
+        op_name: str,
+        timeout: int = 300,
+        device_id: Optional[int] = None
+    ) -> Tuple[bool, str, Dict[str, Any]]:
         """
         Send verification task to remote worker.
         
@@ -113,7 +120,14 @@ class RemoteWorker(WorkerInterface):
             logger.error(f"[{task_id}] {error_msg}")
             return False, error_msg, {}
 
-    async def profile(self, package_data: bytes, task_id: str, op_name: str, profile_settings: Dict[str, Any]) -> Dict[str, Any]:
+    async def profile(
+        self,
+        package_data: bytes,
+        task_id: str,
+        op_name: str,
+        profile_settings: Dict[str, Any],
+        device_id: Optional[int] = None
+    ) -> Dict[str, Any]:
         """
         Send profiling task to remote worker.
         
