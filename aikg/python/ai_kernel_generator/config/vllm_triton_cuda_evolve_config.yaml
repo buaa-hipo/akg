@@ -73,4 +73,4 @@ sampling_seed: 42  # Random seed for reproducibility
 database_config:
   enable_rag: True          # Whether to enable RAG functionality
   sample_num: 4             # Default sampling number
-  embedding_device: "cuda"    # Embedding model device: cpu or cuda
+  embedding_device: "cpu"    # Embedding model device: cpu or cuda

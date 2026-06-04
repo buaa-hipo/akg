@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Tuple, Any, Dict, Union
+from typing import Tuple, Any, Dict, Union, Optional
 
 class WorkerInterface(ABC):
     """
@@ -7,7 +7,14 @@ class WorkerInterface(ABC):
     """
 
     @abstractmethod
-    async def verify(self, package_data: Union[bytes, str], task_id: str, op_name: str, timeout: int = 300) -> Tuple[bool, str, Dict[str, Any]]:
+    async def verify(
+        self,
+        package_data: Union[bytes, str],
+        task_id: str,
+        op_name: str,
+        timeout: int = 300,
+        device_id: Optional[int] = None
+    ) -> Tuple[bool, str, Dict[str, Any]]:
         """
         Execute verification task.
         
@@ -20,6 +27,7 @@ class WorkerInterface(ABC):
             task_id: Unique task identifier.
             op_name: Operator name.
             timeout: Execution timeout in seconds.
+            device_id: Optional local GPU id for resource locking.
 
         Returns:
             Tuple[bool, str, Dict[str, Any]]: (success, log_output, artifacts)
@@ -31,7 +39,14 @@ class WorkerInterface(ABC):
         pass
 
     @abstractmethod
-    async def profile(self, package_data: bytes, task_id: str, op_name: str, profile_settings: Dict[str, Any]) -> Dict[str, Any]:
+    async def profile(
+        self,
+        package_data: bytes,
+        task_id: str,
+        op_name: str,
+        profile_settings: Dict[str, Any],
+        device_id: Optional[int] = None
+    ) -> Dict[str, Any]:
         """
         Execute profiling task.
 
@@ -40,6 +55,7 @@ class WorkerInterface(ABC):
             task_id: Unique task identifier.
             op_name: Operator name.
             profile_settings: Settings for profiling (e.g., warmup_times, run_times).
+            device_id: Optional local GPU id for resource locking.
 
         Returns:
             Dict[str, Any]: Profiling results, including:

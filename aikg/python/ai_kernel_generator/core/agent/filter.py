@@ -18,7 +18,7 @@ class CrossEncoderSimilarity:
         初始化Cross-Encoder模型
         :param model_name: 预训练模型名称或路径
         """
-        self.device = "cuda"
+        self.device = "cpu"
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(self.device)
         logger.info(f"Initialized Cross-Encoder model from {model_name} on {self.device}") 
@@ -103,8 +103,8 @@ class Filter(AgentBase):
         feat_similarity_scores = [self.cross_encoder.calculate_similarity(code_feat, exist_feat) for exist_feat in exist_code_feat]
         # 计算加权相似度分数，IR相似度权重为0.3，特征相似度权重为0.7
         weighted_similarity_scores = [0.3 * ir_score + 0.7 * feat_score for ir_score, feat_score in zip(ir_similarity_scores, feat_similarity_scores)]
-        # 如果存在相似度分数超过0.75，则认为生成的代码与历史代码过于相似，需要过滤
-        filter_or_not = any(score > 0.75 for score in weighted_similarity_scores)
+        # 如果存在相似度分数超过0.85，则认为生成的代码与历史代码过于相似，需要过滤
+        filter_or_not = any(score > 0.85 for score in weighted_similarity_scores)
         logger.info(f"Filter Score of current IR: {weighted_similarity_scores}")
         logger.info(f"Filter cross-encoder cost time: {time.time() - start:.2f}s")
         
