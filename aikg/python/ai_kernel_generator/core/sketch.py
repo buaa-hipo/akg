@@ -153,6 +153,7 @@ class Sketch(AgentBase):
 
             except Exception as parse_error:
                 logger.error(f"Failed to parse sketch content: {parse_error}")
+                logger.error(f"Original content: {content}")
                 raise
 
         except Exception as e:

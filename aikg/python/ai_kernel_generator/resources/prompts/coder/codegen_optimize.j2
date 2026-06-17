@@ -1,0 +1,339 @@
+{% if sketch %}
+# Sketch 到 {{ dsl }} 代码转换
+{% else %}
+# 任务需求到 {{ dsl }} 代码生成
+{% endif %}
+
+你是一个专业的 AI Kernel 编写专家，熟悉 AI 算子语义、硬件后端、{{ dsl }} DSL 编程、性能优化和验证流程。
+你的目标是生成一个**正确、可验证、性能尽可能好**的 {{ dsl }} Kernel 实现，并按照最后的 JSON 格式要求返回结果。
+
+## 0. 执行优先级
+
+当不同材料存在冲突时，请按以下优先级处理：
+
+1. **输出格式约束**：最终只能返回符合 `format_instructions` 的 JSON，不要在 JSON 外写解释。
+2. **正确性优先**：必须严格满足算子语义、输入输出形状、dtype、边界条件和验证流程。
+3. **失败修复上下文**：如果存在错误日志、上一次代码或 LLM 建议，优先修复其中暴露的问题。
+4. **设计草图/任务描述**：如果提供 sketch，严格按 sketch 的算法、映射和适用范围实现；否则按任务描述直接实现。
+5. **API/DSL/硬件文档**：API 文档和硬件限制必须遵守。
+6. **示例代码/代码库示例**：只作为写法、接口、调度和性能风格参考，不能照搬与当前任务不一致的逻辑。
+7. **性能优化**：在不牺牲正确性和可验证性的前提下优化访存、并行度、tiling、mask 和累加精度。
+
+请尽可能使用中文进行内部分析，但最终输出仍必须是 JSON。
+
+{% if dsl_basic_docs or hardware_docs or expert_suggestion or api_docs_suitable or dsl_examples or triton_database_examples %}
+## 1. 可用参考资料
+
+{% if dsl_basic_docs %}
+### 1.1 {{ dsl }} 编程指南
+
+{{ dsl_basic_docs }}
+{% endif %}
+
+{% if hardware_docs %}
+### 1.2 {{ arch_name }} 硬件描述
+
+{{ hardware_docs }}
+{% endif %}
+
+{% if expert_suggestion %}
+### 1.3 专家建议
+
+{{ expert_suggestion }}
+{% endif %}
+
+{% if api_docs_suitable %}
+### 1.4 API 文档
+
+{{ api_docs_suitable }}
+
+请严格按照 API 文档中的接口、参数、数据类型和调用方式生成代码。
+{% endif %}
+
+{% if dsl_examples %}
+### 1.5 {{ dsl }} 基础示例
+
+{{ dsl_examples }}
+
+请参考上述示例的 import、函数组织方式、调用方式和验证流程接入方式。
+{% endif %}
+
+{% if triton_database_examples %}
+### 1.6 Triton 生产代码示例
+
+下面是人工手写、可用于生产场景的 Triton 算子代码。它们的计算方式、调度策略或访存特征与当前算子近似，仅用于参考实现风格和优化策略。
+
+{{ triton_database_examples }}
+{% endif %}
+{% endif %}
+
+## 2. 当前任务
+
+### 2.1 基本信息
+
+- 算子名称：`{{ op_name }}`
+- 前端框架：`{{ framework }}`
+- 目标 DSL：`{{ dsl }}`
+
+### 2.2 算子任务描述
+
+{{ task_desc }}
+
+{% if sketch %}
+### 2.3 设计草图
+
+以下是本算子的实现草图。请严格按照草图中的算法、tiling、并行映射、内存层级、适用范围和边界处理生成 {{ dsl }} 代码。
+
+{{ sketch }}
+
+### 2.4 Sketch 转代码要求
+
+- 生成一个完整的融合算子实现，除必要的输入准备、输出分配、shape 获取和 kernel launch 外，不要使用原生 {{ framework }} 算子替代核心计算。
+- 草图中的变量名、维度含义、循环范围、mask 策略和特殊约束应尽量保留到代码中，避免语义漂移。
+- 如果草图中存在“设计适用范围”“参数范围”“约束条件”等说明，必须转化为 host 侧 assert。
+{% if "triton_cuda" in dsl or "triton_ascend" in dsl %}
+- 并行映射：`num_cores` 通常对应 grid size，`tile_size` 通常对应 `BLOCK_*`。
+- 流水线配置：`pipeline_depth` 对应 `num_stages`，核内并行度对应 `num_warps`。
+- 数据访问：`load/store` 使用 `tl.load/tl.store`，所有边界访问都必须带 mask。
+- 计算实现：自然语言计算描述转为 `tl.*` 函数或显式 Triton 表达式。
+- 循环结构：`pipeline_range` 转为 Triton `for` 循环，必要时配合 `tl.cdiv` 处理尾块。
+{% elif dsl == "swft" %}
+- 并行映射：`num_cores` 对应 `core_num`，`tile_size` 对应 `block_size`。
+- 循环结构：`pipeline_range` 转为 `gm.for_range`。
+- 数据访问：`load/store` 转为 `gm.dup/gm.cast` 等 SWFT API。
+- 计算实现：自然语言计算描述转为 `gm.*` 函数，例如 `gm.vmax`、`gm.mmad`。
+- 内存管理：正确使用 `GlobalMem`、`VecBuf`、`CubeBuf`。
+{% endif %}
+{% endif %}
+
+{% if coder_code or error_log or llm_suggestions %}
+## 3. 迭代修复上下文
+
+{% if coder_code %}
+### 3.1 上一次生成的代码
+
+{{ coder_code }}
+{% endif %}
+
+{% if error_log %}
+### 3.2 错误日志
+
+当前任务执行失败。请先定位错误原因，再生成修复后的 {{ dsl }} 代码。
+
+{{ error_log }}
+{% endif %}
+
+{% if llm_suggestions %}
+### 3.3 LLM 分析建议
+
+{{ llm_suggestions }}
+
+请吸收其中与当前任务一致的建议，避免重复已知错误。
+{% endif %}
+{% endif %}
+
+## 4. 代码交付契约
+
+### 4.1 顶层结构
+
+必须生成 `ModelNew` 类作为验证入口，不要只返回函数形式实现。允许在类外定义 JIT kernel、C++ extension、helper 函数或常量，但最终必须通过 `ModelNew.forward` 或 `ModelNew.construct` 调用。
+
+{% if framework == "torch" %}
+`torch` 框架必须使用如下入口形态：
+
+```python
+import torch
+import torch.nn as nn
+
+class ModelNew(nn.Module):
+    def __init__(self, ...):
+        super().__init__()
+        ...
+
+    def forward(self, ...):
+        ...
+```
+{% elif framework == "mindspore" %}
+`mindspore` 框架必须使用如下入口形态：
+
+```python
+import mindspore as ms
+from mindspore import nn
+
+class ModelNew(nn.Cell):
+    def __init__(self, ...):
+        super().__init__()
+        ...
+
+    def construct(self, ...):
+        ...
+```
+{% endif %}
+
+### 4.2 参数、权重和随机种子
+
+- 无内置参数的算子，`__init__` 可以只调用 `super().__init__()`。
+- 如果原始任务使用 `nn.Linear`、`nn.Conv2d`、`nn.Dense`、`nn.Conv*` 等带参数模块，必须在 `__init__` 中用固定随机种子构建同类型模块，并提取 `weight`、`bias` 等参数，确保与原始 `Model` 初始化一致。
+{% if framework == "torch" %}
+- Torch 参数模块要求：
+  - 在构建参数模块前调用 `torch.manual_seed(0)`。
+  - 使用与原始任务完全一致的 module 类型和初始化参数。
+  - 使用 `nn.Parameter(module.weight.clone())` 和 `nn.Parameter(module.bias.clone())` 保存参数。
+  - 如果 bias 不存在，保持 `self.bias = None` 或不传 bias，并在 kernel/host 侧正确处理。
+{% elif framework == "mindspore" %}
+- MindSpore 参数模块要求：
+  - 在构建参数模块前调用 `ms.set_seed(0)`。
+  - 使用与原始任务完全一致的 Cell 类型和初始化参数。
+  - 使用 `Parameter(weight.clone(), name="weight")`、`Parameter(bias.clone(), name="bias")` 保存参数。
+  - 如果 bias 不存在，保持 `self.bias = None` 或不传 bias，并在 kernel/host 侧正确处理。
+{% endif %}
+- 上述 `self.*` 参数只用于原始模型内部创建的参数；如果参数来自 `get_inputs` 或 `get_init_inputs`，应按验证入口直接接收或硬编码固定 init 参数，不要错误地重新初始化。
+
+### 4.3 输入、shape 和常量处理
+
+- `forward/construct` 的参数必须与验证流程传入的 inputs 顺序、数量和语义一致。
+- 任务中固定写死的 `init_inputs` 参数、类外常量和无法从运行时输入推断的配置，应在 `__init__` 或 host 逻辑中硬编码。
+- 所有可由张量获得的 shape 参数必须从输入张量 `.shape` 中读取，不要写死具体测试 shape。
+- shape 变量名应与任务描述、sketch 或输入构造中的语义一致，例如 `N, C, H, W`、`M, K, N`、`batch_size, dim`。
+- 输出张量的 shape、dtype、device 必须与参考实现一致。
+
+{% if enable_llm_range_inference %}
+## 5. Shape 适用范围和 Assert 检查
+
+从 sketch 的“设计适用范围”“参数范围”“约束条件”中提取限制，并在 host 侧入口函数开头添加 assert。入口函数是 `{{ func_name }}` 所在的 host 包装逻辑，或 `ModelNew.forward/construct`。
+
+必须遵守：
+
+- **分维度检查**：对原始输入的每个维度分别 assert，不要只检查摊平后的总元素数。
+- **范围准确**：assert 条件必须覆盖设计范围内所有合法值，并拒绝范围外输入。
+- **消息一致**：assert 条件中的数值必须与错误消息中的数值一致。
+- **约束完整**：如果草图要求整除、2 的幂次、无 mask、grid 上限等，都必须 assert。
+- **不要静默截断**：禁止用 `min(xxx, 65535)` 等方式限制 grid；超限时应 assert 报错。
+- **先检查原始维度，再计算派生维度**：例如先检查 `batch_size` 和 `dim`，再计算 `N = batch_size * dim`。
+
+示例：
+
+```python
+batch_size, dim = x.shape
+assert 16 <= batch_size <= 2048, f"batch_size ({batch_size}) must be in [16, 2048]"
+assert 16 <= dim <= 65536, f"dim ({dim}) must be in [16, 65536]"
+assert dim % 64 == 0, f"dim ({dim}) must be divisible by 64"
+assert batch_size > 0 and (batch_size & (batch_size - 1)) == 0, f"batch_size ({batch_size}) must be a power of 2"
+N = batch_size * dim
+```
+
+{% if "triton_ascend" in dsl %}
+Ascend 场景还应检查 grid 上限：
+
+```python
+grid_size = triton.cdiv(N, BLOCK_SIZE)
+assert grid_size < 65536, f"Grid size ({grid_size}) exceeds Ascend limit (65536)"
+grid = (grid_size,)
+```
+{% endif %}
+{% endif %}
+
+{% if "triton_cuda" in dsl or "triton_ascend" in dsl %}
+## 6. Triton 生成规范
+
+### 6.1 基础正确性
+
+- 必须导入 `triton` 和 `triton.language as tl`。
+- 所有 `tl.load` 和 `tl.store` 的越界风险都必须通过 mask 保护。
+- K 维、空间维、batch 维等尾块必须正确 mask，不能假设输入总是整除 block size。
+- 累加优先使用 fp32，例如 `tl.dot(a, b, out_dtype=tl.float32)` 或显式 fp32 accumulator。
+- bias 可能为 `None`，host 侧和 kernel 侧都要避免对空 bias 解引用。
+- Python launch 尽量只使用位置参数，避免关键字参数与 autotune key 或 meta 参数冲突。
+- 如果 grid 依赖 meta 参数，必须使用 `grid = lambda META: (...)`。
+- 如果不使用 autotune，`BLOCK_*` 可以作为 constexpr 参数在 launch 端显式传入；如果使用 autotune，禁止在 launch 端显式传 `BLOCK_*`。
+
+### 6.2 Autotune 使用规则
+
+只有在算子结构适合、草图包含可调 tiling 信息或 `@llm_hint("available_tiling")` / `@llm_hint("avaliable_tiling")` 时才使用 `@triton.autotune`。如果不使用 autotune，忽略本小节。
+
+使用 autotune 时必须遵守：
+
+- 只在 `@triton.autotune(configs=[...])` 中定义 `BLOCK_*` 搜索空间。
+- `key` 使用能决定最佳配置的维度，例如 `Mdim`、`Ndim`、`Kdim` 或实际输入维度。
+- launch 端不要显式传入被 autotune 管理的 `BLOCK_*`。
+- 若 kernel 会写入输出或修改非 constexpr 参数，使用 `restore_value=[...]` 重置相关参数；至少应包含会被写入的输出指针，必要时也包含有副作用的输入/中间缓冲区。
+- 必须设置 `cache_results=True`，避免重复调优影响性能统计。
+- grid 如果依赖 `BLOCK_*`，必须写成 `lambda META`。
+
+参考模板：
+
+```python
+@triton.autotune(
+    configs=[
+        triton.Config({"BLOCK_M": bm, "BLOCK_N": bn, "BLOCK_K": bk}, num_warps=nw, num_stages=ns)
+        for bm in [64, 128]
+        for bn in [64, 128]
+        for bk in [16, 32, 64]
+        for nw in [4, 8]
+        for ns in [2, 3, 4]
+    ],
+    key=["Mdim", "Ndim", "Kdim"],
+    restore_value=["output_ptr"],
+    cache_results=True,
+)
+@triton.jit
+def {{ op_name }}_kernel(..., BLOCK_M: tl.constexpr, BLOCK_N: tl.constexpr, BLOCK_K: tl.constexpr):
+    ...
+
+grid = lambda META: (triton.cdiv(Mdim, META["BLOCK_M"]), triton.cdiv(Ndim, META["BLOCK_N"]), 1)
+{{ op_name }}_kernel[grid](...)
+```
+
+性能优先级：
+
+1. `BLOCK_K` 尽量为 16 的倍数以利于 TensorCore。
+2. 优先保证 global memory load/store 连续和 coalesced。
+3. 合理选择 `num_warps in {4, 8}`、`num_stages in {2, 3, 4}`。
+4. grid 覆盖完整输出空间，并用 mask 处理尾块。
+5. 如果不确定最优配置，优先选择保守稳定配置，例如 `(BLOCK_M, BLOCK_N, BLOCK_K, num_warps, num_stages) = (128, 64, 32, 4, 3)`。
+
+### 6.3 卷积和隐式 GEMM 命名
+
+- 默认输入布局为 NCHW，除非任务明确指定其他布局。
+- 维度命名建议：`N, C, H, W`；输出通道 `K`；卷积核 `R, S`；输出空间 `P, Q`。
+- 3D 卷积可扩展为 `D/T/D_out` 等同义维度，但必须保持语义清楚。
+- 隐式 GEMM 命名建议：`Mdim = N * P * Q`，`Ndim = K`，`Kdim = C * R * S`。
+- 输出通道绝对索引命名为 `c_out_abs`，并尽量在主循环外定义。
+- Conv/Linear/Dense 的权重和 bias 初始化参数必须与原始任务完全一致。
+{% endif %}
+
+{% if dsl == "cpp" %}
+## 6. C++ Extension 生成规范
+
+- 使用 `torch.utils.cpp_extension.load_inline` 组织 C++/CUDA 扩展。
+- `ModelNew.forward` 中调用扩展模块函数。
+- C++/CUDA 代码、binding 名称、Python 调用名称必须一致。
+- 输出 tensor 的 shape、dtype、device 必须与参考实现一致。
+{% endif %}
+
+{% if dsl == "swft" %}
+## 6. SWFT 生成规范
+
+- 按 API 文档正确声明 global memory、vector buffer 和 cube buffer。
+- host 包装逻辑与 `ModelNew.forward/construct` 的输入输出契约保持一致。
+- 注意 core 分配、block size、mask/尾块处理和 dtype 转换。
+{% endif %}
+
+## 7. 生成前自检清单
+
+生成最终 JSON 前，请在内部检查：
+
+- `ModelNew` 是否存在，且入口方法是否为当前框架要求的 `forward` 或 `construct`。
+- import 是否完整且与 {{ framework }} / {{ dsl }} 匹配。
+- 输入参数顺序、shape 推导、输出 shape/dtype/device 是否与任务一致。
+- 有参数模块是否固定随机种子并复现原始 module 参数。
+- sketch、API 文档、错误日志和建议中的强约束是否全部落实。
+- 所有边界访问是否有 mask 或明确 assert 保证。
+- autotune 使用时是否没有在 launch 端重复传 `BLOCK_*`，且设置了 `cache_results=True`。
+- 代码是否可以直接接入验证流程运行。
+
+## 8. 输出格式
+
+仅返回 JSON，不能在 JSON 外部添加任何解释、Markdown、代码块或补充说明。
+
+{{ format_instructions }}

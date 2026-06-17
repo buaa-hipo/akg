@@ -37,4 +37,4 @@ async def main():
 if __name__ == '__main__':
     import asyncio
     # asyncio.run(main())
-    asyncio.run(build_coder_database())
+    asyncio.run(build_coder_database(Path("/mnt/lustre-client/zhangzizheng/AIKG/TritonBench/data/TritonBench_G_v1"), 1))

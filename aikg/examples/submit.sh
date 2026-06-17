@@ -22,11 +22,12 @@ OP_NAME=$(echo "$FULL_OP_NAME" | sed 's/^[0-9]*_//')
 mkdir -p "log/$DIR"
 
 # 执行命令
-AIKG_DEEPSEEK_API_KEY=sk-eb7f7960366d41a5a4310277168e93da nohup python run_torch_evolve_triton.py \
+nohup python run_torch_evolve_triton.py \
+    --config_name "evolve_deepseek.yaml" \
     --op-name "$OP_NAME" \
     --task-desc "/mnt/lustre-client/zhangzizheng/AIKG/KernelBench/KernelBench/$DIR/$FULL_OP_NAME.py" \
     --evolve-database "$DIR/$FULL_OP_NAME" \
-    > "log/$DIR/$FULL_OP_NAME.log" 2>&1 &
+    >> "log/$DIR/$FULL_OP_NAME.log" 2>&1 &
 
 echo "Submitted: $INPUT"
 echo "Log file: log/$DIR/$FULL_OP_NAME.log"

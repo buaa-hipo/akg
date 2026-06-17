@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import Tuple, List
 
 from ai_kernel_generator.core.agent.agent_base import AgentBase
@@ -18,7 +19,7 @@ class CrossEncoderSimilarity:
         初始化Cross-Encoder模型
         :param model_name: 预训练模型名称或路径
         """
-        self.device = "cpu"
+        self.device = os.environ.get("AIKG_MODEL_DEVICE", "cpu")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(self.device)
         logger.info(f"Initialized Cross-Encoder model from {model_name} on {self.device}") 

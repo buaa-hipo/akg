@@ -1,7 +1,8 @@
 # Model preset configuration
+
 agent_model_config:
-  designer: deepseek_v4_flash
-  coder: deepseek_v4_flash
+  designer: claude-opus-4-7
+  coder: claude-opus-4-7
   profiler: deepseek_v4_flash
   conductor: deepseek_v4_flash
   feature_extractor: deepseek_v4_flash
@@ -10,29 +11,6 @@ agent_model_config:
   selector: deepseek_v4_flash
   test_case_generator: deepseek_v4_flash
   default: deepseek_v4_flash
-
-# agent_model_config:
-#   designer: smallai_o3
-#   coder: smallai_o3
-#   profiler: smallai_o3
-#   conductor: smallai_o3
-#   feature_extractor: smallai_o3
-#   api_generator: smallai_o3
-#   sketch: smallai_o3
-#   selector: smallai_o3
-#   test_case_generator: smallai_o3
-
-# agent_model_config:
-#   designer: claude-opus-4-7
-#   coder: claude-opus-4-7
-#   profiler: deepseek_v4_flash
-#   conductor: deepseek_v4_flash
-#   feature_extractor: deepseek_v4_flash
-#   api_generator: deepseek_v4_flash
-#   sketch: deepseek_v4_flash
-#   selector: deepseek_v4_flash
-#   test_case_generator: deepseek_v4_flash
-#   default: deepseek_v4_flash
 
 # Log configuration
 log_dir: "/ssd/zhangzizheng/aikg_logs"

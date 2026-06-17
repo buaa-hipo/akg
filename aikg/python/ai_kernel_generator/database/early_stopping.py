@@ -7,15 +7,27 @@ import math
 EPS = 1e-12
 
 NCU_METRIC_LIST = [
+    # Overall work/runtime behavior.
     "sm__cycles_active.avg",
     "sm__warps_active.avg.pct_of_peak_sustained_active",
     "sm__inst_executed.sum",
+    # Compute-pipe utilization.
+    "sm__inst_executed_pipe_fp32.avg.pct_of_peak_sustained_active",
+    "sm__inst_executed_pipe_tensor.avg.pct_of_peak_sustained_active",
+    # DRAM traffic and pressure.
     "dram__bytes_read.sum",
     "dram__bytes_write.sum",
     "dram__throughput.avg.pct_of_peak_sustained_elapsed",
-    "dram__bytes.sum.per_second",
-    "gpu__dram_throughput.avg.pct_of_peak_sustained_elapsed",
-    "smsp__warp_issue_stalled_short_scoreboard_per_warp_active.pct"
+    # Cache behavior.
+    "l1tex__t_sector_hit_rate.pct",
+    "l1tex__throughput.avg.pct_of_peak_sustained_active",
+    "lts__t_sector_hit_rate.pct",
+    "lts__throughput.avg.pct_of_peak_sustained_active",
+    # Major stall reasons for dense/pointwise/reduction kernels.
+    "smsp__warp_issue_stalled_memory_dependency_per_warp_active.pct",
+    "smsp__warp_issue_stalled_short_scoreboard_per_warp_active.pct",
+    "smsp__warp_issue_stalled_long_scoreboard_per_warp_active.pct",
+    "smsp__warp_issue_stalled_barrier_per_warp_active.pct",
 ]
 
 @dataclass
@@ -35,35 +47,43 @@ class EarlyStoppingConfig:
     """
 
     # -------- 基本长度要求 --------
-    min_history: int = 6              # 至少多少轮后才开始判停
+    min_history: int = 7              # 至少多少轮后才开始判停
     patience: int = 4                 # 连续多少轮低收益 / 平台后可触发
 
     # -------- 增量收益阈值 --------
-    abs_improve_threshold: float = 0.01   # speedup绝对提升阈值，例如 0.01 表示提升不到1%
-    rel_improve_threshold: float = 0.005  # 相对提升阈值，例如 0.5%
+    abs_improve_threshold: float = 0.05   # speedup绝对提升阈值，例如 0.01 表示提升不到1%
+    rel_improve_threshold: float = 0.01  # 相对提升阈值，例如 0.5%
 
     # -------- 趋势斜率 --------
     moving_avg_window: int = 3            # 求平均窗口大小 -> 窗口内求得一个平滑点
     slope_window: int = 5                 # 用最近多少个平滑点估计趋势
-    slope_threshold: float = 0.003        # 平均每步提升斜率阈值
+    slope_threshold: float = 0.03        # 平均每步提升斜率阈值
 
     # -------- 波动噪声 --------
     noise_tolerance: float = 0.000        # 允许的小波动，可根据测量噪声调
 
     # -------- NCU 平台化判定 --------
-    ncu_stable_window: int = 4            # 最近几轮看NCU是否平台化
+    ncu_stable_window: int = 5            # 最近几轮看NCU是否平台化
     ncu_metric_thresholds: Dict[str, float] = field(default_factory=lambda: {
-        "sm__cycles_active.avg": 0.02,
-        "sm__warps_active.avg.pct_of_peak_sustained_active": 0.02,
-        "sm__inst_executed.sum": 0.02,
-        "dram__bytes_read.sum": 0.02,
-        "dram__bytes_write.sum": 0.02,
-        "dram__throughput.avg.pct_of_peak_sustained_elapsed": 0.02,
-        "dram__bytes.sum.per_second": 0.02,
-        "gpu__dram_throughput.avg.pct_of_peak_sustained_elapsed": 0.02,
-        "smsp__warp_issue_stalled_short_scoreboard_per_warp_active.pct": 0.02
+        # Thresholds are relative changes. For example, 0.03 means 3%.
+        "sm__cycles_active.avg": 0.03,
+        "sm__warps_active.avg.pct_of_peak_sustained_active": 0.03,
+        "sm__inst_executed.sum": 0.03,
+        "sm__inst_executed_pipe_fp32.avg.pct_of_peak_sustained_active": 0.05,
+        "sm__inst_executed_pipe_tensor.avg.pct_of_peak_sustained_active": 0.05,
+        "dram__bytes_read.sum": 0.03,
+        "dram__bytes_write.sum": 0.03,
+        "dram__throughput.avg.pct_of_peak_sustained_elapsed": 0.05,
+        "l1tex__t_sector_hit_rate.pct": 0.05,
+        "l1tex__throughput.avg.pct_of_peak_sustained_active": 0.05,
+        "lts__t_sector_hit_rate.pct": 0.05,
+        "lts__throughput.avg.pct_of_peak_sustained_active": 0.05,
+        "smsp__warp_issue_stalled_memory_dependency_per_warp_active.pct": 0.08,
+        "smsp__warp_issue_stalled_short_scoreboard_per_warp_active.pct": 0.08,
+        "smsp__warp_issue_stalled_long_scoreboard_per_warp_active.pct": 0.08,
+        "smsp__warp_issue_stalled_barrier_per_warp_active.pct": 0.08,
     })
-    ncu_plateau_ratio: float = 0.6        # 超过多少比例关键指标都平台化，则认为NCU平台化
+    ncu_plateau_ratio: float = 0.65       # 超过多少比例关键指标都平台化，则认为NCU平台化
 
     # -------- 收敛得分权重 --------
     weight_gain: float = 0.30
@@ -75,8 +95,8 @@ class EarlyStoppingConfig:
     stop_score_threshold: float = 0.7
 
     # -------- 安全限制 --------
-    max_depth: Optional[int] = 15               # 超出 max_depth 直接判停
-    hard_no_improve_rounds: Optional[int] = 8   # 若连续8轮几乎无提升，直接停，无需和其他指标加权
+    max_depth: Optional[int] = 20               # 超出 max_depth 直接判停
+    hard_no_improve_rounds: Optional[int] = 4   # 若连续4轮几乎无提升，直接停，无需和其他指标加权
 
 
 @dataclass
@@ -328,9 +348,14 @@ class BranchEarlyStoppingJudge:
             if len(vals) < 2:
                 continue
 
-            changes = [abs(vals[i] - vals[i - 1]) for i in range(1, len(vals))]
-            avg_change = sum(changes) / len(changes)
-            stable = avg_change <= threshold
+            abs_changes = [abs(vals[i] - vals[i - 1]) for i in range(1, len(vals))]
+            rel_changes = [
+                abs(vals[i] - vals[i - 1]) / (abs(vals[i - 1]) + EPS)
+                for i in range(1, len(vals))
+            ]
+            avg_abs_change = sum(abs_changes) / len(abs_changes)
+            avg_rel_change = sum(rel_changes) / len(rel_changes)
+            stable = avg_rel_change <= threshold
 
             valid_metric_count += 1
             if stable:
@@ -338,7 +363,8 @@ class BranchEarlyStoppingJudge:
 
             metric_results[metric_name] = {
                 "values": vals,
-                "avg_abs_change": avg_change,
+                "avg_abs_change": avg_abs_change,
+                "avg_rel_change": avg_rel_change,
                 "threshold": threshold,
                 "stable": stable,
             }

@@ -1,9 +1,9 @@
 # 模型预设配置
 # 每个预设包含完整的模型参数
 
-claude-opus-4-6:
+claude-opus-4-7:
   api_base: "https://gw.claudeapi.com"
-  model: "claude-opus-4-6"
+  model: "claude-opus-4-7"
   api_key_env: "AIKG_CLAUDE_API_KEY"
   max_tokens: 65535
   temperature: 0.1
@@ -170,6 +170,20 @@ sflow_qwen_7b:
   presence_penalty: 0.5
 
 # DeepSeek官方API
+deepseek_v4_pro:
+  api_base: "https://api.deepseek.com"
+  model: "deepseek-v4-pro"
+  api_key_env: "AIKG_DEEPSEEK_API_KEY"
+  max_tokens: 65535
+  temperature: 0.1
+  top_p: 0.9
+  frequency_penalty: 0.5
+  presence_penalty: 0.5
+  extra_body:
+    reasoning_effort: "max"
+    response_format:
+      type: "json_object"
+      
 deepseek_v4_flash:
   api_base: "https://api.deepseek.com"
   model: "deepseek-v4-flash"
