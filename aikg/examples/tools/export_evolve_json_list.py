@@ -1,6 +1,7 @@
 import os
 import json
 from pathlib import Path
+import argparse
 
 def get_evolution_trajectories(base_path):
     all_nodes = {}
@@ -80,8 +81,23 @@ def get_evolution_trajectories(base_path):
 
 # 使用示例
 if __name__ == "__main__":
-    # 替换为你实际的文件夹路径
-    folder_path = "/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level2/59_Matmul_Swish_Scaling/island_0" 
+    parser = argparse.ArgumentParser(description="传入文件夹路径参数")
+    
+    # 2. 添加 --folder_path 参数（必填）
+    parser.add_argument(
+        "--folder_path", 
+        type=str, 
+        required=True, 
+        default="/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level2/59_Matmul_Swish_Scaling/island_0",
+        help="请输入你的实际文件夹路径"
+    )
+    
+    # 3. 解析命令行参数
+    args = parser.parse_args()
+    
+    # 4. 获取传入的路径
+    folder_path = args.folder_path
+    
     # 执行 rm evolve_*
     os.system(f"rm evolve_*.json")
     

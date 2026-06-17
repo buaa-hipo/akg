@@ -341,7 +341,7 @@ class AgentBase(ABC):
         effective_model_name = getattr(model, "model_name", model_name)
         is_openai_async_client = OpenAIAsyncClient is not None and isinstance(model, OpenAIAsyncClient)
 
-        try:
+        async def _invoke_once() -> tuple[str, str, str]:
             # 如果是VLLM模型（openai.AsyncOpenAI客户端）
             if effective_model_name.startswith("vllm_") or is_openai_async_client:
                 # 将formatted_prompt转换为OpenAI格式的消息
@@ -419,7 +419,7 @@ class AgentBase(ABC):
                 total_time = end_time - start_time
                 
                 response_metadata = f"response_metadata: {raw_result.response_metadata}\n" + \
-                    f"usage_metadata: {raw_result.usage_metadata}"
+                    f"llm model: {model_name}, usage_metadata: {raw_result.usage_metadata}"
                 logger.info(response_metadata)
                 
                 # 计算输出输出吞吐速度和LLM请求时间
@@ -433,18 +433,47 @@ class AgentBase(ABC):
                     line = f"{self.context.get('agent_name', 'null_name')},{raw_result.usage_metadata.get('input_tokens', '0')},{raw_result.usage_metadata.get('output_token_details', {}).get('reasoning', '0')},{raw_result.usage_metadata.get('output_tokens', '0')},{total_time:.2f}\n"
                     tokens_cnt_f.write(line)
 
-            logger.debug(f"LLM End:    [status] %s -- [model] %s",
-                         self.context.get('agent_name', ''), effective_model_name)
+            return content, reasoning_content, response_metadata
 
-            # 后处理：从 content 中剥离可能包含的 reasoning 片段
-            if 'claude' in model_name:
-                raw_content = content
-                content = raw_content[1].get("text")
-                reasoning_content = raw_content[0].get("thinking")
-            else:
-                content, extracted_reasoning = self.split_think(content)
-                if extracted_reasoning:
-                    reasoning_content = extracted_reasoning
+        try:
+            max_empty_content_retries = 3
+            for attempt in range(max_empty_content_retries + 1):
+                content, reasoning_content, response_metadata = await _invoke_once()
+
+                logger.debug(f"LLM End:    [status] %s -- [model] %s",
+                             self.context.get('agent_name', ''), effective_model_name)
+
+                # 后处理：从 content 中剥离可能包含的 reasoning 片段
+                if 'claude' in model_name:
+                    raw_content = content
+                    content = raw_content[1].get("text")
+                    reasoning_content = raw_content[0].get("thinking")
+                else:
+                    content, extracted_reasoning = self.split_think(content)
+                    if extracted_reasoning:
+                        reasoning_content = extracted_reasoning
+
+                if content and content.strip():
+                    break
+
+                if attempt < max_empty_content_retries:
+                    logger.warning(
+                        "LLM returned empty content: [status] %s -- [model] %s, retrying (%d/%d). reasoning_len=%d",
+                        self.context.get('agent_name', ''),
+                        effective_model_name,
+                        attempt + 1,
+                        max_empty_content_retries,
+                        len(reasoning_content or ""),
+                    )
+                else:
+                    logger.error(
+                        "LLM returned empty content after %d retries: [status] %s -- [model] %s -- reasoning_len=%d",
+                        max_empty_content_retries,
+                        self.context.get('agent_name', ''),
+                        effective_model_name,
+                        len(reasoning_content or ""),
+                    )
+                    raise ValueError(f"LLM returned empty content after {max_empty_content_retries} retries")
 
             if os.getenv("AIKG_DATA_COLLECT", "off").lower() == "on":
                 # 使用collector收集数据
@@ -472,7 +501,7 @@ class AgentBase(ABC):
 
             return content, formatted_prompt, reasoning_content
         except Exception as e:
-            import pdb;pdb.set_trace()
+            # import pdb;pdb.set_trace()
             logger.error(f"LLM Failed: [status] %s -- [model] %s -- [error] %s",
                          self.context.get('agent_name', ''), effective_model_name, e)
             logger.error(f"Exception in run_llm: {type(e).__name__}: {e}")

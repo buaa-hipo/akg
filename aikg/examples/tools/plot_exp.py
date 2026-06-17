@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import json
 import glob
+import argparse
+import os
 
-def plot_evolution_trajectories(json_files=None):
+def plot_evolution_trajectories(json_files=None, save_name="evolution_trajectories.png"):
     if json_files is None:
         json_files = glob.glob("evolve_*.json")
     
@@ -44,8 +46,19 @@ def plot_evolution_trajectories(json_files=None):
     plt.grid(True, linestyle=':', alpha=0.6)
     plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
     plt.tight_layout()
-    plt.savefig("evolution_trajectories.png", bbox_inches='tight', dpi=150)
+    os.makedirs("evolve_plots", exist_ok=True)
+    if not save_name.endswith(".png"):
+        save_name = f"{save_name}.png"
+    save_path = os.path.join("evolve_plots", save_name)
+    plt.savefig(save_path, bbox_inches='tight', dpi=150)
     plt.show()
 
 if __name__ == "__main__":
-    plot_evolution_trajectories()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--save_name",
+        default="evolution_trajectories.png",
+        help="Name of the output PNG file saved under evolve_plots/.",
+    )
+    args = parser.parse_args()
+    plot_evolution_trajectories(save_name=args.save_name)

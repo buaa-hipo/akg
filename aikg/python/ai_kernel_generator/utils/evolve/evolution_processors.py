@@ -235,6 +235,14 @@ class TaskCreationProcessor:
     def __init__(self, runtime_config: EvolveRuntimeConfig, init_data: Dict[str, Any]):
         self.config = runtime_config
         self.init_data = init_data
+    
+    def save_checkpoint(
+        self,
+        round_idx: int,
+        round_implementations: List[Dict[str, Any]] = None,
+        evolve_from_checkpoint: bool = False
+    ):
+        self._prepare_island_inspirations(round_idx, round_implementations, evolve_from_checkpoint)
         
     def create_evolve_designer_tasks_for_round(
         self,

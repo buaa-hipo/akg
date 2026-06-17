@@ -67,7 +67,7 @@ def get_init_inputs():
 def get_task_desc(file: str):
     return ''.join(open(file, 'r').readlines())
 
-async def run_torch_evolve_triton(op_name: str, task_desc: str, evolve_database: str, worker_mode="local", worker_url=None):
+async def run_torch_evolve_triton(op_name: str, task_desc: str, evolve_database: str, worker_mode="local", worker_url=None, config_name: str = "evolve_deepseek.yaml"):
     """
     运行Triton进化示例
     
@@ -85,7 +85,7 @@ async def run_torch_evolve_triton(op_name: str, task_desc: str, evolve_database:
     config.arch = "a100"
 
     # 进化参数
-    config.max_rounds = 10
+    config.max_rounds = 1
     config.parallel_num = 1         # coder_parallel_num 和 parallel_num 不可同时选，当前开发 coder_parallel_num
     config.coder_parallel_num = 3   # 每次岛屿任务并行探索Coder的数量
 
@@ -99,7 +99,7 @@ async def run_torch_evolve_triton(op_name: str, task_desc: str, evolve_database:
     config.device_list = [1]
 
     # 配置文件路径
-    config.config_path = str(Path(get_project_root()) / "config" / "vllm_triton_cuda_evolve_config.yaml")
+    config.config_path = str(Path(get_project_root()) / "config" / config_name)
 
     # 选择要运行的任务
     # config.op_name = get_op_name()
@@ -211,6 +211,12 @@ if __name__ == "__main__":
         help="远程 Worker Service 的 URL（仅 remote 模式需要）。也可通过环境变量 AIKG_WORKER_URL 设置"
     )
     
+    parser.add_argument(
+        "--config_name",
+        type=str,
+        default="evolve_deepseek.yaml",
+    )
+    
     aikg_debug_mode = os.environ.get("AIKG_DEBUG_MODE", False) is not False
     parser.add_argument(
         "--op-name",
@@ -245,4 +251,4 @@ if __name__ == "__main__":
             print(f"   请设置环境变量 AIKG_WORKER_URL 或使用 --worker-url 参数")
         print()
     
-    asyncio.run(run_torch_evolve_triton(args.op_name, args.task_desc, args.evolve_database, worker_mode=args.worker, worker_url=args.worker_url))
+    asyncio.run(run_torch_evolve_triton(args.op_name, args.task_desc, args.evolve_database, worker_mode=args.worker, worker_url=args.worker_url, config_name=args.config_name))

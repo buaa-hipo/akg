@@ -263,30 +263,63 @@ class LocalWorker(WorkerInterface):
             return int(device_id)
         return int(os.environ.get('CUDA_VISIBLE_DEVICES', 0))
 
-    def waiting_for_resources(self, device_id: Optional[int] = None):
-        # disable waiting
-        # return
-
+    def waiting_for_resources(self, device_id: Optional[int] = None, timeout_minutes: int = 120):
         import time
+        import subprocess
+        from typing import Optional
+
         actual_device_id = self._resolve_device_id(device_id)
         cnt = 0
-        while True:
+        max_count = int(timeout_minutes * 60 / 3)  # 3秒一次
+
+        logger.info(f"开始等待 GPU_{actual_device_id} 资源，超时时间 {timeout_minutes} 分钟")
+
+        while cnt < max_count:
             if cnt % 100 == 0:
-                logger.info(f"I'm waiting for GPU_{actual_device_id} resources for {cnt * 3 / 60} minutes ...\n")
-            result = subprocess.check_output(
-                [
-                    "nvidia-smi",
-                    f"--id={actual_device_id}",
-                    "--query-compute-apps=pid",
-                    "--format=csv,noheader"
-                ],
-                encoding="utf-8",
-                stderr=subprocess.STDOUT
-            )
-            if not result.strip():
-                break
+                elapsed_min = cnt * 3 / 60
+                logger.info(f"已等待 GPU_{actual_device_id} 资源 {elapsed_min:.2f} 分钟 ...")
+
+            try:
+                # 运行 nvidia-smi，捕获所有异常
+                result = subprocess.run(
+                    [
+                        "nvidia-smi",
+                        f"--id={actual_device_id}",
+                        "--query-compute-apps=pid",
+                        "--format=csv,noheader"
+                    ],
+                    encoding="utf-8",
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    timeout=10  # 防止命令卡死
+                )
+
+                # 命令执行失败
+                if result.returncode != 0:
+                    err = result.stderr.strip()
+                    logger.warning(f"nvidia-smi 执行失败 (code={result.returncode}): {err}")
+                    cnt += 1
+                    time.sleep(3)
+                    continue
+
+                output = result.stdout.strip()
+
+                # 没有进程 → 退出等待
+                if not output:
+                    logger.info(f"GPU_{actual_device_id} 资源已释放，开始执行任务")
+                    return
+
+            except subprocess.TimeoutExpired:
+                logger.error("nvidia-smi 命令执行超时，重试...")
+            except Exception as e:
+                logger.error(f"查询 GPU 资源异常: {str(e)}", exc_info=True)
+
             cnt += 1
             time.sleep(3)
+
+        # 超时退出
+        logger.error(f"等待 GPU_{actual_device_id} 资源超时 {timeout_minutes} 分钟，退出等待")
+        raise TimeoutError(f"GPU_{actual_device_id} 资源等待超时")
 
     @asynccontextmanager
     async def gpu_execution_lock(self, device_id: Optional[int], task_id: str):

@@ -1,9 +1,9 @@
 # 模型预设配置
 # 每个预设包含完整的模型参数
 
-claude-opus-4-6:
+claude-opus-4-7:
   api_base: "https://gw.claudeapi.com"
-  model: "claude-opus-4-6"
+  model: "claude-opus-4-7"
   api_key_env: "AIKG_CLAUDE_API_KEY"
   max_tokens: 65535
   temperature: 0.1

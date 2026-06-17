@@ -1,0 +1,1619 @@
+[INFO] processing 1_Conv2D_ReLU_BiasAdd
+一共有 21 条进化轨迹 (叶子节点)
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> id24e_0.80x -> id295_0.32x -> id079_0.52x -> id207_0.16x -> id0c7_0.61x -> id1a3_0.28x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> id24e_0.80x -> id295_0.32x -> id079_0.52x -> id207_0.16x -> id0c7_0.61x -> idf68_0.29x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> id24e_0.80x -> id295_0.32x -> id079_0.52x -> id207_0.16x -> id0c7_0.61x -> id20f_0.25x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> id24e_0.80x -> id295_0.32x -> id079_0.52x -> id207_0.16x -> id262_0.29x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> id24e_0.80x -> id295_0.32x -> id079_0.52x -> id207_0.16x -> idb04_nanx -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> id24e_0.80x -> id295_0.32x -> id079_0.52x -> id1ac_0.09x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> id24e_0.80x -> id295_0.32x -> id079_0.52x -> idc5e_0.11x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> id24e_0.80x -> id295_0.32x -> id195_0.41x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> id24e_0.80x -> id295_0.32x -> idfac_0.37x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> id24e_0.80x -> id3be_0.26x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> id24e_0.80x -> id0f8_0.16x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> ide97_0.69x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> id60f_0.65x -> id9b9_0.77x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> idd5f_0.43x -> 
+id1c8_0.33x -> id5ea_0.90x -> idae9_0.36x -> idfb7_0.55x -> 
+id1c8_0.33x -> id5ea_0.90x -> id5e3_0.23x -> 
+id1c8_0.33x -> id5ea_0.90x -> id3d6_0.17x -> 
+id1c8_0.33x -> idab5_0.89x -> 
+id1c8_0.33x -> id102_0.39x -> 
+idcdf_0.18x -> 
+id736_0.21x -> 
+[INFO] processing 2_ConvTranspose2d_BiasAdd_Clamp_Scaling_Clamp_Divide
+一共有 19 条进化轨迹 (叶子节点)
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id372_0.42x -> ideeb_0.33x -> idc85_0.15x -> id241_0.37x -> id3a1_0.41x -> id353_0.27x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id372_0.42x -> ideeb_0.33x -> idc85_0.15x -> id241_0.37x -> id3a1_0.41x -> id206_0.33x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id372_0.42x -> ideeb_0.33x -> idc85_0.15x -> id241_0.37x -> id3a1_0.41x -> idb07_0.40x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id372_0.42x -> ideeb_0.33x -> idc85_0.15x -> id241_0.37x -> idcfe_0.29x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id372_0.42x -> ideeb_0.33x -> idc85_0.15x -> id241_0.37x -> id025_0.36x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id372_0.42x -> ideeb_0.33x -> idc85_0.15x -> idd28_0.13x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id372_0.42x -> ideeb_0.33x -> idc85_0.15x -> id3bf_0.34x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id372_0.42x -> ideeb_0.33x -> id4af_0.15x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id372_0.42x -> ideeb_0.33x -> ide6f_0.10x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id372_0.42x -> id6e7_0.30x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id372_0.42x -> id414_0.10x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id28d_0.23x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> id570_0.23x -> id1e9_0.28x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> idac3_0.15x -> 
+id1b0_1.76x -> ide91_0.21x -> ide36_0.61x -> ida4f_0.16x -> 
+id1b0_1.76x -> ide91_0.21x -> idc61_0.28x -> 
+id1b0_1.76x -> ide91_0.21x -> idba8_0.33x -> 
+id1b0_1.76x -> idf1b_0.08x -> 
+id5b5_nanx -> 
+[INFO] processing 4_Conv2d_Mish_Mish
+一共有 20 条进化轨迹 (叶子节点)
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> ida08_0.59x -> id400_0.22x -> id3ce_0.57x -> id196_0.41x -> id551_0.40x -> idc75_0.21x -> id098_0.13x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> ida08_0.59x -> id400_0.22x -> id3ce_0.57x -> id196_0.41x -> id551_0.40x -> idc75_0.21x -> id3cc_0.37x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> ida08_0.59x -> id400_0.22x -> id3ce_0.57x -> id196_0.41x -> id551_0.40x -> id9f8_0.20x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> ida08_0.59x -> id400_0.22x -> id3ce_0.57x -> id196_0.41x -> id551_0.40x -> id39c_0.11x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> ida08_0.59x -> id400_0.22x -> id3ce_0.57x -> id196_0.41x -> idc5d_0.35x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> ida08_0.59x -> id400_0.22x -> id3ce_0.57x -> id196_0.41x -> id4f3_0.35x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> ida08_0.59x -> id400_0.22x -> id3ce_0.57x -> id5f3_0.29x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> ida08_0.59x -> id400_0.22x -> id3ce_0.57x -> idcde_0.27x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> ida08_0.59x -> id400_0.22x -> id4b6_0.44x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> ida08_0.59x -> id400_0.22x -> id8d4_0.48x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> ida08_0.59x -> ide64_0.21x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> ida08_0.59x -> iddd7_0.19x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> id970_0.49x -> 
+id4d9_0.28x -> id37a_0.14x -> ide82_0.32x -> idcf4_0.27x -> 
+id4d9_0.28x -> id37a_0.14x -> ida82_0.15x -> 
+id4d9_0.28x -> id37a_0.14x -> id2fa_0.24x -> 
+id4d9_0.28x -> idba5_0.12x -> 
+id4d9_0.28x -> id0e0_0.11x -> 
+id971_0.14x -> 
+id78a_0.13x -> 
+[INFO] processing 5_ConvTranspose2d_Subtract_Tanh
+一共有 8 条进化轨迹 (叶子节点)
+id320_0.09x -> id627_0.06x -> id57a_1.03x -> id692_0.06x -> id156_0.04x -> id687_1.07x -> ida06_0.09x -> iddf5_0.04x -> 
+id320_0.09x -> id627_0.06x -> id57a_1.03x -> id692_0.06x -> id156_0.04x -> id4a4_0.15x -> 
+id320_0.09x -> id627_0.06x -> id57a_1.03x -> id692_0.06x -> id1fd_0.04x -> 
+id320_0.09x -> id627_0.06x -> id57a_1.03x -> id692_0.06x -> id58a_0.02x -> 
+id320_0.09x -> id627_0.06x -> id57a_1.03x -> id19a_0.05x -> 
+id320_0.09x -> id425_0.06x -> 
+id320_0.09x -> id2a9_0.03x -> 
+ida69_0.06x -> 
+[INFO] processing 6_Conv3d_Softmax_MaxPool_MaxPool
+一共有 19 条进化轨迹 (叶子节点)
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id70b_0.36x -> idfdd_0.62x -> id1cb_0.52x -> id4e3_0.32x -> id487_0.50x -> id501_1.26x -> id9e8_0.66x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id70b_0.36x -> idfdd_0.62x -> id1cb_0.52x -> id4e3_0.32x -> id487_0.50x -> id501_1.26x -> id84b_0.69x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id70b_0.36x -> idfdd_0.62x -> id1cb_0.52x -> id4e3_0.32x -> id487_0.50x -> id501_1.26x -> ida97_0.91x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id70b_0.36x -> idfdd_0.62x -> id1cb_0.52x -> id4e3_0.32x -> id487_0.50x -> ida1e_0.14x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id70b_0.36x -> idfdd_0.62x -> id1cb_0.52x -> id4e3_0.32x -> id487_0.50x -> ide75_0.40x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id70b_0.36x -> idfdd_0.62x -> id1cb_0.52x -> id4e3_0.32x -> idaad_0.37x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id70b_0.36x -> idfdd_0.62x -> id1cb_0.52x -> id4e3_0.32x -> idbb5_0.45x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id70b_0.36x -> idfdd_0.62x -> id1cb_0.52x -> id15d_0.23x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id70b_0.36x -> idfdd_0.62x -> id77a_0.51x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id70b_0.36x -> idfdd_0.62x -> ida52_0.50x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id70b_0.36x -> idce5_0.32x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id70b_0.36x -> idce6_0.35x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> id213_0.20x -> 
+id339_0.13x -> idcab_0.32x -> id2cf_0.90x -> idfa7_0.26x -> 
+id339_0.13x -> idcab_0.32x -> idff7_0.19x -> 
+id339_0.13x -> idcab_0.32x -> id1b4_0.30x -> 
+id339_0.13x -> iddaa_0.12x -> 
+id339_0.13x -> id47c_0.16x -> 
+ideb1_0.11x -> 
+[INFO] processing 7_Conv3d_ReLU_LeakyReLU_GELU_Sigmoid_BiasAdd
+一共有 21 条进化轨迹 (叶子节点)
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> id118_0.28x -> id079_0.62x -> idd7e_0.36x -> idbf1_0.47x -> ide8f_0.47x -> id5f0_0.62x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> id118_0.28x -> id079_0.62x -> idd7e_0.36x -> idbf1_0.47x -> ide8f_0.47x -> idbc2_0.89x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> id118_0.28x -> id079_0.62x -> idd7e_0.36x -> idbf1_0.47x -> ide8f_0.47x -> id15e_0.03x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> id118_0.28x -> id079_0.62x -> idd7e_0.36x -> idbf1_0.47x -> idfff_0.28x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> id118_0.28x -> id079_0.62x -> idd7e_0.36x -> idbf1_0.47x -> idd2e_0.36x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> id118_0.28x -> id079_0.62x -> idd7e_0.36x -> ideb6_0.43x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> id118_0.28x -> id079_0.62x -> idd7e_0.36x -> idd48_0.46x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> id118_0.28x -> id079_0.62x -> id8f7_0.31x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> id118_0.28x -> id079_0.62x -> id5b3_0.31x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> id118_0.28x -> id504_0.37x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> id118_0.28x -> id76f_0.37x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> ide9e_0.26x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ida0a_0.28x -> id8c8_0.25x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> ide0f_0.28x -> 
+idc76_1.37x -> id490_0.72x -> ide4c_0.82x -> id88b_0.14x -> 
+idc76_1.37x -> id490_0.72x -> id5b0_0.59x -> 
+idc76_1.37x -> id490_0.72x -> idcf9_0.34x -> 
+idc76_1.37x -> id2cb_0.41x -> 
+idc76_1.37x -> idba1_0.16x -> 
+id12e_0.55x -> 
+id43f_0.08x -> 
+[INFO] processing 8_Conv3d_Divide_Max_GlobalAvgPool_BiasAdd_Sum
+一共有 21 条进化轨迹 (叶子节点)
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> idb2b_0.85x -> id995_0.64x -> idae7_0.14x -> id8b5_0.26x -> idc72_0.13x -> id37b_0.42x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> idb2b_0.85x -> id995_0.64x -> idae7_0.14x -> id8b5_0.26x -> idc72_0.13x -> id743_0.28x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> idb2b_0.85x -> id995_0.64x -> idae7_0.14x -> id8b5_0.26x -> idc72_0.13x -> id0a2_0.29x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> idb2b_0.85x -> id995_0.64x -> idae7_0.14x -> id8b5_0.26x -> id52f_0.12x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> idb2b_0.85x -> id995_0.64x -> idae7_0.14x -> id8b5_0.26x -> id88f_0.09x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> idb2b_0.85x -> id995_0.64x -> idae7_0.14x -> idd66_0.20x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> idb2b_0.85x -> id995_0.64x -> idae7_0.14x -> id4dd_0.13x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> idb2b_0.85x -> id995_0.64x -> idb3c_0.10x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> idb2b_0.85x -> id995_0.64x -> id3a2_0.08x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> idb2b_0.85x -> id3ea_0.23x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> idb2b_0.85x -> id580_0.46x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> idf67_0.19x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcf9_0.21x -> id855_0.28x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> idcbf_0.17x -> 
+id3f4_0.11x -> idea7_0.23x -> idf65_0.36x -> id9f7_0.06x -> 
+id3f4_0.11x -> idea7_0.23x -> id9bb_0.25x -> 
+id3f4_0.11x -> idea7_0.23x -> idcad_0.28x -> 
+id3f4_0.11x -> ide46_0.11x -> 
+id3f4_0.11x -> id424_0.06x -> 
+idd95_0.09x -> 
+id786_0.00x -> 
+[INFO] processing 9_Matmul_Subtract_Multiply_ReLU
+一共有 21 条进化轨迹 (叶子节点)
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> id6cd_11.46x -> id776_7.44x -> idfd4_6.06x -> idfae_9.65x -> id873_12.27x -> ide69_8.69x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> id6cd_11.46x -> id776_7.44x -> idfd4_6.06x -> idfae_9.65x -> id873_12.27x -> idb88_10.97x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> id6cd_11.46x -> id776_7.44x -> idfd4_6.06x -> idfae_9.65x -> id873_12.27x -> idbd9_7.53x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> id6cd_11.46x -> id776_7.44x -> idfd4_6.06x -> idfae_9.65x -> id459_9.36x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> id6cd_11.46x -> id776_7.44x -> idfd4_6.06x -> idfae_9.65x -> ida6f_11.36x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> id6cd_11.46x -> id776_7.44x -> idfd4_6.06x -> id39e_2.91x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> id6cd_11.46x -> id776_7.44x -> idfd4_6.06x -> idd7f_4.67x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> id6cd_11.46x -> id776_7.44x -> id5f4_2.34x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> id6cd_11.46x -> id776_7.44x -> id8f0_4.63x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> id6cd_11.46x -> idca9_3.97x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> id6cd_11.46x -> ida61_3.96x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> id024_4.87x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id237_12.38x -> idf13_9.38x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> id438_11.31x -> 
+id71f_12.12x -> id9dc_10.86x -> id6e5_6.54x -> ideae_10.12x -> 
+id71f_12.12x -> id9dc_10.86x -> id40e_3.63x -> 
+id71f_12.12x -> id9dc_10.86x -> id6c2_4.00x -> 
+id71f_12.12x -> idec7_4.08x -> 
+id71f_12.12x -> id10f_4.20x -> 
+id804_9.60x -> 
+ida29_12.01x -> 
+[INFO] processing 12_Gemm_Multiply_LeakyReLU
+一共有 21 条进化轨迹 (叶子节点)
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> idb48_11.26x -> id152_10.99x -> idcda_1.55x -> id844_12.26x -> id4ef_11.29x -> id69d_5.54x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> idb48_11.26x -> id152_10.99x -> idcda_1.55x -> id844_12.26x -> id4ef_11.29x -> ide66_5.35x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> idb48_11.26x -> id152_10.99x -> idcda_1.55x -> id844_12.26x -> id4ef_11.29x -> id4f1_10.14x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> idb48_11.26x -> id152_10.99x -> idcda_1.55x -> id844_12.26x -> idca0_11.06x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> idb48_11.26x -> id152_10.99x -> idcda_1.55x -> id844_12.26x -> id256_8.37x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> idb48_11.26x -> id152_10.99x -> idcda_1.55x -> id571_11.03x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> idb48_11.26x -> id152_10.99x -> idcda_1.55x -> id501_4.77x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> idb48_11.26x -> id152_10.99x -> idaec_1.54x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> idb48_11.26x -> id152_10.99x -> id702_1.50x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> idb48_11.26x -> idbba_5.34x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> idb48_11.26x -> id728_10.99x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> id3e2_4.26x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> idcd1_7.72x -> idaf7_4.18x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> id6e6_3.92x -> 
+id79d_11.11x -> id70c_8.85x -> idfd3_4.75x -> id0e4_4.22x -> 
+id79d_11.11x -> id70c_8.85x -> id8f2_2.96x -> 
+id79d_11.11x -> id70c_8.85x -> idff3_2.84x -> 
+id79d_11.11x -> id5ca_8.68x -> 
+id79d_11.11x -> id219_3.15x -> 
+idb51_4.83x -> 
+idc61_6.46x -> 
+[INFO] processing 13_ConvTranspose3d_Mean_Add_Softmax_Tanh_Scaling
+一共有 11 条进化轨迹 (叶子节点)
+id154_0.02x -> id04a_0.09x -> id444_0.43x -> id4e5_0.60x -> ide44_1.08x -> id4f7_0.46x -> 
+id154_0.02x -> id04a_0.09x -> id444_0.43x -> id4e5_0.60x -> ide44_1.08x -> id014_0.66x -> 
+id154_0.02x -> id04a_0.09x -> id444_0.43x -> id4e5_0.60x -> ide44_1.08x -> id93b_0.09x -> 
+id154_0.02x -> id04a_0.09x -> id444_0.43x -> id4e5_0.60x -> ide85_0.25x -> 
+id154_0.02x -> id04a_0.09x -> id444_0.43x -> id4e5_0.60x -> idd27_0.26x -> 
+id154_0.02x -> id04a_0.09x -> id444_0.43x -> idc47_0.25x -> 
+id154_0.02x -> id04a_0.09x -> id58d_0.06x -> 
+id154_0.02x -> id0d4_0.01x -> 
+id154_0.02x -> idf04_0.02x -> 
+idc3f_0.00x -> 
+id743_0.00x -> 
+[INFO] processing 14_Gemm_Divide_Sum_Scaling
+一共有 21 条进化轨迹 (叶子节点)
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> id087_52.47x -> idb30_26.56x -> id118_56.78x -> id7b6_23.53x -> id8f9_166.90x -> idfc5_35.89x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> id087_52.47x -> idb30_26.56x -> id118_56.78x -> id7b6_23.53x -> id8f9_166.90x -> ida56_104.17x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> id087_52.47x -> idb30_26.56x -> id118_56.78x -> id7b6_23.53x -> id8f9_166.90x -> ida1e_65.98x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> id087_52.47x -> idb30_26.56x -> id118_56.78x -> id7b6_23.53x -> id474_43.98x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> id087_52.47x -> idb30_26.56x -> id118_56.78x -> id7b6_23.53x -> id106_40.62x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> id087_52.47x -> idb30_26.56x -> id118_56.78x -> idaa1_15.44x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> id087_52.47x -> idb30_26.56x -> id118_56.78x -> id767_21.99x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> id087_52.47x -> idb30_26.56x -> id356_27.71x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> id087_52.47x -> idb30_26.56x -> id759_50.73x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> id087_52.47x -> ide3b_17.32x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> id087_52.47x -> idebe_19.27x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> id82e_27.01x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> idd22_37.75x -> idaec_51.68x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> id98e_18.62x -> 
+id69d_4.35x -> id9d8_3.60x -> id21d_59.45x -> id95f_26.29x -> 
+id69d_4.35x -> id9d8_3.60x -> id72c_41.86x -> 
+id69d_4.35x -> id9d8_3.60x -> id591_46.49x -> 
+id69d_4.35x -> idfa0_1.52x -> 
+id69d_4.35x -> idce9_2.31x -> 
+id342_3.92x -> 
+idfc3_0.32x -> 
+[INFO] processing 16_ConvTranspose2d_Mish_Add_Hardtanh_Scaling
+一共有 14 条进化轨迹 (叶子节点)
+idbf9_0.23x -> idebf_0.39x -> idb47_0.18x -> id7fd_0.12x -> id771_0.29x -> id459_0.38x -> id520_0.35x -> idba5_0.36x -> id387_0.38x -> id59d_0.30x -> 
+idbf9_0.23x -> idebf_0.39x -> idb47_0.18x -> id7fd_0.12x -> id771_0.29x -> id459_0.38x -> id520_0.35x -> idba5_0.36x -> id387_0.38x -> id150_0.57x -> 
+idbf9_0.23x -> idebf_0.39x -> idb47_0.18x -> id7fd_0.12x -> id771_0.29x -> id459_0.38x -> id520_0.35x -> idba5_0.36x -> id60c_0.37x -> 
+idbf9_0.23x -> idebf_0.39x -> idb47_0.18x -> id7fd_0.12x -> id771_0.29x -> id459_0.38x -> id520_0.35x -> idba5_0.36x -> idf95_0.05x -> 
+idbf9_0.23x -> idebf_0.39x -> idb47_0.18x -> id7fd_0.12x -> id771_0.29x -> id459_0.38x -> id520_0.35x -> id835_0.32x -> 
+idbf9_0.23x -> idebf_0.39x -> idb47_0.18x -> id7fd_0.12x -> id771_0.29x -> id459_0.38x -> id751_0.30x -> 
+idbf9_0.23x -> idebf_0.39x -> idb47_0.18x -> id7fd_0.12x -> id771_0.29x -> id459_0.38x -> idba3_0.34x -> 
+idbf9_0.23x -> idebf_0.39x -> idb47_0.18x -> id7fd_0.12x -> id771_0.29x -> id4be_0.30x -> 
+idbf9_0.23x -> idebf_0.39x -> idb47_0.18x -> id7fd_0.12x -> id771_0.29x -> id4fe_0.29x -> 
+idbf9_0.23x -> idebf_0.39x -> idb47_0.18x -> id7fd_0.12x -> id47e_0.20x -> 
+idbf9_0.23x -> idebf_0.39x -> idb47_0.18x -> id7fd_0.12x -> id748_0.15x -> 
+idbf9_0.23x -> idebf_0.39x -> idb47_0.18x -> idc6a_0.08x -> 
+idbf9_0.23x -> idebf_0.39x -> ida64_0.18x -> 
+id7c3_0.21x -> 
+[INFO] processing 17_Conv2d_InstanceNorm_Divide
+一共有 16 条进化轨迹 (叶子节点)
+id6fc_1.60x -> idd5f_0.93x -> id456_0.90x -> id4e0_0.79x -> id9ff_0.87x -> id708_0.77x -> id858_0.55x -> id158_0.43x -> ida05_0.52x -> id740_0.65x -> 
+id6fc_1.60x -> idd5f_0.93x -> id456_0.90x -> id4e0_0.79x -> id9ff_0.87x -> id708_0.77x -> id858_0.55x -> id158_0.43x -> ida05_0.52x -> id43e_0.85x -> 
+id6fc_1.60x -> idd5f_0.93x -> id456_0.90x -> id4e0_0.79x -> id9ff_0.87x -> id708_0.77x -> id858_0.55x -> id158_0.43x -> ida05_0.52x -> id5c9_0.93x -> 
+id6fc_1.60x -> idd5f_0.93x -> id456_0.90x -> id4e0_0.79x -> id9ff_0.87x -> id708_0.77x -> id858_0.55x -> id158_0.43x -> id8f7_0.45x -> 
+id6fc_1.60x -> idd5f_0.93x -> id456_0.90x -> id4e0_0.79x -> id9ff_0.87x -> id708_0.77x -> id858_0.55x -> id158_0.43x -> id6a4_0.50x -> 
+id6fc_1.60x -> idd5f_0.93x -> id456_0.90x -> id4e0_0.79x -> id9ff_0.87x -> id708_0.77x -> id858_0.55x -> id4fd_0.38x -> 
+id6fc_1.60x -> idd5f_0.93x -> id456_0.90x -> id4e0_0.79x -> id9ff_0.87x -> id708_0.77x -> id9f9_0.44x -> 
+id6fc_1.60x -> idd5f_0.93x -> id456_0.90x -> id4e0_0.79x -> id9ff_0.87x -> id708_0.77x -> id4fd_0.46x -> 
+id6fc_1.60x -> idd5f_0.93x -> id456_0.90x -> id4e0_0.79x -> iddef_0.54x -> 
+id6fc_1.60x -> idd5f_0.93x -> id456_0.90x -> id489_0.47x -> 
+id6fc_1.60x -> idd5f_0.93x -> ide9a_0.69x -> 
+id6fc_1.60x -> idd5f_0.93x -> id74d_0.57x -> 
+id6fc_1.60x -> id68f_0.79x -> 
+id6fc_1.60x -> id637_0.26x -> 
+idafe_0.77x -> 
+idc67_0.31x -> 
+[INFO] processing 18_Matmul_Sum_Max_AvgPool_LogSumExp_LogSumExp
+一共有 21 条进化轨迹 (叶子节点)
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> idd3e_0.22x -> id5a1_208.70x -> id32f_145.64x -> id868_222.00x -> idbbd_112.79x -> ide6d_65.03x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> idd3e_0.22x -> id5a1_208.70x -> id32f_145.64x -> id868_222.00x -> idbbd_112.79x -> idbf4_145.54x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> idd3e_0.22x -> id5a1_208.70x -> id32f_145.64x -> id868_222.00x -> idbbd_112.79x -> idfff_208.79x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> idd3e_0.22x -> id5a1_208.70x -> id32f_145.64x -> id868_222.00x -> idd73_53.56x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> idd3e_0.22x -> id5a1_208.70x -> id32f_145.64x -> id868_222.00x -> id36a_112.74x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> idd3e_0.22x -> id5a1_208.70x -> id32f_145.64x -> id9f5_122.55x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> idd3e_0.22x -> id5a1_208.70x -> id32f_145.64x -> id5b4_78.99x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> idd3e_0.22x -> id5a1_208.70x -> id215_133.08x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> idd3e_0.22x -> id5a1_208.70x -> idf4f_145.52x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> idd3e_0.22x -> iddca_199.76x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> idd3e_0.22x -> idfa7_208.66x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> id334_0.20x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> ideec_0.21x -> ida52_0.22x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> id6fc_0.18x -> 
+id685_0.30x -> id458_0.28x -> id0f2_0.25x -> id305_0.19x -> 
+id685_0.30x -> id458_0.28x -> ida46_0.14x -> 
+id685_0.30x -> id458_0.28x -> id1b6_0.19x -> 
+id685_0.30x -> ida85_0.22x -> 
+id685_0.30x -> ida45_0.28x -> 
+idb49_0.29x -> 
+id77c_0.20x -> 
+[INFO] processing 19_ConvTranspose2d_GELU_GroupNorm
+一共有 16 条进化轨迹 (叶子节点)
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id497_0.15x -> id011_0.16x -> id948_0.17x -> id958_0.29x -> id061_0.25x -> id00c_0.41x -> idb8a_0.30x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id497_0.15x -> id011_0.16x -> id948_0.17x -> id958_0.29x -> id061_0.25x -> id00c_0.41x -> id921_0.26x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id497_0.15x -> id011_0.16x -> id948_0.17x -> id958_0.29x -> id061_0.25x -> id00c_0.41x -> id554_0.19x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id497_0.15x -> id011_0.16x -> id948_0.17x -> id958_0.29x -> id061_0.25x -> id195_0.27x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id497_0.15x -> id011_0.16x -> id948_0.17x -> id958_0.29x -> id061_0.25x -> ida6c_0.36x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id497_0.15x -> id011_0.16x -> id948_0.17x -> id958_0.29x -> ida6e_0.24x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id497_0.15x -> id011_0.16x -> id948_0.17x -> id958_0.29x -> idb76_0.24x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id497_0.15x -> id011_0.16x -> id948_0.17x -> ida1d_0.24x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id497_0.15x -> id011_0.16x -> id948_0.17x -> id7dc_0.26x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id497_0.15x -> id011_0.16x -> idf53_0.13x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id497_0.15x -> id011_0.16x -> id81d_0.17x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id497_0.15x -> id4c9_0.09x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> id785_0.14x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide07_0.29x -> idab9_0.13x -> 
+id8e9_0.16x -> idb5d_0.17x -> ide52_0.09x -> 
+idb85_0.15x -> 
+[INFO] processing 20_ConvTranspose3d_Sum_ResidualAdd_Multiply_ResidualAdd
+一共有 7 条进化轨迹 (叶子节点)
+id0ef_0.27x -> id163_0.30x -> id687_0.46x -> id8e2_0.11x -> 
+id0ef_0.27x -> id163_0.30x -> id687_0.46x -> iddb7_0.18x -> 
+id0ef_0.27x -> id163_0.30x -> id188_0.30x -> 
+id0ef_0.27x -> ida5f_0.13x -> 
+id0ef_0.27x -> idcee_0.27x -> 
+id669_0.23x -> 
+id8e3_0.04x -> 
+[INFO] processing 21_Conv2d_Add_Scale_Sigmoid_GroupNorm
+一共有 21 条进化轨迹 (叶子节点)
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> idb65_0.91x -> id484_1.13x -> id049_0.57x -> id529_0.80x -> idb89_0.72x -> id0ef_0.88x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> idb65_0.91x -> id484_1.13x -> id049_0.57x -> id529_0.80x -> idb89_0.72x -> id128_1.00x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> idb65_0.91x -> id484_1.13x -> id049_0.57x -> id529_0.80x -> idb89_0.72x -> id972_1.11x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> idb65_0.91x -> id484_1.13x -> id049_0.57x -> id529_0.80x -> id801_0.51x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> idb65_0.91x -> id484_1.13x -> id049_0.57x -> id529_0.80x -> id0ff_0.49x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> idb65_0.91x -> id484_1.13x -> id049_0.57x -> ida09_0.76x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> idb65_0.91x -> id484_1.13x -> id049_0.57x -> idab8_0.68x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> idb65_0.91x -> id484_1.13x -> id0fd_0.09x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> idb65_0.91x -> id484_1.13x -> id878_0.02x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> idb65_0.91x -> id0d8_1.01x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> idb65_0.91x -> id9c2_1.03x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> id8be_0.69x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> ide82_1.70x -> id3bd_0.53x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> idad3_0.69x -> 
+id76b_0.84x -> id831_1.06x -> id324_1.21x -> id474_0.87x -> 
+id76b_0.84x -> id831_1.06x -> idf06_1.11x -> 
+id76b_0.84x -> id831_1.06x -> id7d9_1.01x -> 
+id76b_0.84x -> idc43_0.53x -> 
+id76b_0.84x -> id6e7_1.03x -> 
+id522_0.01x -> 
+ida4d_0.75x -> 
+[INFO] processing 22_Matmul_Scale_ResidualAdd_Clamp_LogSumExp_Mish
+一共有 20 条进化轨迹 (叶子节点)
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id5c6_0.28x -> id437_0.29x -> id135_0.18x -> id416_0.23x -> idf83_0.18x -> idf4a_0.26x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id5c6_0.28x -> id437_0.29x -> id135_0.18x -> id416_0.23x -> idf83_0.18x -> iddeb_0.14x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id5c6_0.28x -> id437_0.29x -> id135_0.18x -> id416_0.23x -> idf83_0.18x -> idd73_0.14x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id5c6_0.28x -> id437_0.29x -> id135_0.18x -> id416_0.23x -> id619_0.14x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id5c6_0.28x -> id437_0.29x -> id135_0.18x -> id416_0.23x -> idde7_0.14x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id5c6_0.28x -> id437_0.29x -> id135_0.18x -> idf59_0.01x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id5c6_0.28x -> id437_0.29x -> id135_0.18x -> id273_0.09x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id5c6_0.28x -> id437_0.29x -> id176_0.11x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id5c6_0.28x -> id437_0.29x -> id208_0.12x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id5c6_0.28x -> id252_0.29x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id5c6_0.28x -> idf5f_0.29x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id160_0.22x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id995_0.21x -> id818_0.23x -> 
+id8d4_0.15x -> idc5a_0.24x -> idfaa_0.19x -> id616_0.09x -> 
+id8d4_0.15x -> idc5a_0.24x -> id376_0.13x -> 
+id8d4_0.15x -> idc5a_0.24x -> id66f_0.18x -> 
+id8d4_0.15x -> id163_0.09x -> 
+id8d4_0.15x -> id58a_0.13x -> 
+ide2a_0.14x -> 
+id8ca_0.14x -> 
+[INFO] processing 24_Conv3d_Min_Softmax
+一共有 18 条进化轨迹 (叶子节点)
+id3c8_0.23x -> id84b_0.17x -> id8af_0.95x -> id159_0.83x -> ida98_0.17x -> idd6c_0.23x -> ide11_0.05x -> idaa8_0.02x -> id4ec_0.05x -> ida2b_0.02x -> 
+id3c8_0.23x -> id84b_0.17x -> id8af_0.95x -> id159_0.83x -> ida98_0.17x -> idd6c_0.23x -> ide11_0.05x -> idaa8_0.02x -> id4ec_0.05x -> idccf_0.01x -> 
+id3c8_0.23x -> id84b_0.17x -> id8af_0.95x -> id159_0.83x -> ida98_0.17x -> idd6c_0.23x -> ide11_0.05x -> idaa8_0.02x -> iddbd_0.02x -> 
+id3c8_0.23x -> id84b_0.17x -> id8af_0.95x -> id159_0.83x -> ida98_0.17x -> idd6c_0.23x -> ide11_0.05x -> id6eb_0.02x -> 
+id3c8_0.23x -> id84b_0.17x -> id8af_0.95x -> id159_0.83x -> ida98_0.17x -> idd6c_0.23x -> ide11_0.05x -> id37f_0.02x -> 
+id3c8_0.23x -> id84b_0.17x -> id8af_0.95x -> id159_0.83x -> ida98_0.17x -> idd6c_0.23x -> iddd7_0.03x -> 
+id3c8_0.23x -> id84b_0.17x -> id8af_0.95x -> id159_0.83x -> ida98_0.17x -> id1d4_0.17x -> 
+id3c8_0.23x -> id84b_0.17x -> id8af_0.95x -> id159_0.83x -> ida98_0.17x -> ida6c_0.17x -> 
+id3c8_0.23x -> id84b_0.17x -> id8af_0.95x -> id159_0.83x -> id64c_0.07x -> 
+id3c8_0.23x -> id84b_0.17x -> id8af_0.95x -> id159_0.83x -> id119_0.08x -> 
+id3c8_0.23x -> id84b_0.17x -> id8af_0.95x -> id5d0_0.00x -> 
+id3c8_0.23x -> id84b_0.17x -> id8af_0.95x -> id3c8_0.49x -> 
+id3c8_0.23x -> id84b_0.17x -> idd2a_0.12x -> 
+id3c8_0.23x -> id84b_0.17x -> id872_0.06x -> 
+id3c8_0.23x -> idc80_0.12x -> 
+id3c8_0.23x -> idef7_0.07x -> 
+id836_0.06x -> 
+id27f_0.01x -> 
+[INFO] processing 25_Conv2d_Min_Tanh_Tanh
+一共有 21 条进化轨迹 (叶子节点)
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> idf49_1.73x -> id905_1.91x -> id802_0.64x -> id05d_1.69x -> id35e_1.77x -> idb07_1.19x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> idf49_1.73x -> id905_1.91x -> id802_0.64x -> id05d_1.69x -> id35e_1.77x -> id938_1.14x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> idf49_1.73x -> id905_1.91x -> id802_0.64x -> id05d_1.69x -> id35e_1.77x -> id3e1_1.31x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> idf49_1.73x -> id905_1.91x -> id802_0.64x -> id05d_1.69x -> id54e_1.27x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> idf49_1.73x -> id905_1.91x -> id802_0.64x -> id05d_1.69x -> id18c_1.71x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> idf49_1.73x -> id905_1.91x -> id802_0.64x -> id22b_1.65x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> idf49_1.73x -> id905_1.91x -> id802_0.64x -> id805_1.05x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> idf49_1.73x -> id905_1.91x -> id7e4_0.39x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> idf49_1.73x -> id905_1.91x -> idd0b_0.00x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> idf49_1.73x -> id3a0_1.55x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> idf49_1.73x -> id769_0.80x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> idd1c_1.66x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> idb86_1.68x -> ide13_1.62x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> id3c2_1.38x -> 
+id5e0_0.06x -> id6c9_0.11x -> id674_0.23x -> id8ae_0.82x -> 
+id5e0_0.06x -> id6c9_0.11x -> id279_0.17x -> 
+id5e0_0.06x -> id6c9_0.11x -> id621_0.17x -> 
+id5e0_0.06x -> id756_0.01x -> 
+id5e0_0.06x -> ideb2_0.05x -> 
+idac5_0.02x -> 
+id452_0.06x -> 
+[INFO] processing 27_Conv3d_HardSwish_GroupNorm_Mean
+一共有 12 条进化轨迹 (叶子节点)
+id446_0.63x -> id41a_0.27x -> idfea_0.47x -> id1f1_0.95x -> id945_0.54x -> id008_0.46x -> 
+id446_0.63x -> id41a_0.27x -> idfea_0.47x -> id1f1_0.95x -> id945_0.54x -> id0ae_0.35x -> 
+id446_0.63x -> id41a_0.27x -> idfea_0.47x -> id1f1_0.95x -> id945_0.54x -> id94c_0.55x -> 
+id446_0.63x -> id41a_0.27x -> idfea_0.47x -> id1f1_0.95x -> id60c_0.20x -> 
+id446_0.63x -> id41a_0.27x -> idfea_0.47x -> id1f1_0.95x -> idb37_0.51x -> 
+id446_0.63x -> id41a_0.27x -> idfea_0.47x -> id7c3_0.47x -> 
+id446_0.63x -> id41a_0.27x -> id0c8_0.26x -> 
+id446_0.63x -> id41a_0.27x -> id09c_0.02x -> 
+id446_0.63x -> id9e6_0.24x -> 
+id446_0.63x -> id557_0.26x -> 
+id406_0.01x -> 
+id2cf_0.41x -> 
+[INFO] processing 28_BMM_InstanceNorm_Sum_ResidualAdd_Multiply
+一共有 21 条进化轨迹 (叶子节点)
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> idb0d_9.73x -> id8ab_10.47x -> id2b4_8.41x -> id93a_4.17x -> id6e2_10.77x -> iddd9_3.77x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> idb0d_9.73x -> id8ab_10.47x -> id2b4_8.41x -> id93a_4.17x -> id6e2_10.77x -> id95e_5.22x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> idb0d_9.73x -> id8ab_10.47x -> id2b4_8.41x -> id93a_4.17x -> id6e2_10.77x -> ide6a_6.92x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> idb0d_9.73x -> id8ab_10.47x -> id2b4_8.41x -> id93a_4.17x -> id157_3.99x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> idb0d_9.73x -> id8ab_10.47x -> id2b4_8.41x -> id93a_4.17x -> id893_3.88x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> idb0d_9.73x -> id8ab_10.47x -> id2b4_8.41x -> idefa_4.04x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> idb0d_9.73x -> id8ab_10.47x -> id2b4_8.41x -> id5e7_1.65x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> idb0d_9.73x -> id8ab_10.47x -> id7d6_4.84x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> idb0d_9.73x -> id8ab_10.47x -> idc28_7.07x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> idb0d_9.73x -> id196_3.77x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> idb0d_9.73x -> id935_6.66x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> id2e3_5.53x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id234_9.59x -> idf1f_6.66x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> id4d6_4.99x -> 
+id0b9_8.61x -> ida57_9.26x -> id9b9_8.71x -> idc56_4.93x -> 
+id0b9_8.61x -> ida57_9.26x -> id108_1.78x -> 
+id0b9_8.61x -> ida57_9.26x -> idd9f_5.79x -> 
+id0b9_8.61x -> id255_8.03x -> 
+id0b9_8.61x -> id6ba_4.51x -> 
+id222_4.10x -> 
+id04f_5.81x -> 
+[INFO] processing 29_Matmul_Mish_Mish
+一共有 21 条进化轨迹 (叶子节点)
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id4f3_8.66x -> id983_8.71x -> idca2_7.23x -> idc7d_4.71x -> idb31_8.66x -> id470_7.78x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id4f3_8.66x -> id983_8.71x -> idca2_7.23x -> idc7d_4.71x -> idb31_8.66x -> id99b_8.84x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id4f3_8.66x -> id983_8.71x -> idca2_7.23x -> idc7d_4.71x -> idb31_8.66x -> id6d2_4.93x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id4f3_8.66x -> id983_8.71x -> idca2_7.23x -> idc7d_4.71x -> id210_7.86x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id4f3_8.66x -> id983_8.71x -> idca2_7.23x -> idc7d_4.71x -> id964_4.26x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id4f3_8.66x -> id983_8.71x -> idca2_7.23x -> id23c_4.21x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id4f3_8.66x -> id983_8.71x -> idca2_7.23x -> id6cc_4.71x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id4f3_8.66x -> id983_8.71x -> id80e_4.32x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id4f3_8.66x -> id983_8.71x -> idd1c_5.64x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id4f3_8.66x -> id216_3.38x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id4f3_8.66x -> idb30_8.22x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id4d7_4.68x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id400_9.53x -> id877_8.56x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id2e9_7.38x -> 
+id4f8_3.83x -> idf9b_7.98x -> id2ec_8.47x -> id448_4.50x -> 
+id4f8_3.83x -> idf9b_7.98x -> id225_7.64x -> 
+id4f8_3.83x -> idf9b_7.98x -> id13d_4.18x -> 
+id4f8_3.83x -> id8dc_7.91x -> 
+id4f8_3.83x -> id257_3.25x -> 
+id3b6_3.14x -> 
+idb22_0.05x -> 
+[INFO] processing 30_Gemm_GroupNorm_Hardtanh
+一共有 21 条进化轨迹 (叶子节点)
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> id86b_4.74x -> id84c_8.86x -> id508_6.41x -> id3d2_8.14x -> id2ef_8.65x -> id999_3.10x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> id86b_4.74x -> id84c_8.86x -> id508_6.41x -> id3d2_8.14x -> id2ef_8.65x -> id9ad_4.16x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> id86b_4.74x -> id84c_8.86x -> id508_6.41x -> id3d2_8.14x -> id2ef_8.65x -> id985_4.24x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> id86b_4.74x -> id84c_8.86x -> id508_6.41x -> id3d2_8.14x -> id2c7_6.25x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> id86b_4.74x -> id84c_8.86x -> id508_6.41x -> id3d2_8.14x -> id9a1_3.20x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> id86b_4.74x -> id84c_8.86x -> id508_6.41x -> id3af_6.23x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> id86b_4.74x -> id84c_8.86x -> id508_6.41x -> id066_5.61x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> id86b_4.74x -> id84c_8.86x -> id429_5.88x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> id86b_4.74x -> id84c_8.86x -> id841_6.39x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> id86b_4.74x -> id23a_4.25x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> id86b_4.74x -> id539_8.84x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> ide40_2.32x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> idbae_8.87x -> id466_2.44x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> id541_8.66x -> 
+id8e4_7.37x -> idc38_4.31x -> id84f_4.66x -> id0f3_5.07x -> 
+id8e4_7.37x -> idc38_4.31x -> id774_4.38x -> 
+id8e4_7.37x -> idc38_4.31x -> idd39_4.64x -> 
+id8e4_7.37x -> idb9c_2.75x -> 
+id8e4_7.37x -> id6bc_2.86x -> 
+id02a_3.87x -> 
+idb43_6.23x -> 
+[INFO] processing 31_Conv2d_Min_Add_Multiply
+一共有 21 条进化轨迹 (叶子节点)
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> id5b2_0.63x -> id710_1.84x -> id519_1.23x -> id2ec_0.76x -> ideb4_0.93x -> id641_0.59x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> id5b2_0.63x -> id710_1.84x -> id519_1.23x -> id2ec_0.76x -> ideb4_0.93x -> id3df_1.31x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> id5b2_0.63x -> id710_1.84x -> id519_1.23x -> id2ec_0.76x -> ideb4_0.93x -> id906_0.86x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> id5b2_0.63x -> id710_1.84x -> id519_1.23x -> id2ec_0.76x -> idec7_0.74x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> id5b2_0.63x -> id710_1.84x -> id519_1.23x -> id2ec_0.76x -> id13f_0.76x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> id5b2_0.63x -> id710_1.84x -> id519_1.23x -> id0bd_0.32x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> id5b2_0.63x -> id710_1.84x -> id519_1.23x -> id02d_0.41x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> id5b2_0.63x -> id710_1.84x -> idf94_0.88x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> id5b2_0.63x -> id710_1.84x -> idbfb_0.75x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> id5b2_0.63x -> ide5e_0.63x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> id5b2_0.63x -> id997_0.56x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> idfd6_0.48x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id3d0_0.91x -> id96e_0.47x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> idd9b_0.58x -> 
+id148_0.95x -> id3aa_0.87x -> id856_1.18x -> id346_0.59x -> 
+id148_0.95x -> id3aa_0.87x -> idcdc_1.05x -> 
+id148_0.95x -> id3aa_0.87x -> idfb2_0.70x -> 
+id148_0.95x -> id83b_0.53x -> 
+id148_0.95x -> id433_0.60x -> 
+idd14_0.87x -> 
+idaa2_0.72x -> 
+[INFO] processing 32_Conv2d_Scaling_Min
+一共有 19 条进化轨迹 (叶子节点)
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id180_0.65x -> id6d8_0.74x -> id6ca_0.22x -> id1b1_0.53x -> id15e_0.58x -> id736_0.22x -> id705_0.43x -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id180_0.65x -> id6d8_0.74x -> id6ca_0.22x -> id1b1_0.53x -> id15e_0.58x -> id736_0.22x -> idf99_0.27x -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id180_0.65x -> id6d8_0.74x -> id6ca_0.22x -> id1b1_0.53x -> id15e_0.58x -> id736_0.22x -> id56b_0.68x -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id180_0.65x -> id6d8_0.74x -> id6ca_0.22x -> id1b1_0.53x -> id15e_0.58x -> id62a_0.09x -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id180_0.65x -> id6d8_0.74x -> id6ca_0.22x -> id1b1_0.53x -> id15e_0.58x -> id2dc_nanx -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id180_0.65x -> id6d8_0.74x -> id6ca_0.22x -> id1b1_0.53x -> id97b_0.20x -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id180_0.65x -> id6d8_0.74x -> id6ca_0.22x -> id1b1_0.53x -> id0f4_0.10x -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id180_0.65x -> id6d8_0.74x -> id6ca_0.22x -> idc24_0.48x -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id180_0.65x -> id6d8_0.74x -> id6ca_0.22x -> id064_0.18x -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id180_0.65x -> id6d8_0.74x -> idfa5_0.05x -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id180_0.65x -> id6d8_0.74x -> iddd7_0.20x -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id180_0.65x -> id38a_0.38x -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id36b_0.45x -> 
+id145_0.55x -> id174_0.04x -> ida7f_0.06x -> id93d_0.64x -> 
+id145_0.55x -> id174_0.04x -> id347_0.04x -> 
+id145_0.55x -> id174_0.04x -> ida28_0.00x -> 
+id145_0.55x -> id708_0.00x -> 
+id145_0.55x -> id45c_0.00x -> 
+id1fa_0.13x -> 
+[INFO] processing 33_Gemm_Scale_BatchNorm
+一共有 16 条进化轨迹 (叶子节点)
+id3b2_5.02x -> id39c_7.03x -> id0df_5.82x -> id242_2.92x -> id403_6.46x -> idf11_10.13x -> id027_10.13x -> id66f_2.10x -> 
+id3b2_5.02x -> id39c_7.03x -> id0df_5.82x -> id242_2.92x -> id403_6.46x -> idf11_10.13x -> id027_10.13x -> idf51_1.82x -> 
+id3b2_5.02x -> id39c_7.03x -> id0df_5.82x -> id242_2.92x -> id403_6.46x -> idf11_10.13x -> id027_10.13x -> id621_2.10x -> 
+id3b2_5.02x -> id39c_7.03x -> id0df_5.82x -> id242_2.92x -> id403_6.46x -> idf11_10.13x -> id8a9_8.06x -> 
+id3b2_5.02x -> id39c_7.03x -> id0df_5.82x -> id242_2.92x -> id403_6.46x -> idf11_10.13x -> id378_7.85x -> 
+id3b2_5.02x -> id39c_7.03x -> id0df_5.82x -> id242_2.92x -> id403_6.46x -> id4e5_5.43x -> 
+id3b2_5.02x -> id39c_7.03x -> id0df_5.82x -> id242_2.92x -> id403_6.46x -> idd6e_4.67x -> 
+id3b2_5.02x -> id39c_7.03x -> id0df_5.82x -> id242_2.92x -> id0d4_2.81x -> 
+id3b2_5.02x -> id39c_7.03x -> id0df_5.82x -> id242_2.92x -> idbae_6.37x -> 
+id3b2_5.02x -> id39c_7.03x -> id0df_5.82x -> id824_2.32x -> 
+id3b2_5.02x -> id39c_7.03x -> id0df_5.82x -> id513_2.17x -> 
+id3b2_5.02x -> id39c_7.03x -> id7d0_5.79x -> 
+id3b2_5.02x -> id39c_7.03x -> id1cd_3.96x -> 
+id3b2_5.02x -> idca7_2.03x -> 
+id3b2_5.02x -> id93d_6.24x -> 
+id7e8_2.44x -> 
+[INFO] processing 34_ConvTranspose3d_LayerNorm_GELU_Scaling
+一共有 1 条进化轨迹 (叶子节点)
+idab1_0.02x -> 
+/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/tools/plot_exp.py:47: UserWarning: No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+  plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+[INFO] processing 35_Conv2d_Subtract_HardSwish_MaxPool_Mish
+一共有 20 条进化轨迹 (叶子节点)
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> idc30_0.01x -> id9ad_0.01x -> id92e_0.02x -> id32f_0.02x -> ida03_0.02x -> id708_0.01x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> idc30_0.01x -> id9ad_0.01x -> id92e_0.02x -> id32f_0.02x -> ida03_0.02x -> id879_0.01x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> idc30_0.01x -> id9ad_0.01x -> id92e_0.02x -> id32f_0.02x -> ida03_0.02x -> id9a7_0.02x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> idc30_0.01x -> id9ad_0.01x -> id92e_0.02x -> id32f_0.02x -> id01d_0.01x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> idc30_0.01x -> id9ad_0.01x -> id92e_0.02x -> id32f_0.02x -> id730_0.02x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> idc30_0.01x -> id9ad_0.01x -> id92e_0.02x -> id94f_0.02x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> idc30_0.01x -> id9ad_0.01x -> id92e_0.02x -> id50f_0.02x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> idc30_0.01x -> id9ad_0.01x -> idd1b_0.02x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> idc30_0.01x -> id9ad_0.01x -> id5fa_0.01x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> idc30_0.01x -> idf76_nanx -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> idc30_0.01x -> idb77_0.01x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> id0f9_0.01x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id8d3_0.01x -> idee6_0.00x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id7a6_0.01x -> 
+id1ee_0.06x -> id41c_0.02x -> idb6a_0.02x -> id2d6_0.01x -> 
+id1ee_0.06x -> id41c_0.02x -> idcfc_0.02x -> 
+id1ee_0.06x -> id41c_0.02x -> id5dd_0.02x -> 
+id1ee_0.06x -> id7ae_0.01x -> 
+ida9e_nanx -> 
+id80e_0.00x -> 
+[INFO] processing 36_ConvTranspose2d_Min_Sum_GELU_Add
+一共有 19 条进化轨迹 (叶子节点)
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> id55f_0.00x -> id3d5_0.00x -> id776_0.02x -> id068_0.05x -> id050_0.13x -> idb03_0.04x -> id875_0.02x -> 
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> id55f_0.00x -> id3d5_0.00x -> id776_0.02x -> id068_0.05x -> id050_0.13x -> idb03_0.04x -> idfa3_0.02x -> 
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> id55f_0.00x -> id3d5_0.00x -> id776_0.02x -> id068_0.05x -> id050_0.13x -> idb03_0.04x -> id125_0.01x -> 
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> id55f_0.00x -> id3d5_0.00x -> id776_0.02x -> id068_0.05x -> id050_0.13x -> idd1c_0.04x -> 
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> id55f_0.00x -> id3d5_0.00x -> id776_0.02x -> id068_0.05x -> idbfe_0.03x -> 
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> id55f_0.00x -> id3d5_0.00x -> id776_0.02x -> id068_0.05x -> idf18_0.01x -> 
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> id55f_0.00x -> id3d5_0.00x -> id776_0.02x -> idfdf_0.00x -> 
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> id55f_0.00x -> id3d5_0.00x -> id776_0.02x -> id788_0.00x -> 
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> id55f_0.00x -> id3d5_0.00x -> idb54_0.02x -> 
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> id55f_0.00x -> id3d5_0.00x -> id4d5_0.01x -> 
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> id55f_0.00x -> id05e_0.00x -> 
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> id55f_0.00x -> idba3_0.00x -> 
+id304_0.01x -> id286_0.02x -> idfda_0.01x -> idfe8_0.00x -> 
+id304_0.01x -> id286_0.02x -> idda4_0.01x -> 
+id304_0.01x -> id286_0.02x -> idcbb_0.01x -> 
+id304_0.01x -> ida6f_0.01x -> 
+id304_0.01x -> ide79_0.01x -> 
+idb8f_0.00x -> 
+id274_0.00x -> 
+[INFO] processing 37_Matmul_Swish_Sum_GroupNorm
+一共有 20 条进化轨迹 (叶子节点)
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id66e_2.22x -> idf71_2.76x -> id4eb_3.18x -> id505_4.19x -> id27f_2.50x -> id635_2.65x -> idda8_1.25x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id66e_2.22x -> idf71_2.76x -> id4eb_3.18x -> id505_4.19x -> id27f_2.50x -> id635_2.65x -> idec9_2.21x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id66e_2.22x -> idf71_2.76x -> id4eb_3.18x -> id505_4.19x -> id27f_2.50x -> id635_2.65x -> id614_1.60x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id66e_2.22x -> idf71_2.76x -> id4eb_3.18x -> id505_4.19x -> id27f_2.50x -> id2ed_1.91x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id66e_2.22x -> idf71_2.76x -> id4eb_3.18x -> id505_4.19x -> id27f_2.50x -> id32d_1.23x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id66e_2.22x -> idf71_2.76x -> id4eb_3.18x -> id505_4.19x -> idfb9_1.84x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id66e_2.22x -> idf71_2.76x -> id4eb_3.18x -> id505_4.19x -> id291_1.29x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id66e_2.22x -> idf71_2.76x -> id4eb_3.18x -> id509_0.94x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id66e_2.22x -> idf71_2.76x -> id4eb_3.18x -> id6df_2.91x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id66e_2.22x -> idf71_2.76x -> id783_2.75x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id66e_2.22x -> idf71_2.76x -> id879_0.72x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id66e_2.22x -> iddb8_1.62x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id2f6_1.59x -> 
+idbaf_0.27x -> id6e8_0.33x -> id95f_1.46x -> id8f3_1.03x -> 
+idbaf_0.27x -> id6e8_0.33x -> id729_0.52x -> 
+idbaf_0.27x -> id6e8_0.33x -> id7c2_0.52x -> 
+idbaf_0.27x -> id6f8_0.18x -> 
+idbaf_0.27x -> id48a_0.31x -> 
+ida42_0.13x -> 
+id5ff_0.12x -> 
+[INFO] processing 38_ConvTranspose3d_AvgPool_Clamp_Softmax_Multiply
+一共有 3 条进化轨迹 (叶子节点)
+iddd4_0.02x -> idf43_0.04x -> idb09_0.04x -> 
+iddd4_0.02x -> idf43_0.04x -> iddb5_0.04x -> 
+iddd4_0.02x -> idb5b_0.02x -> 
+[INFO] processing 40_Matmul_Scaling_ResidualAdd
+一共有 20 条进化轨迹 (叶子节点)
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id653_4.46x -> id60f_3.63x -> id33d_5.69x -> idae1_3.31x -> id3bc_1.59x -> id5b0_5.30x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id653_4.46x -> id60f_3.63x -> id33d_5.69x -> idae1_3.31x -> id3bc_1.59x -> id889_3.75x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id653_4.46x -> id60f_3.63x -> id33d_5.69x -> idae1_3.31x -> id3bc_1.59x -> idaa1_6.38x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id653_4.46x -> id60f_3.63x -> id33d_5.69x -> idae1_3.31x -> idd79_1.58x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id653_4.46x -> id60f_3.63x -> id33d_5.69x -> idae1_3.31x -> id73d_1.32x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id653_4.46x -> id60f_3.63x -> id33d_5.69x -> id0af_3.04x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id653_4.46x -> id60f_3.63x -> id33d_5.69x -> idffd_3.26x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id653_4.46x -> id60f_3.63x -> id9a7_4.55x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id653_4.46x -> id60f_3.63x -> id5fc_4.74x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id653_4.46x -> id60f_3.63x -> id22b_6.39x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id653_4.46x -> idec0_2.95x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id653_4.46x -> id965_1.64x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id020_1.53x -> 
+id9bb_4.29x -> id155_8.93x -> idc9c_13.13x -> id70d_3.99x -> 
+id9bb_4.29x -> id155_8.93x -> id1cc_4.42x -> 
+id9bb_4.29x -> id155_8.93x -> id7d7_5.46x -> 
+id9bb_4.29x -> id8f1_5.15x -> 
+id9bb_4.29x -> iddea_5.30x -> 
+id199_4.01x -> 
+id319_3.64x -> 
+[INFO] processing 42_ConvTranspose2d_GlobalAvgPool_BiasAdd_LogSumExp_Sum_Multiply
+一共有 19 条进化轨迹 (叶子节点)
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> idbde_2.12x -> id885_21.74x -> idc13_20.73x -> id048_25.44x -> id61d_24.89x -> idf11_22.92x -> 
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> idbde_2.12x -> id885_21.74x -> idc13_20.73x -> id048_25.44x -> id61d_24.89x -> id547_24.07x -> 
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> idbde_2.12x -> id885_21.74x -> idc13_20.73x -> id048_25.44x -> id61d_24.89x -> id759_24.83x -> 
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> idbde_2.12x -> id885_21.74x -> idc13_20.73x -> id048_25.44x -> id970_0.99x -> 
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> idbde_2.12x -> id885_21.74x -> idc13_20.73x -> id048_25.44x -> id78c_23.58x -> 
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> idbde_2.12x -> id885_21.74x -> idc13_20.73x -> id708_1.00x -> 
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> idbde_2.12x -> id885_21.74x -> idc13_20.73x -> id2c0_25.02x -> 
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> idbde_2.12x -> id885_21.74x -> ida44_20.39x -> 
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> idbde_2.12x -> id885_21.74x -> id9ab_11.88x -> 
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> idbde_2.12x -> id67a_20.01x -> 
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> idbde_2.12x -> ida55_20.04x -> 
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> id696_0.84x -> 
+ide6e_1.00x -> id433_24.00x -> ideea_24.18x -> id911_2.48x -> idbfd_0.94x -> 
+ide6e_1.00x -> id433_24.00x -> iddf6_23.91x -> 
+ide6e_1.00x -> id433_24.00x -> ida6d_21.11x -> 
+ide6e_1.00x -> idf7b_7.83x -> 
+ide6e_1.00x -> id758_23.82x -> 
+ida47_nanx -> 
+id7ea_0.00x -> 
+[INFO] processing 43_Conv3d_Max_LogSumExp_ReLU
+一共有 7 条进化轨迹 (叶子节点)
+id9aa_0.14x -> id9c5_0.20x -> id1ec_0.40x -> 
+id9aa_0.14x -> id9c5_0.20x -> id0aa_0.19x -> 
+id9aa_0.14x -> id9c5_0.20x -> id5e7_0.16x -> 
+id9aa_0.14x -> id290_0.13x -> 
+id9aa_0.14x -> id700_0.14x -> 
+idb30_0.03x -> 
+id6d8_0.10x -> 
+[INFO] processing 45_Gemm_Sigmoid_LogSumExp
+一共有 21 条进化轨迹 (叶子节点)
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> idf09_2.67x -> idcad_5.08x -> idf85_11.44x -> idc15_4.71x -> idef4_5.26x -> id08b_8.46x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> idf09_2.67x -> idcad_5.08x -> idf85_11.44x -> idc15_4.71x -> idef4_5.26x -> idd2a_5.00x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> idf09_2.67x -> idcad_5.08x -> idf85_11.44x -> idc15_4.71x -> idef4_5.26x -> idf73_4.66x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> idf09_2.67x -> idcad_5.08x -> idf85_11.44x -> idc15_4.71x -> id87b_5.15x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> idf09_2.67x -> idcad_5.08x -> idf85_11.44x -> idc15_4.71x -> id46a_5.23x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> idf09_2.67x -> idcad_5.08x -> idf85_11.44x -> idde9_3.39x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> idf09_2.67x -> idcad_5.08x -> idf85_11.44x -> iddfb_4.20x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> idf09_2.67x -> idcad_5.08x -> idb3c_5.48x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> idf09_2.67x -> idcad_5.08x -> idbd2_5.32x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> idf09_2.67x -> id6ee_5.02x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> idf09_2.67x -> id80c_4.26x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> idc54_2.66x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0d4_5.49x -> id587_2.65x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> id0bd_4.11x -> 
+ide45_6.67x -> id805_3.74x -> ida5d_6.76x -> ida04_5.18x -> 
+ide45_6.67x -> id805_3.74x -> id1b3_nanx -> 
+ide45_6.67x -> id805_3.74x -> idbfe_6.72x -> 
+ide45_6.67x -> id951_0.98x -> 
+ide45_6.67x -> id6ce_2.86x -> 
+id963_6.15x -> 
+id281_5.36x -> 
+[INFO] processing 46_Conv2d_Subtract_Tanh_Subtract_AvgPool
+一共有 20 条进化轨迹 (叶子节点)
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idd64_1.21x -> id757_0.12x -> id019_0.34x -> ide61_0.15x -> id858_1.12x -> idcc8_1.00x -> id03f_0.65x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idd64_1.21x -> id757_0.12x -> id019_0.34x -> ide61_0.15x -> id858_1.12x -> idcc8_1.00x -> id87a_0.65x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idd64_1.21x -> id757_0.12x -> id019_0.34x -> ide61_0.15x -> id858_1.12x -> idcc8_1.00x -> id592_0.62x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idd64_1.21x -> id757_0.12x -> id019_0.34x -> ide61_0.15x -> id858_1.12x -> id698_0.56x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idd64_1.21x -> id757_0.12x -> id019_0.34x -> ide61_0.15x -> id858_1.12x -> idf5f_0.74x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idd64_1.21x -> id757_0.12x -> id019_0.34x -> ide61_0.15x -> ide94_0.88x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idd64_1.21x -> id757_0.12x -> id019_0.34x -> ide61_0.15x -> id39f_0.55x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idd64_1.21x -> id757_0.12x -> id019_0.34x -> id5c2_0.13x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idd64_1.21x -> id757_0.12x -> id034_0.33x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idd64_1.21x -> id757_0.12x -> id666_0.20x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idd64_1.21x -> id87b_0.11x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idd64_1.21x -> id4b5_0.10x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> idf36_0.43x -> 
+id196_0.13x -> id7e5_0.09x -> idffe_0.56x -> ida23_0.84x -> 
+id196_0.13x -> id7e5_0.09x -> id6b1_0.30x -> 
+id196_0.13x -> id7e5_0.09x -> idb90_0.36x -> 
+id196_0.13x -> id4cb_0.09x -> 
+id196_0.13x -> ida5c_0.06x -> 
+idf6c_0.12x -> 
+idaf4_0.07x -> 
+[INFO] processing 47_Conv3d_Mish_Tanh
+一共有 20 条进化轨迹 (叶子节点)
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> id24c_0.25x -> idd22_0.26x -> idc87_0.11x -> id376_0.21x -> id74e_0.26x -> idc8a_0.38x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> id24c_0.25x -> idd22_0.26x -> idc87_0.11x -> id376_0.21x -> id74e_0.26x -> id6a6_0.10x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> id24c_0.25x -> idd22_0.26x -> idc87_0.11x -> id376_0.21x -> id74e_0.26x -> id9a2_0.29x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> id24c_0.25x -> idd22_0.26x -> idc87_0.11x -> id376_0.21x -> ida8f_0.26x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> id24c_0.25x -> idd22_0.26x -> idc87_0.11x -> id376_0.21x -> idaf4_0.12x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> id24c_0.25x -> idd22_0.26x -> idc87_0.11x -> id4ed_0.20x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> id24c_0.25x -> idd22_0.26x -> idc87_0.11x -> id356_0.20x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> id24c_0.25x -> idd22_0.26x -> id9a2_0.10x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> id24c_0.25x -> idd22_0.26x -> id576_0.10x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> id24c_0.25x -> id332_0.07x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> id24c_0.25x -> id209_0.09x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> id5de_0.14x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> id9bd_0.14x -> idd64_0.11x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> idf9b_0.12x -> 
+iddb5_0.30x -> idc77_0.30x -> idf53_0.31x -> ida61_0.13x -> 
+iddb5_0.30x -> idc77_0.30x -> idb59_0.26x -> 
+iddb5_0.30x -> idc77_0.30x -> ideb2_0.27x -> 
+iddb5_0.30x -> id673_0.30x -> 
+iddb5_0.30x -> idee6_0.29x -> 
+id6fc_0.24x -> 
+[INFO] processing 48_Conv3d_Scaling_Tanh_Multiply_Sigmoid
+一共有 20 条进化轨迹 (叶子节点)
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> idca5_0.63x -> idce0_0.59x -> idee8_1.13x -> id744_0.66x -> idec8_0.73x -> id4bc_0.25x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> idca5_0.63x -> idce0_0.59x -> idee8_1.13x -> id744_0.66x -> idec8_0.73x -> id6fa_0.44x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> idca5_0.63x -> idce0_0.59x -> idee8_1.13x -> id744_0.66x -> idec8_0.73x -> id46e_0.67x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> idca5_0.63x -> idce0_0.59x -> idee8_1.13x -> id744_0.66x -> idc38_0.13x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> idca5_0.63x -> idce0_0.59x -> idee8_1.13x -> id744_0.66x -> id144_0.62x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> idca5_0.63x -> idce0_0.59x -> idee8_1.13x -> ida0a_0.55x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> idca5_0.63x -> idce0_0.59x -> idee8_1.13x -> idf94_0.66x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> idca5_0.63x -> idce0_0.59x -> idd4c_0.70x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> idca5_0.63x -> idce0_0.59x -> idcfb_0.70x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> idca5_0.63x -> id5c4_0.12x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> idca5_0.63x -> id356_0.07x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> ida60_0.11x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idc58_0.59x -> id7a9_0.45x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> id569_0.15x -> 
+id713_0.53x -> idbef_1.02x -> idc3f_0.85x -> idbb1_0.47x -> 
+id713_0.53x -> idbef_1.02x -> id416_0.84x -> 
+id713_0.53x -> idfc9_0.49x -> 
+id713_0.53x -> id90d_0.81x -> 
+idf4d_0.43x -> 
+id6b1_0.30x -> 
+[INFO] processing 49_ConvTranspose3d_Softmax_Sigmoid
+一共有 21 条进化轨迹 (叶子节点)
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> id5e4_0.23x -> idf44_0.16x -> idb37_0.12x -> id5af_0.04x -> id8ce_0.13x -> id77a_0.06x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> id5e4_0.23x -> idf44_0.16x -> idb37_0.12x -> id5af_0.04x -> id8ce_0.13x -> idb13_0.14x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> id5e4_0.23x -> idf44_0.16x -> idb37_0.12x -> id5af_0.04x -> id8ce_0.13x -> id91e_0.07x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> id5e4_0.23x -> idf44_0.16x -> idb37_0.12x -> id5af_0.04x -> id122_0.00x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> id5e4_0.23x -> idf44_0.16x -> idb37_0.12x -> id5af_0.04x -> idf96_0.08x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> id5e4_0.23x -> idf44_0.16x -> idb37_0.12x -> ide43_0.03x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> id5e4_0.23x -> idf44_0.16x -> idb37_0.12x -> iddaf_0.03x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> id5e4_0.23x -> idf44_0.16x -> id44b_0.07x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> id5e4_0.23x -> idf44_0.16x -> id369_0.06x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> id5e4_0.23x -> ida9c_0.15x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> id5e4_0.23x -> id99a_0.12x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> idbab_0.23x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> ide50_0.15x -> id294_nanx -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> id5fa_0.11x -> 
+id08a_0.20x -> id825_0.22x -> ida99_0.22x -> id5e4_0.10x -> 
+id08a_0.20x -> id825_0.22x -> id5a5_0.14x -> 
+id08a_0.20x -> id825_0.22x -> id803_0.14x -> 
+id08a_0.20x -> id8b7_0.14x -> 
+id08a_0.20x -> id6e0_0.16x -> 
+id460_0.09x -> 
+idff0_0.03x -> 
+[INFO] processing 50_ConvTranspose3d_Scaling_AvgPool_BiasAdd_Scaling
+一共有 1 条进化轨迹 (叶子节点)
+idab7_0.36x -> idabb_nanx -> 
+[INFO] processing 51_Gemm_Subtract_GlobalAvgPool_LogSumExp_GELU_ResidualAdd
+一共有 21 条进化轨迹 (叶子节点)
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> idd82_7.13x -> id0ec_5.77x -> id51b_4.47x -> id992_8.16x -> ide53_10.78x -> id950_3.56x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> idd82_7.13x -> id0ec_5.77x -> id51b_4.47x -> id992_8.16x -> ide53_10.78x -> idb2f_3.56x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> idd82_7.13x -> id0ec_5.77x -> id51b_4.47x -> id992_8.16x -> ide53_10.78x -> id301_3.03x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> idd82_7.13x -> id0ec_5.77x -> id51b_4.47x -> id992_8.16x -> ide5f_3.50x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> idd82_7.13x -> id0ec_5.77x -> id51b_4.47x -> id992_8.16x -> ida37_5.59x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> idd82_7.13x -> id0ec_5.77x -> id51b_4.47x -> id2e2_7.75x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> idd82_7.13x -> id0ec_5.77x -> id51b_4.47x -> ide3e_8.12x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> idd82_7.13x -> id0ec_5.77x -> idd00_3.24x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> idd82_7.13x -> id0ec_5.77x -> idab4_2.63x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> idd82_7.13x -> idc47_4.16x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> idd82_7.13x -> id9da_4.11x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> idc70_6.97x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> ide76_4.34x -> ida42_5.17x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> id156_3.50x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7b_7.88x -> id7c6_4.24x -> 
+idea5_10.37x -> idb0c_7.41x -> ide25_3.45x -> 
+idea5_10.37x -> idb0c_7.41x -> idf7d_4.94x -> 
+idea5_10.37x -> idcd6_3.62x -> 
+idea5_10.37x -> id1d4_5.44x -> 
+id8e3_5.66x -> 
+ida49_4.74x -> 
+[INFO] processing 53_Gemm_Scaling_Hardtanh_GELU
+一共有 21 条进化轨迹 (叶子节点)
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> id080_6.86x -> id841_7.89x -> id120_7.92x -> id73e_7.60x -> ide39_5.59x -> idd3a_6.30x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> id080_6.86x -> id841_7.89x -> id120_7.92x -> id73e_7.60x -> ide39_5.59x -> id41d_3.86x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> id080_6.86x -> id841_7.89x -> id120_7.92x -> id73e_7.60x -> ide39_5.59x -> id4d3_4.84x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> id080_6.86x -> id841_7.89x -> id120_7.92x -> id73e_7.60x -> idfdd_3.17x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> id080_6.86x -> id841_7.89x -> id120_7.92x -> id73e_7.60x -> id240_3.54x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> id080_6.86x -> id841_7.89x -> id120_7.92x -> id5f5_7.50x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> id080_6.86x -> id841_7.89x -> id120_7.92x -> id27c_4.19x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> id080_6.86x -> id841_7.89x -> id100_7.41x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> id080_6.86x -> id841_7.89x -> id91a_5.83x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> id080_6.86x -> id324_4.12x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> id080_6.86x -> id70e_7.79x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> ide2d_6.78x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id406_7.10x -> id6cd_6.36x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id6b5_5.93x -> 
+id410_11.30x -> id120_6.86x -> id4f0_8.54x -> id415_4.40x -> 
+id410_11.30x -> id120_6.86x -> ide9b_5.37x -> 
+id410_11.30x -> id120_6.86x -> ide6b_7.83x -> 
+id410_11.30x -> id68d_4.05x -> 
+id410_11.30x -> id3fc_6.75x -> 
+id051_6.88x -> 
+ide10_7.40x -> 
+[INFO] processing 54_Conv2d_Multiply_LeakyReLU_GELU
+一共有 19 条进化轨迹 (叶子节点)
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id933_0.58x -> iddda_0.59x -> id935_0.43x -> idfa1_0.67x -> id267_0.48x -> id210_0.24x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id933_0.58x -> iddda_0.59x -> id935_0.43x -> idfa1_0.67x -> id267_0.48x -> idb3e_0.55x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id933_0.58x -> iddda_0.59x -> id935_0.43x -> idfa1_0.67x -> id267_0.48x -> id525_0.92x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id933_0.58x -> iddda_0.59x -> id935_0.43x -> idfa1_0.67x -> idefc_0.48x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id933_0.58x -> iddda_0.59x -> id935_0.43x -> idfa1_0.67x -> id6ad_0.48x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id933_0.58x -> iddda_0.59x -> id935_0.43x -> id96d_0.21x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id933_0.58x -> iddda_0.59x -> id935_0.43x -> id828_0.67x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id933_0.58x -> iddda_0.59x -> idea2_0.37x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id933_0.58x -> iddda_0.59x -> idaf7_0.35x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id933_0.58x -> ide9f_0.28x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id933_0.58x -> idbeb_0.57x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id836_0.58x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idc55_0.34x -> id48a_0.27x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> id46f_0.33x -> 
+ide0f_0.14x -> ided6_0.10x -> id777_0.43x -> idfbe_0.20x -> 
+ide0f_0.14x -> ided6_0.10x -> id334_0.04x -> 
+ide0f_0.14x -> ided6_0.10x -> id3be_0.04x -> 
+ide0f_0.14x -> id38f_0.10x -> 
+id638_0.10x -> 
+[INFO] processing 55_Matmul_MaxPool_Sum_Scale
+一共有 16 条进化轨迹 (叶子节点)
+idd3f_0.30x -> id204_4.04x -> idda2_4.20x -> idcdb_2.21x -> id338_0.67x -> id3ec_8.74x -> id9de_4.56x -> id184_8.75x -> id5ec_4.55x -> idc6c_8.41x -> 
+idd3f_0.30x -> id204_4.04x -> idda2_4.20x -> idcdb_2.21x -> id338_0.67x -> id3ec_8.74x -> id9de_4.56x -> id184_8.75x -> id5ec_4.55x -> idf4a_0.61x -> 
+idd3f_0.30x -> id204_4.04x -> idda2_4.20x -> idcdb_2.21x -> id338_0.67x -> id3ec_8.74x -> id9de_4.56x -> id184_8.75x -> id5ec_4.55x -> idd71_8.13x -> 
+idd3f_0.30x -> id204_4.04x -> idda2_4.20x -> idcdb_2.21x -> id338_0.67x -> id3ec_8.74x -> id9de_4.56x -> id184_8.75x -> idacb_0.57x -> 
+idd3f_0.30x -> id204_4.04x -> idda2_4.20x -> idcdb_2.21x -> id338_0.67x -> id3ec_8.74x -> id9de_4.56x -> id1d5_8.74x -> 
+idd3f_0.30x -> id204_4.04x -> idda2_4.20x -> idcdb_2.21x -> id338_0.67x -> id3ec_8.74x -> id9de_4.56x -> idb8a_3.67x -> 
+idd3f_0.30x -> id204_4.04x -> idda2_4.20x -> idcdb_2.21x -> id338_0.67x -> id3ec_8.74x -> id0e4_2.51x -> 
+idd3f_0.30x -> id204_4.04x -> idda2_4.20x -> idcdb_2.21x -> id338_0.67x -> id3ec_8.74x -> id3dd_4.21x -> 
+idd3f_0.30x -> id204_4.04x -> idda2_4.20x -> idcdb_2.21x -> idef8_0.33x -> 
+idd3f_0.30x -> id204_4.04x -> idda2_4.20x -> idcdb_2.21x -> ide50_0.67x -> 
+idd3f_0.30x -> id204_4.04x -> idda2_4.20x -> idb23_1.08x -> 
+idd3f_0.30x -> id204_4.04x -> id5f4_1.01x -> 
+idd3f_0.30x -> id7ba_2.04x -> 
+idd3f_0.30x -> id100_4.02x -> 
+id67e_0.24x -> 
+id592_0.10x -> 
+[INFO] processing 56_Matmul_Sigmoid_Sum
+一共有 21 条进化轨迹 (叶子节点)
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id2e1_3.98x -> idc03_2.88x -> id0f6_8.45x -> id50e_8.79x -> id2b9_7.41x -> idb42_5.80x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id2e1_3.98x -> idc03_2.88x -> id0f6_8.45x -> id50e_8.79x -> id2b9_7.41x -> id068_5.70x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id2e1_3.98x -> idc03_2.88x -> id0f6_8.45x -> id50e_8.79x -> id2b9_7.41x -> id044_3.12x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id2e1_3.98x -> idc03_2.88x -> id0f6_8.45x -> id50e_8.79x -> id3d0_6.97x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id2e1_3.98x -> idc03_2.88x -> id0f6_8.45x -> id50e_8.79x -> id8cb_3.32x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id2e1_3.98x -> idc03_2.88x -> id0f6_8.45x -> id479_0.05x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id2e1_3.98x -> idc03_2.88x -> id0f6_8.45x -> idd80_0.88x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id2e1_3.98x -> idc03_2.88x -> id800_0.17x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id2e1_3.98x -> idc03_2.88x -> idd2b_0.32x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id2e1_3.98x -> id92b_2.80x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id2e1_3.98x -> id405_0.93x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id8d5_0.56x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id9d7_4.07x -> id94a_3.83x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> id00c_0.57x -> 
+idbc4_0.17x -> idf14_3.94x -> id029_3.17x -> ideb4_0.57x -> 
+idbc4_0.17x -> idf14_3.94x -> id7a0_0.59x -> 
+idbc4_0.17x -> idf14_3.94x -> id96a_0.21x -> 
+idbc4_0.17x -> idba2_2.41x -> 
+idbc4_0.17x -> idc48_0.56x -> 
+id1d5_0.11x -> 
+id51a_0.14x -> 
+[INFO] processing 57_Conv2d_ReLU_HardSwish
+一共有 21 条进化轨迹 (叶子节点)
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> ide99_3.20x -> id9c3_0.81x -> id53e_1.25x -> idf2c_2.15x -> id78d_3.61x -> id24f_2.51x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> ide99_3.20x -> id9c3_0.81x -> id53e_1.25x -> idf2c_2.15x -> id78d_3.61x -> idcfd_3.40x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> ide99_3.20x -> id9c3_0.81x -> id53e_1.25x -> idf2c_2.15x -> id78d_3.61x -> idfb6_4.29x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> ide99_3.20x -> id9c3_0.81x -> id53e_1.25x -> idf2c_2.15x -> id97e_0.54x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> ide99_3.20x -> id9c3_0.81x -> id53e_1.25x -> idf2c_2.15x -> idb9a_0.91x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> ide99_3.20x -> id9c3_0.81x -> id53e_1.25x -> ideab_1.25x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> ide99_3.20x -> id9c3_0.81x -> id53e_1.25x -> id3b4_1.91x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> ide99_3.20x -> id9c3_0.81x -> id4b6_1.06x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> ide99_3.20x -> id9c3_0.81x -> ida24_0.88x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> ide99_3.20x -> id897_0.58x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> ide99_3.20x -> id6c3_0.41x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> idd1f_2.10x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> ida5d_2.54x -> id607_1.83x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> idc61_2.34x -> 
+id2da_1.69x -> id06e_2.85x -> id623_4.62x -> id96c_1.90x -> 
+id2da_1.69x -> id06e_2.85x -> ide5c_2.09x -> 
+id2da_1.69x -> id06e_2.85x -> id73f_2.81x -> 
+id2da_1.69x -> idb0e_1.82x -> 
+id2da_1.69x -> id1dd_1.58x -> 
+idabf_1.69x -> 
+id8e9_0.88x -> 
+[INFO] processing 58_ConvTranspose3d_LogSumExp_HardSwish_Subtract_Clamp
+一共有 7 条进化轨迹 (叶子节点)
+id44e_5.14x -> id09d_0.94x -> idde1_0.96x -> idd45_4.97x -> 
+id44e_5.14x -> id09d_0.94x -> idde1_0.96x -> id272_0.59x -> 
+id44e_5.14x -> id09d_0.94x -> id392_0.96x -> 
+id44e_5.14x -> id09d_0.94x -> ided1_0.93x -> 
+id44e_5.14x -> ide16_0.94x -> 
+id44e_5.14x -> idf3f_0.54x -> 
+idb11_2.62x -> 
+[INFO] processing 59_Matmul_Swish_Scaling
+一共有 21 条进化轨迹 (叶子节点)
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> id20e_5.21x -> id85c_8.97x -> ida68_7.13x -> id086_0.71x -> id4f0_2.08x -> idaef_6.63x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> id20e_5.21x -> id85c_8.97x -> ida68_7.13x -> id086_0.71x -> id4f0_2.08x -> id945_6.72x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> id20e_5.21x -> id85c_8.97x -> ida68_7.13x -> id086_0.71x -> id4f0_2.08x -> ida11_6.53x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> id20e_5.21x -> id85c_8.97x -> ida68_7.13x -> id086_0.71x -> id891_0.67x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> id20e_5.21x -> id85c_8.97x -> ida68_7.13x -> id086_0.71x -> iddb9_1.07x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> id20e_5.21x -> id85c_8.97x -> ida68_7.13x -> id182_0.68x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> id20e_5.21x -> id85c_8.97x -> ida68_7.13x -> id3b7_0.57x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> id20e_5.21x -> id85c_8.97x -> iddfc_0.94x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> id20e_5.21x -> id85c_8.97x -> id67c_1.16x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> id20e_5.21x -> idbcc_4.94x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> id20e_5.21x -> id16d_5.63x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> idc68_0.68x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id9c2_4.45x -> id5bd_4.49x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id002_1.18x -> 
+ide6d_7.22x -> id426_8.43x -> id110_4.39x -> id1eb_0.60x -> 
+ide6d_7.22x -> id426_8.43x -> ideb4_0.99x -> 
+ide6d_7.22x -> id426_8.43x -> id672_0.53x -> 
+ide6d_7.22x -> ida9c_1.10x -> 
+ide6d_7.22x -> idcbc_2.81x -> 
+idf7f_6.42x -> 
+id337_3.34x -> 
+[INFO] processing 60_ConvTranspose3d_Swish_GroupNorm_HardSwish
+一共有 12 条进化轨迹 (叶子节点)
+id797_0.91x -> idadf_1.04x -> idb7e_0.71x -> id90b_0.87x -> id1bc_0.82x -> id75e_0.89x -> id7bc_1.25x -> id7cd_0.96x -> idea9_0.06x -> id02f_0.78x -> 
+id797_0.91x -> idadf_1.04x -> idb7e_0.71x -> id90b_0.87x -> id1bc_0.82x -> id75e_0.89x -> id7bc_1.25x -> id7cd_0.96x -> idea9_0.06x -> id9a3_1.02x -> 
+id797_0.91x -> idadf_1.04x -> idb7e_0.71x -> id90b_0.87x -> id1bc_0.82x -> id75e_0.89x -> id7bc_1.25x -> id7cd_0.96x -> idea9_0.06x -> id355_0.93x -> 
+id797_0.91x -> idadf_1.04x -> idb7e_0.71x -> id90b_0.87x -> id1bc_0.82x -> idac1_0.72x -> 
+id797_0.91x -> idadf_1.04x -> idb7e_0.71x -> id90b_0.87x -> id1bc_0.82x -> idfea_0.56x -> 
+id797_0.91x -> idadf_1.04x -> idb7e_0.71x -> id90b_0.87x -> id64d_0.76x -> 
+id797_0.91x -> idadf_1.04x -> idb7e_0.71x -> id9fb_0.67x -> 
+id797_0.91x -> idadf_1.04x -> id970_0.69x -> 
+id797_0.91x -> idadf_1.04x -> id6df_0.70x -> 
+id797_0.91x -> id876_0.64x -> 
+id797_0.91x -> id509_0.90x -> 
+id2a8_0.85x -> 
+[INFO] processing 61_ConvTranspose3d_ReLU_GroupNorm
+一共有 15 条进化轨迹 (叶子节点)
+ide76_0.21x -> ide57_0.10x -> id9ba_0.20x -> id06e_0.12x -> id391_0.05x -> id991_0.16x -> id359_0.33x -> idc37_0.16x -> idbe2_0.33x -> id5a8_0.26x -> 
+ide76_0.21x -> ide57_0.10x -> id9ba_0.20x -> id06e_0.12x -> id391_0.05x -> id991_0.16x -> id359_0.33x -> idc37_0.16x -> idbe2_0.33x -> id945_0.16x -> 
+ide76_0.21x -> ide57_0.10x -> id9ba_0.20x -> id06e_0.12x -> id391_0.05x -> id991_0.16x -> id359_0.33x -> idc37_0.16x -> idbe2_0.33x -> idd28_0.18x -> 
+ide76_0.21x -> ide57_0.10x -> id9ba_0.20x -> id06e_0.12x -> id391_0.05x -> id991_0.16x -> id359_0.33x -> idc37_0.16x -> id42e_0.09x -> 
+ide76_0.21x -> ide57_0.10x -> id9ba_0.20x -> id06e_0.12x -> id391_0.05x -> id991_0.16x -> id359_0.33x -> id7c2_0.14x -> 
+ide76_0.21x -> ide57_0.10x -> id9ba_0.20x -> id06e_0.12x -> id391_0.05x -> id991_0.16x -> id359_0.33x -> id2d3_0.16x -> 
+ide76_0.21x -> ide57_0.10x -> id9ba_0.20x -> id06e_0.12x -> id391_0.05x -> id991_0.16x -> id311_0.30x -> 
+ide76_0.21x -> ide57_0.10x -> id9ba_0.20x -> id06e_0.12x -> id391_0.05x -> id991_0.16x -> idd7e_0.31x -> 
+ide76_0.21x -> ide57_0.10x -> id9ba_0.20x -> id06e_0.12x -> id391_0.05x -> id8dc_0.15x -> 
+ide76_0.21x -> ide57_0.10x -> id9ba_0.20x -> id06e_0.12x -> id391_0.05x -> ida52_0.14x -> 
+ide76_0.21x -> ide57_0.10x -> id9ba_0.20x -> idfb8_0.11x -> 
+ide76_0.21x -> ide57_0.10x -> id9ba_0.20x -> id7fe_0.11x -> 
+ide76_0.21x -> ide57_0.10x -> idfdf_0.17x -> 
+ide76_0.21x -> id7e8_0.09x -> 
+id7ec_0.15x -> 
+[INFO] processing 62_Matmul_GroupNorm_LeakyReLU_Sum
+一共有 20 条进化轨迹 (叶子节点)
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> ideaf_7.79x -> id13b_14.68x -> id9a9_10.94x -> idb76_8.64x -> id840_8.21x -> id29a_6.13x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> ideaf_7.79x -> id13b_14.68x -> id9a9_10.94x -> idb76_8.64x -> id840_8.21x -> id07c_4.57x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> ideaf_7.79x -> id13b_14.68x -> id9a9_10.94x -> idb76_8.64x -> id840_8.21x -> idf56_3.85x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> ideaf_7.79x -> id13b_14.68x -> id9a9_10.94x -> idb76_8.64x -> id665_4.27x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> ideaf_7.79x -> id13b_14.68x -> id9a9_10.94x -> idb76_8.64x -> id5d8_4.48x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> ideaf_7.79x -> id13b_14.68x -> id9a9_10.94x -> id232_7.08x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> ideaf_7.79x -> id13b_14.68x -> id9a9_10.94x -> id58a_7.11x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> ideaf_7.79x -> id13b_14.68x -> idbe7_7.17x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> ideaf_7.79x -> id13b_14.68x -> idc2e_2.38x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> ideaf_7.79x -> ided0_9.88x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> ideaf_7.79x -> id4f4_7.37x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> idb50_7.73x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id0e3_11.25x -> idda6_5.23x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id4b5_9.88x -> 
+id743_6.04x -> id3b0_0.98x -> id87b_10.09x -> id226_10.42x -> 
+id743_6.04x -> id3b0_0.98x -> id1d9_8.67x -> 
+id743_6.04x -> id3b0_0.98x -> id45b_4.51x -> 
+id743_6.04x -> id425_0.70x -> 
+idf04_3.99x -> 
+idd2d_4.65x -> 
+[INFO] processing 63_Gemm_ReLU_Divide
+一共有 21 条进化轨迹 (叶子节点)
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> id631_8.77x -> id3e8_10.51x -> id327_11.31x -> id116_8.85x -> idb80_8.94x -> id89a_2.18x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> id631_8.77x -> id3e8_10.51x -> id327_11.31x -> id116_8.85x -> idb80_8.94x -> id1e9_7.39x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> id631_8.77x -> id3e8_10.51x -> id327_11.31x -> id116_8.85x -> idb80_8.94x -> idd50_7.40x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> id631_8.77x -> id3e8_10.51x -> id327_11.31x -> id116_8.85x -> idd2c_4.43x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> id631_8.77x -> id3e8_10.51x -> id327_11.31x -> id116_8.85x -> id239_4.32x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> id631_8.77x -> id3e8_10.51x -> id327_11.31x -> id991_4.22x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> id631_8.77x -> id3e8_10.51x -> id327_11.31x -> id4a5_7.50x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> id631_8.77x -> id3e8_10.51x -> ided0_4.90x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> id631_8.77x -> id3e8_10.51x -> id2f7_11.30x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> id631_8.77x -> id8ad_5.51x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> id631_8.77x -> id0b8_10.32x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> id43a_8.69x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> id55b_4.95x -> idd61_8.34x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> idbe2_1.57x -> 
+id60a_5.72x -> idc4e_9.09x -> idaa6_5.93x -> ida10_3.02x -> 
+id60a_5.72x -> idc4e_9.09x -> id977_3.81x -> 
+id60a_5.72x -> idc4e_9.09x -> id023_5.07x -> 
+id60a_5.72x -> id5f8_4.61x -> 
+id60a_5.72x -> idcb1_3.30x -> 
+ide02_3.54x -> 
+id341_5.04x -> 
+[INFO] processing 64_Gemm_LogSumExp_LeakyReLU_LeakyReLU_GELU_GELU
+一共有 20 条进化轨迹 (叶子节点)
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id8f6_9.77x -> idc27_10.62x -> id7e1_10.89x -> idccd_8.40x -> id26e_2.63x -> idceb_8.50x -> id708_5.23x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id8f6_9.77x -> idc27_10.62x -> id7e1_10.89x -> idccd_8.40x -> id26e_2.63x -> idceb_8.50x -> id872_10.79x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id8f6_9.77x -> idc27_10.62x -> id7e1_10.89x -> idccd_8.40x -> id26e_2.63x -> idceb_8.50x -> id789_5.33x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id8f6_9.77x -> idc27_10.62x -> id7e1_10.89x -> idccd_8.40x -> id26e_2.63x -> id5c0_8.41x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id8f6_9.77x -> idc27_10.62x -> id7e1_10.89x -> idccd_8.40x -> id26e_2.63x -> idba8_3.64x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id8f6_9.77x -> idc27_10.62x -> id7e1_10.89x -> idccd_8.40x -> idb6d_2.18x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id8f6_9.77x -> idc27_10.62x -> id7e1_10.89x -> id556_5.95x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id8f6_9.77x -> idc27_10.62x -> id7e1_10.89x -> idbb1_7.06x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id8f6_9.77x -> idc27_10.62x -> ida4d_10.76x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id8f6_9.77x -> idc27_10.62x -> idc06_6.43x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id8f6_9.77x -> idb22_7.45x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id8f6_9.77x -> id3e3_9.06x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id31f_5.44x -> 
+id821_9.71x -> id418_6.36x -> id4ca_4.58x -> id1f9_3.38x -> 
+id821_9.71x -> id418_6.36x -> idae7_4.52x -> 
+id821_9.71x -> id418_6.36x -> id13d_4.53x -> 
+id821_9.71x -> id7d6_5.59x -> 
+id821_9.71x -> id19d_4.06x -> 
+idc52_9.61x -> 
+iddfb_5.48x -> 
+[INFO] processing 65_Conv2d_AvgPool_Sigmoid_Sum
+一共有 20 条进化轨迹 (叶子节点)
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> id1d5_1.54x -> id66c_1.14x -> id7c3_0.67x -> iddcc_1.72x -> id836_0.65x -> id74e_0.85x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> id1d5_1.54x -> id66c_1.14x -> id7c3_0.67x -> iddcc_1.72x -> id836_0.65x -> idd76_0.39x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> id1d5_1.54x -> id66c_1.14x -> id7c3_0.67x -> iddcc_1.72x -> id836_0.65x -> id47e_0.41x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> id1d5_1.54x -> id66c_1.14x -> id7c3_0.67x -> iddcc_1.72x -> id253_0.38x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> id1d5_1.54x -> id66c_1.14x -> id7c3_0.67x -> iddcc_1.72x -> idfa1_0.41x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> id1d5_1.54x -> id66c_1.14x -> id7c3_0.67x -> id871_0.47x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> id1d5_1.54x -> id66c_1.14x -> id7c3_0.67x -> id2dd_1.25x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> id1d5_1.54x -> id66c_1.14x -> idada_0.37x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> id1d5_1.54x -> id66c_1.14x -> id0d6_0.10x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> id1d5_1.54x -> id6e7_0.48x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> id1d5_1.54x -> idd8a_0.32x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> idf31_0.28x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> id1ab_0.06x -> id832_0.23x -> 
+id584_0.14x -> id8af_0.05x -> id77e_0.01x -> idfef_0.05x -> 
+id584_0.14x -> id8af_0.05x -> id3aa_0.01x -> 
+id584_0.14x -> id8af_0.05x -> id64a_0.01x -> 
+id584_0.14x -> id10b_0.04x -> 
+id584_0.14x -> idce1_0.05x -> 
+id4ee_0.00x -> 
+idd0f_0.01x -> 
+[INFO] processing 67_Conv2d_GELU_GlobalAvgPool
+一共有 21 条进化轨迹 (叶子节点)
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id8a6_0.71x -> idd3c_0.75x -> id013_0.77x -> idf89_1.54x -> idb8d_1.30x -> ida56_1.22x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id8a6_0.71x -> idd3c_0.75x -> id013_0.77x -> idf89_1.54x -> idb8d_1.30x -> id674_1.10x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id8a6_0.71x -> idd3c_0.75x -> id013_0.77x -> idf89_1.54x -> idb8d_1.30x -> ide13_1.44x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id8a6_0.71x -> idd3c_0.75x -> id013_0.77x -> idf89_1.54x -> idfc7_1.00x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id8a6_0.71x -> idd3c_0.75x -> id013_0.77x -> idf89_1.54x -> id5ee_1.05x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id8a6_0.71x -> idd3c_0.75x -> id013_0.77x -> idf0a_0.49x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id8a6_0.71x -> idd3c_0.75x -> id013_0.77x -> idfc9_1.49x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id8a6_0.71x -> idd3c_0.75x -> id1b1_0.38x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id8a6_0.71x -> idd3c_0.75x -> id24d_0.26x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id8a6_0.71x -> id1de_0.28x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id8a6_0.71x -> id0eb_0.70x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id2f2_0.61x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id371_0.81x -> id782_0.69x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id02a_0.55x -> 
+id7a0_1.25x -> idf4d_1.67x -> idc1c_1.61x -> id189_0.50x -> 
+id7a0_1.25x -> idf4d_1.67x -> ideff_0.31x -> 
+id7a0_1.25x -> idf4d_1.67x -> id6d9_0.34x -> 
+id7a0_1.25x -> id034_0.90x -> 
+id7a0_1.25x -> idc7e_0.88x -> 
+id70b_0.35x -> 
+id3b5_0.75x -> 
+[INFO] processing 68_Matmul_Min_Subtract
+一共有 21 条进化轨迹 (叶子节点)
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id3dd_3.34x -> id52d_5.73x -> id9fd_5.91x -> id9f6_5.76x -> idb55_3.13x -> idb30_5.56x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id3dd_3.34x -> id52d_5.73x -> id9fd_5.91x -> id9f6_5.76x -> idb55_3.13x -> id4ff_0.55x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id3dd_3.34x -> id52d_5.73x -> id9fd_5.91x -> id9f6_5.76x -> idb55_3.13x -> ide3d_5.49x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id3dd_3.34x -> id52d_5.73x -> id9fd_5.91x -> id9f6_5.76x -> id83c_0.98x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id3dd_3.34x -> id52d_5.73x -> id9fd_5.91x -> id9f6_5.76x -> idc60_0.97x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id3dd_3.34x -> id52d_5.73x -> id9fd_5.91x -> id7cf_4.67x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id3dd_3.34x -> id52d_5.73x -> id9fd_5.91x -> idea8_0.91x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id3dd_3.34x -> id52d_5.73x -> idfce_2.89x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id3dd_3.34x -> id52d_5.73x -> id1ec_1.14x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id3dd_3.34x -> id134_1.01x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id3dd_3.34x -> ida66_1.03x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id17a_1.02x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idbcc_4.06x -> id402_1.05x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> id1aa_2.34x -> 
+id778_5.45x -> idb0f_5.46x -> id632_4.19x -> idc54_3.68x -> 
+id778_5.45x -> idb0f_5.46x -> id945_3.45x -> 
+id778_5.45x -> idb0f_5.46x -> id531_0.96x -> 
+id778_5.45x -> id8a2_3.98x -> 
+id778_5.45x -> id622_4.43x -> 
+id366_5.08x -> 
+idffc_5.39x -> 
+[INFO] processing 69_Conv2d_HardSwish_ReLU
+一共有 21 条进化轨迹 (叶子节点)
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id76d_1.87x -> idc5d_1.77x -> id043_2.25x -> id4bb_1.02x -> id01d_2.00x -> idec7_0.73x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id76d_1.87x -> idc5d_1.77x -> id043_2.25x -> id4bb_1.02x -> id01d_2.00x -> id293_0.72x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id76d_1.87x -> idc5d_1.77x -> id043_2.25x -> id4bb_1.02x -> id01d_2.00x -> id423_0.96x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id76d_1.87x -> idc5d_1.77x -> id043_2.25x -> id4bb_1.02x -> id0cb_1.47x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id76d_1.87x -> idc5d_1.77x -> id043_2.25x -> id4bb_1.02x -> id397_1.94x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id76d_1.87x -> idc5d_1.77x -> id043_2.25x -> id8b3_0.51x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id76d_1.87x -> idc5d_1.77x -> id043_2.25x -> idd9d_0.70x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id76d_1.87x -> idc5d_1.77x -> id90a_0.88x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id76d_1.87x -> idc5d_1.77x -> ida2e_2.05x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id76d_1.87x -> id896_1.22x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id76d_1.87x -> idee0_1.10x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id04e_1.85x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> idb71_1.73x -> id4b3_1.86x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> id534_0.88x -> 
+id5ca_1.07x -> id69b_2.06x -> idc94_1.69x -> id077_0.88x -> 
+id5ca_1.07x -> id69b_2.06x -> id6e2_1.09x -> 
+id5ca_1.07x -> id69b_2.06x -> id808_1.07x -> 
+id5ca_1.07x -> idfa7_1.04x -> 
+id5ca_1.07x -> idfa1_1.23x -> 
+id6ba_0.17x -> 
+idad8_0.48x -> 
+[INFO] processing 70_Gemm_Sigmoid_Scaling_ResidualAdd
+一共有 21 条进化轨迹 (叶子节点)
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> idbf6_7.56x -> iddfd_6.57x -> id555_11.33x -> idfb9_7.51x -> id917_10.58x -> id08b_4.65x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> idbf6_7.56x -> iddfd_6.57x -> id555_11.33x -> idfb9_7.51x -> id917_10.58x -> idbba_10.87x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> idbf6_7.56x -> iddfd_6.57x -> id555_11.33x -> idfb9_7.51x -> id917_10.58x -> id2af_6.04x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> idbf6_7.56x -> iddfd_6.57x -> id555_11.33x -> idfb9_7.51x -> idd93_5.19x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> idbf6_7.56x -> iddfd_6.57x -> id555_11.33x -> idfb9_7.51x -> id9d4_5.48x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> idbf6_7.56x -> iddfd_6.57x -> id555_11.33x -> id423_4.62x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> idbf6_7.56x -> iddfd_6.57x -> id555_11.33x -> id939_4.20x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> idbf6_7.56x -> iddfd_6.57x -> id2dc_10.09x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> idbf6_7.56x -> iddfd_6.57x -> idee4_4.94x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> idbf6_7.56x -> id37a_4.57x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> idbf6_7.56x -> id6db_6.42x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> id7ac_7.46x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide50_11.80x -> id9f1_3.16x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> id4fc_4.99x -> 
+idfc9_9.44x -> idc4f_12.08x -> id9dc_10.20x -> ide4f_9.52x -> 
+idfc9_9.44x -> idc4f_12.08x -> id876_7.43x -> 
+idfc9_9.44x -> idc4f_12.08x -> id1a3_3.09x -> 
+idfc9_9.44x -> idf63_4.52x -> 
+idfc9_9.44x -> id245_4.90x -> 
+idca6_4.35x -> 
+id365_4.41x -> 
+[INFO] processing 71_Conv2d_Divide_LeakyReLU
+一共有 13 条进化轨迹 (叶子节点)
+id72b_3.25x -> id883_1.99x -> id4c8_2.55x -> idf5d_2.55x -> id5fa_2.04x -> id4d0_2.92x -> 
+id72b_3.25x -> id883_1.99x -> id4c8_2.55x -> idf5d_2.55x -> id5fa_2.04x -> id8fa_0.52x -> 
+id72b_3.25x -> id883_1.99x -> id4c8_2.55x -> idf5d_2.55x -> id5fa_2.04x -> idbbd_2.25x -> 
+id72b_3.25x -> id883_1.99x -> id4c8_2.55x -> idf5d_2.55x -> id3e8_1.24x -> 
+id72b_3.25x -> id883_1.99x -> id4c8_2.55x -> idf5d_2.55x -> id130_0.98x -> 
+id72b_3.25x -> id883_1.99x -> id4c8_2.55x -> idb9c_1.13x -> 
+id72b_3.25x -> id883_1.99x -> id4c8_2.55x -> id51e_2.03x -> 
+id72b_3.25x -> id883_1.99x -> id59e_2.27x -> 
+id72b_3.25x -> id883_1.99x -> id9d4_2.07x -> 
+id72b_3.25x -> id3ab_1.50x -> 
+id72b_3.25x -> id5ce_1.47x -> 
+id015_0.48x -> 
+idbf5_0.64x -> 
+[INFO] processing 73_Conv2d_BatchNorm_Scaling
+一共有 19 条进化轨迹 (叶子节点)
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> idbc2_0.50x -> id9e6_0.31x -> id791_0.25x -> ida48_1.84x -> id55e_2.70x -> id6e2_0.96x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> idbc2_0.50x -> id9e6_0.31x -> id791_0.25x -> ida48_1.84x -> id55e_2.70x -> id45a_1.47x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> idbc2_0.50x -> id9e6_0.31x -> id791_0.25x -> ida48_1.84x -> id55e_2.70x -> ida0a_1.35x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> idbc2_0.50x -> id9e6_0.31x -> id791_0.25x -> ida48_1.84x -> ideb1_1.34x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> idbc2_0.50x -> id9e6_0.31x -> id791_0.25x -> ida48_1.84x -> id52e_1.05x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> idbc2_0.50x -> id9e6_0.31x -> id791_0.25x -> idafd_0.71x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> idbc2_0.50x -> id9e6_0.31x -> id791_0.25x -> ida73_1.08x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> idbc2_0.50x -> id9e6_0.31x -> idebc_0.13x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> idbc2_0.50x -> id9e6_0.31x -> id3cb_0.16x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> idbc2_0.50x -> id4be_0.07x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> idbc2_0.50x -> ida1e_0.07x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> id527_0.46x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> iddf7_0.58x -> id1a8_0.40x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> id17a_0.07x -> 
+id989_0.88x -> ide47_0.56x -> id1d6_0.36x -> idff9_0.37x -> 
+id989_0.88x -> ide47_0.56x -> idce6_0.14x -> 
+id989_0.88x -> ide47_0.56x -> id5f3_0.35x -> 
+id989_0.88x -> ida3f_0.55x -> 
+id989_0.88x -> id2b6_0.12x -> 
+[INFO] processing 74_ConvTranspose3d_LeakyReLU_Multiply_LeakyReLU_Max
+一共有 15 条进化轨迹 (叶子节点)
+idd21_0.13x -> idac6_0.04x -> idff3_0.08x -> ida6f_0.10x -> ide01_0.10x -> id9f7_0.43x -> id239_0.66x -> ide87_0.16x -> id5b7_0.29x -> id6f0_0.21x -> 
+idd21_0.13x -> idac6_0.04x -> idff3_0.08x -> ida6f_0.10x -> ide01_0.10x -> id9f7_0.43x -> id239_0.66x -> ide87_0.16x -> id5b7_0.29x -> id37e_0.11x -> 
+idd21_0.13x -> idac6_0.04x -> idff3_0.08x -> ida6f_0.10x -> ide01_0.10x -> id9f7_0.43x -> id239_0.66x -> ide87_0.16x -> id638_0.22x -> 
+idd21_0.13x -> idac6_0.04x -> idff3_0.08x -> ida6f_0.10x -> ide01_0.10x -> id9f7_0.43x -> id239_0.66x -> ide87_0.16x -> id4eb_0.15x -> 
+idd21_0.13x -> idac6_0.04x -> idff3_0.08x -> ida6f_0.10x -> ide01_0.10x -> id9f7_0.43x -> id239_0.66x -> idc15_0.10x -> 
+idd21_0.13x -> idac6_0.04x -> idff3_0.08x -> ida6f_0.10x -> ide01_0.10x -> id9f7_0.43x -> ida1a_0.46x -> 
+idd21_0.13x -> idac6_0.04x -> idff3_0.08x -> ida6f_0.10x -> ide01_0.10x -> id092_0.20x -> 
+idd21_0.13x -> idac6_0.04x -> idff3_0.08x -> ida6f_0.10x -> ide01_0.10x -> idf6e_0.21x -> 
+idd21_0.13x -> idac6_0.04x -> idff3_0.08x -> ida6f_0.10x -> ide20_0.08x -> 
+idd21_0.13x -> idac6_0.04x -> idff3_0.08x -> id0c4_0.07x -> 
+idd21_0.13x -> idac6_0.04x -> idff3_0.08x -> idbaa_0.04x -> 
+idd21_0.13x -> idac6_0.04x -> idc55_0.08x -> 
+idd21_0.13x -> idac6_0.04x -> ida34_0.08x -> 
+ida59_0.03x -> 
+ide4d_0.01x -> 
+[INFO] processing 76_Gemm_Add_ReLU
+一共有 21 条进化轨迹 (叶子节点)
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> idb65_10.78x -> id9bb_10.72x -> id8e2_6.07x -> id965_10.17x -> id5ae_9.01x -> idbe0_3.87x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> idb65_10.78x -> id9bb_10.72x -> id8e2_6.07x -> id965_10.17x -> id5ae_9.01x -> idc68_4.28x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> idb65_10.78x -> id9bb_10.72x -> id8e2_6.07x -> id965_10.17x -> id5ae_9.01x -> idb02_7.38x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> idb65_10.78x -> id9bb_10.72x -> id8e2_6.07x -> id965_10.17x -> idd67_8.88x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> idb65_10.78x -> id9bb_10.72x -> id8e2_6.07x -> id965_10.17x -> idf2f_4.73x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> idb65_10.78x -> id9bb_10.72x -> id8e2_6.07x -> id0da_5.02x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> idb65_10.78x -> id9bb_10.72x -> id8e2_6.07x -> idfe3_3.20x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> idb65_10.78x -> id9bb_10.72x -> id4c8_3.44x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> idb65_10.78x -> id9bb_10.72x -> id595_3.02x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> idb65_10.78x -> id1fa_4.57x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> idb65_10.78x -> id446_4.60x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> iddb4_6.00x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id7b4_9.18x -> id0af_10.72x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> id702_4.90x -> 
+id1fa_11.37x -> id2d9_3.63x -> id374_9.28x -> idb34_9.06x -> 
+id1fa_11.37x -> id2d9_3.63x -> id30e_9.24x -> 
+id1fa_11.37x -> id2d9_3.63x -> ide37_3.26x -> 
+id1fa_11.37x -> ide20_3.58x -> 
+id1fa_11.37x -> id64b_3.54x -> 
+ida8e_4.49x -> 
+id447_4.26x -> 
+[INFO] processing 78_ConvTranspose3d_Max_Max_Sum
+一共有 19 条进化轨迹 (叶子节点)
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> id40d_0.07x -> id0f7_0.05x -> id26c_0.01x -> id4cc_0.01x -> id914_0.04x -> ide63_0.02x -> id890_0.02x -> 
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> id40d_0.07x -> id0f7_0.05x -> id26c_0.01x -> id4cc_0.01x -> id914_0.04x -> ide63_0.02x -> ide0e_0.03x -> 
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> id40d_0.07x -> id0f7_0.05x -> id26c_0.01x -> id4cc_0.01x -> id914_0.04x -> ide63_0.02x -> id3eb_0.02x -> 
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> id40d_0.07x -> id0f7_0.05x -> id26c_0.01x -> id4cc_0.01x -> id914_0.04x -> idf24_0.01x -> 
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> id40d_0.07x -> id0f7_0.05x -> id26c_0.01x -> id4cc_0.01x -> id914_0.04x -> idd49_0.01x -> 
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> id40d_0.07x -> id0f7_0.05x -> id26c_0.01x -> id4cc_0.01x -> ide11_0.02x -> 
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> id40d_0.07x -> id0f7_0.05x -> id26c_0.01x -> id4cc_0.01x -> ida83_0.00x -> 
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> id40d_0.07x -> id0f7_0.05x -> id26c_0.01x -> ideb1_0.01x -> 
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> id40d_0.07x -> id0f7_0.05x -> id26c_0.01x -> id03a_0.01x -> 
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> id40d_0.07x -> idbdb_0.02x -> 
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> id40d_0.07x -> id131_0.04x -> 
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> idecb_0.05x -> 
+id312_0.06x -> idb85_0.06x -> idfee_0.04x -> id2d7_0.04x -> 
+id312_0.06x -> idb85_0.06x -> id2bc_0.03x -> 
+id312_0.06x -> idb85_0.06x -> id6d9_0.03x -> 
+id312_0.06x -> id63a_0.05x -> 
+id312_0.06x -> idaf8_0.05x -> 
+id05f_0.05x -> 
+id270_0.05x -> 
+[INFO] processing 79_Conv3d_Multiply_InstanceNorm_Clamp_Multiply_Max
+一共有 21 条进化轨迹 (叶子节点)
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id557_0.13x -> iddca_0.16x -> id882_0.89x -> ida14_1.20x -> ide7a_0.95x -> id973_0.37x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id557_0.13x -> iddca_0.16x -> id882_0.89x -> ida14_1.20x -> ide7a_0.95x -> id853_0.69x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id557_0.13x -> iddca_0.16x -> id882_0.89x -> ida14_1.20x -> ide7a_0.95x -> id86e_0.43x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id557_0.13x -> iddca_0.16x -> id882_0.89x -> ida14_1.20x -> id1e2_0.47x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id557_0.13x -> iddca_0.16x -> id882_0.89x -> ida14_1.20x -> id0f6_0.42x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id557_0.13x -> iddca_0.16x -> id882_0.89x -> id15c_0.30x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id557_0.13x -> iddca_0.16x -> id882_0.89x -> ide37_0.34x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id557_0.13x -> iddca_0.16x -> idee6_0.65x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id557_0.13x -> iddca_0.16x -> id1fb_0.34x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id557_0.13x -> idab9_0.03x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id557_0.13x -> idfe6_0.15x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id2e5_0.11x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id80b_0.49x -> id9fa_0.13x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> id4cb_0.44x -> 
+idee0_0.07x -> id7df_0.07x -> idc08_0.07x -> idd67_0.48x -> 
+idee0_0.07x -> id7df_0.07x -> id458_0.05x -> 
+idee0_0.07x -> id7df_0.07x -> idfa0_0.06x -> 
+idee0_0.07x -> id401_0.04x -> 
+idee0_0.07x -> id841_0.05x -> 
+id44d_0.03x -> 
+idab7_0.07x -> 
+[INFO] processing 80_Gemm_Max_Subtract_GELU
+一共有 17 条进化轨迹 (叶子节点)
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> id9e4_9.76x -> id8a6_1.76x -> id58c_266.77x -> idd93_8.83x -> idb9d_1.82x -> id8b0_8.45x -> id6a6_8.30x -> 
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> id9e4_9.76x -> id8a6_1.76x -> id58c_266.77x -> idd93_8.83x -> idb9d_1.82x -> id8b0_8.45x -> ida7f_2.90x -> 
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> id9e4_9.76x -> id8a6_1.76x -> id58c_266.77x -> idd93_8.83x -> idb9d_1.82x -> id7ea_7.40x -> 
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> id9e4_9.76x -> id8a6_1.76x -> id58c_266.77x -> idd93_8.83x -> idb9d_1.82x -> id785_4.25x -> 
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> id9e4_9.76x -> id8a6_1.76x -> id58c_266.77x -> idd93_8.83x -> id853_1.69x -> 
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> id9e4_9.76x -> id8a6_1.76x -> id58c_266.77x -> id313_4.28x -> 
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> id9e4_9.76x -> id8a6_1.76x -> id58c_266.77x -> ide4a_4.53x -> 
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> id9e4_9.76x -> id8a6_1.76x -> idcb0_0.77x -> 
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> id9e4_9.76x -> id8a6_1.76x -> id33d_40.69x -> 
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> id9e4_9.76x -> id7ee_1.45x -> 
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> id9e4_9.76x -> id8c3_1.30x -> 
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> id1b7_1.44x -> 
+idf01_0.21x -> ida5f_9.54x -> id1fc_10.05x -> idada_1.58x -> 
+idf01_0.21x -> ida5f_9.54x -> ide2e_7.94x -> 
+idf01_0.21x -> id081_0.52x -> 
+idf01_0.21x -> id298_0.79x -> 
+id94b_0.12x -> 
+[INFO] processing 81_Gemm_Swish_Divide_Clamp_Tanh_Clamp
+一共有 21 条进化轨迹 (叶子节点)
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> iddaf_10.93x -> id579_11.75x -> idccc_10.21x -> id346_11.02x -> id286_10.35x -> id5c5_4.67x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> iddaf_10.93x -> id579_11.75x -> idccc_10.21x -> id346_11.02x -> id286_10.35x -> id599_5.45x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> iddaf_10.93x -> id579_11.75x -> idccc_10.21x -> id346_11.02x -> id286_10.35x -> idb38_4.18x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> iddaf_10.93x -> id579_11.75x -> idccc_10.21x -> id346_11.02x -> id1c3_7.11x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> iddaf_10.93x -> id579_11.75x -> idccc_10.21x -> id346_11.02x -> ida22_3.11x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> iddaf_10.93x -> id579_11.75x -> idccc_10.21x -> id9e1_5.33x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> iddaf_10.93x -> id579_11.75x -> idccc_10.21x -> id97c_10.55x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> iddaf_10.93x -> id579_11.75x -> id0d8_5.29x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> iddaf_10.93x -> id579_11.75x -> idaff_4.95x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> iddaf_10.93x -> idd79_0.75x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> iddaf_10.93x -> ide7b_10.75x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> id1a6_6.36x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id4f0_10.23x -> id253_3.62x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> idc0f_5.82x -> 
+idbc9_6.60x -> idcc9_10.35x -> id059_3.61x -> id622_4.51x -> 
+idbc9_6.60x -> idcc9_10.35x -> idcdb_3.11x -> 
+idbc9_6.60x -> idcc9_10.35x -> ida6e_3.05x -> 
+idbc9_6.60x -> id788_8.94x -> 
+idbc9_6.60x -> idb34_8.96x -> 
+id55a_3.64x -> 
+id4fe_6.57x -> 
+[INFO] processing 82_Conv2d_Tanh_Scaling_BiasAdd_Max
+一共有 20 条进化轨迹 (叶子节点)
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> iddbe_0.08x -> id0df_0.44x -> id4d8_0.29x -> ide13_0.06x -> id8d5_0.33x -> id1b4_0.20x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> iddbe_0.08x -> id0df_0.44x -> id4d8_0.29x -> ide13_0.06x -> id8d5_0.33x -> idd52_0.33x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> iddbe_0.08x -> id0df_0.44x -> id4d8_0.29x -> ide13_0.06x -> id8d5_0.33x -> idbfc_0.18x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> iddbe_0.08x -> id0df_0.44x -> id4d8_0.29x -> ide13_0.06x -> id6a0_0.08x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> iddbe_0.08x -> id0df_0.44x -> id4d8_0.29x -> ide13_0.06x -> ida9b_0.07x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> iddbe_0.08x -> id0df_0.44x -> id4d8_0.29x -> idf38_0.04x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> iddbe_0.08x -> id0df_0.44x -> id4d8_0.29x -> id3b4_0.04x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> iddbe_0.08x -> id0df_0.44x -> idc75_0.03x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> iddbe_0.08x -> id0df_0.44x -> id2a0_0.26x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> iddbe_0.08x -> id8e0_0.02x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> iddbe_0.08x -> ida83_0.14x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> id9e3_0.08x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> idcde_0.08x -> id271_0.08x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> id464_0.08x -> 
+id7ce_0.08x -> id6c8_0.18x -> idc4d_0.08x -> id177_0.08x -> 
+id7ce_0.08x -> id6c8_0.18x -> id435_0.04x -> 
+id7ce_0.08x -> idd63_0.16x -> 
+id7ce_0.08x -> idd42_0.18x -> 
+id9eb_0.00x -> 
+id88c_0.00x -> 
+[INFO] processing 83_Conv3d_GroupNorm_Min_Clamp_Dropout
+一共有 21 条进化轨迹 (叶子节点)
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> id862_0.52x -> id448_0.71x -> idf68_0.62x -> id3aa_0.61x -> id180_0.07x -> idd12_0.10x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> id862_0.52x -> id448_0.71x -> idf68_0.62x -> id3aa_0.61x -> id180_0.07x -> id78c_0.18x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> id862_0.52x -> id448_0.71x -> idf68_0.62x -> id3aa_0.61x -> id180_0.07x -> id881_0.10x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> id862_0.52x -> id448_0.71x -> idf68_0.62x -> id3aa_0.61x -> id306_0.05x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> id862_0.52x -> id448_0.71x -> idf68_0.62x -> id3aa_0.61x -> ideb9_0.05x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> id862_0.52x -> id448_0.71x -> idf68_0.62x -> id8fb_0.25x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> id862_0.52x -> id448_0.71x -> idf68_0.62x -> id77a_0.38x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> id862_0.52x -> id448_0.71x -> id101_0.49x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> id862_0.52x -> id448_0.71x -> idb83_0.52x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> id862_0.52x -> id32d_0.39x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> id862_0.52x -> id5ed_0.46x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> id4e1_0.29x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id6f6_0.76x -> idaab_0.34x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> idc6e_0.59x -> 
+id8b3_0.76x -> id5f0_0.94x -> id501_0.83x -> id4b5_0.57x -> 
+id8b3_0.76x -> id5f0_0.94x -> id5f5_0.73x -> 
+id8b3_0.76x -> id5f0_0.94x -> idde1_0.45x -> 
+id8b3_0.76x -> id23c_0.65x -> 
+id8b3_0.76x -> id161_0.55x -> 
+id18a_0.67x -> 
+id1cb_0.20x -> 
+[INFO] processing 84_Gemm_BatchNorm_Scaling_Softmax
+一共有 21 条进化轨迹 (叶子节点)
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> id1ab_6.10x -> idc6f_9.79x -> id1c5_6.90x -> id5e3_6.94x -> idaf5_10.05x -> id80b_5.37x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> id1ab_6.10x -> idc6f_9.79x -> id1c5_6.90x -> id5e3_6.94x -> idaf5_10.05x -> id4d9_5.72x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> id1ab_6.10x -> idc6f_9.79x -> id1c5_6.90x -> id5e3_6.94x -> idaf5_10.05x -> idb52_3.12x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> id1ab_6.10x -> idc6f_9.79x -> id1c5_6.90x -> id5e3_6.94x -> id30f_9.49x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> id1ab_6.10x -> idc6f_9.79x -> id1c5_6.90x -> id5e3_6.94x -> idd7f_4.06x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> id1ab_6.10x -> idc6f_9.79x -> id1c5_6.90x -> id6b8_5.39x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> id1ab_6.10x -> idc6f_9.79x -> id1c5_6.90x -> id623_6.92x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> id1ab_6.10x -> idc6f_9.79x -> id1f3_3.25x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> id1ab_6.10x -> idc6f_9.79x -> idb48_2.57x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> id1ab_6.10x -> id026_7.85x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> id1ab_6.10x -> id067_3.57x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> idec3_5.26x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idcb6_7.77x -> id2cd_2.96x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> id564_6.37x -> 
+iddc1_7.45x -> idd4b_7.19x -> ida08_10.07x -> idd6b_7.24x -> 
+iddc1_7.45x -> idd4b_7.19x -> id2fc_3.96x -> 
+iddc1_7.45x -> idd4b_7.19x -> id0ff_9.62x -> 
+iddc1_7.45x -> idded_2.45x -> 
+iddc1_7.45x -> id99a_3.37x -> 
+id157_2.89x -> 
+idaa2_4.49x -> 
+[INFO] processing 85_Conv2d_GroupNorm_Scale_MaxPool_Clamp
+一共有 18 条进化轨迹 (叶子节点)
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id211_1.43x -> id552_1.03x -> id134_2.44x -> ide82_1.94x -> idd77_1.50x -> id540_1.75x -> id89c_1.01x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id211_1.43x -> id552_1.03x -> id134_2.44x -> ide82_1.94x -> idd77_1.50x -> id540_1.75x -> ida42_1.17x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id211_1.43x -> id552_1.03x -> id134_2.44x -> ide82_1.94x -> idd77_1.50x -> id540_1.75x -> idf57_0.84x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id211_1.43x -> id552_1.03x -> id134_2.44x -> ide82_1.94x -> idd77_1.50x -> ida73_1.02x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id211_1.43x -> id552_1.03x -> id134_2.44x -> ide82_1.94x -> idd77_1.50x -> idd53_1.32x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id211_1.43x -> id552_1.03x -> id134_2.44x -> ide82_1.94x -> id1b1_1.45x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id211_1.43x -> id552_1.03x -> id134_2.44x -> idcb8_1.49x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id211_1.43x -> id552_1.03x -> id134_2.44x -> id1de_1.32x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id211_1.43x -> id552_1.03x -> id7fb_1.67x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id211_1.43x -> id552_1.03x -> idabf_0.46x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id211_1.43x -> id3a9_0.95x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id211_1.43x -> id135_1.02x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> id0db_0.91x -> 
+id34c_1.87x -> id4c9_1.57x -> idf92_1.80x -> idf1d_0.01x -> 
+id34c_1.87x -> id4c9_1.57x -> id8c0_1.62x -> 
+id34c_1.87x -> id4c9_1.57x -> idd0b_0.65x -> 
+id34c_1.87x -> ida9d_1.50x -> 
+id0f2_0.67x -> 
+[INFO] processing 86_Matmul_Divide_GELU
+一共有 21 条进化轨迹 (叶子节点)
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> id668_11.93x -> idd14_11.84x -> idda6_7.42x -> id731_10.39x -> idbe0_4.29x -> id86f_1.68x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> id668_11.93x -> idd14_11.84x -> idda6_7.42x -> id731_10.39x -> idbe0_4.29x -> id817_2.13x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> id668_11.93x -> idd14_11.84x -> idda6_7.42x -> id731_10.39x -> idbe0_4.29x -> id193_2.30x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> id668_11.93x -> idd14_11.84x -> idda6_7.42x -> id731_10.39x -> idc09_4.15x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> id668_11.93x -> idd14_11.84x -> idda6_7.42x -> id731_10.39x -> id0b4_2.96x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> id668_11.93x -> idd14_11.84x -> idda6_7.42x -> id26d_8.83x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> id668_11.93x -> idd14_11.84x -> idda6_7.42x -> idb94_7.40x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> id668_11.93x -> idd14_11.84x -> id73e_2.05x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> id668_11.93x -> idd14_11.84x -> id866_4.67x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> id668_11.93x -> id9f7_4.08x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> id668_11.93x -> ide1e_4.46x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> ida57_9.40x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idce6_7.26x -> id524_10.62x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> idcbe_3.81x -> 
+id146_10.26x -> id8ea_6.59x -> id1dc_6.75x -> id823_2.42x -> 
+id146_10.26x -> id8ea_6.59x -> ida68_4.46x -> 
+id146_10.26x -> id8ea_6.59x -> idb0f_4.49x -> 
+id146_10.26x -> id2a7_3.99x -> 
+id146_10.26x -> id2f5_3.12x -> 
+id9b4_8.17x -> 
+id880_10.26x -> 
+[INFO] processing 87_Conv2d_Subtract_Subtract_Mish
+一共有 21 条进化轨迹 (叶子节点)
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> idd0e_1.91x -> id250_1.70x -> id2e9_1.90x -> id298_0.82x -> id8da_2.57x -> id0fa_1.94x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> idd0e_1.91x -> id250_1.70x -> id2e9_1.90x -> id298_0.82x -> id8da_2.57x -> id1d5_0.92x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> idd0e_1.91x -> id250_1.70x -> id2e9_1.90x -> id298_0.82x -> id8da_2.57x -> id2d7_1.09x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> idd0e_1.91x -> id250_1.70x -> id2e9_1.90x -> id298_0.82x -> id335_0.86x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> idd0e_1.91x -> id250_1.70x -> id2e9_1.90x -> id298_0.82x -> id5e9_0.46x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> idd0e_1.91x -> id250_1.70x -> id2e9_1.90x -> id5e3_0.51x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> idd0e_1.91x -> id250_1.70x -> id2e9_1.90x -> id82e_0.57x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> idd0e_1.91x -> id250_1.70x -> id73e_1.60x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> idd0e_1.91x -> id250_1.70x -> id35c_0.84x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> idd0e_1.91x -> ide44_1.14x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> idd0e_1.91x -> id1a1_1.14x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> id87b_1.26x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id1e6_1.17x -> id74b_1.14x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> idc02_0.68x -> 
+id29b_0.88x -> idbf3_1.81x -> idfab_0.80x -> id9c0_0.84x -> 
+id29b_0.88x -> idbf3_1.81x -> id30e_0.39x -> 
+id29b_0.88x -> idbf3_1.81x -> id87d_0.39x -> 
+id29b_0.88x -> id76f_0.94x -> 
+id29b_0.88x -> id61e_0.29x -> 
+idcaf_0.30x -> 
+idfab_0.85x -> 
+[INFO] processing 88_Gemm_GroupNorm_Swish_Multiply_Swish
+一共有 21 条进化轨迹 (叶子节点)
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> idc9e_11.70x -> id4a8_7.52x -> idf74_4.05x -> id020_6.39x -> idaca_5.28x -> id20f_4.73x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> idc9e_11.70x -> id4a8_7.52x -> idf74_4.05x -> id020_6.39x -> idaca_5.28x -> id912_3.08x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> idc9e_11.70x -> id4a8_7.52x -> idf74_4.05x -> id020_6.39x -> idaca_5.28x -> idfac_6.09x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> idc9e_11.70x -> id4a8_7.52x -> idf74_4.05x -> id020_6.39x -> id4f8_3.02x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> idc9e_11.70x -> id4a8_7.52x -> idf74_4.05x -> id020_6.39x -> id432_4.88x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> idc9e_11.70x -> id4a8_7.52x -> idf74_4.05x -> id5e0_1.60x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> idc9e_11.70x -> id4a8_7.52x -> idf74_4.05x -> id7e3_5.99x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> idc9e_11.70x -> id4a8_7.52x -> id709_3.46x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> idc9e_11.70x -> id4a8_7.52x -> id5e2_3.46x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> idc9e_11.70x -> id71b_4.04x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> idc9e_11.70x -> id3f7_4.37x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> id966_6.47x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idff4_8.31x -> id917_7.63x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> id148_7.59x -> 
+idbc5_9.16x -> id521_4.14x -> id2a6_7.73x -> idb15_7.59x -> 
+idbc5_9.16x -> id521_4.14x -> idfda_4.36x -> 
+idbc5_9.16x -> id521_4.14x -> ida27_4.25x -> 
+idbc5_9.16x -> id63a_3.79x -> 
+idbc5_9.16x -> idd31_3.84x -> 
+idf7a_8.08x -> 
+idc66_3.56x -> 
+[INFO] processing 89_ConvTranspose3d_MaxPool_Softmax_Subtract_Swish_Max
+一共有 16 条进化轨迹 (叶子节点)
+id56f_0.10x -> id6b5_0.16x -> idd89_0.16x -> ida2b_0.60x -> id9c9_0.21x -> id841_0.84x -> id99c_0.38x -> idc5f_0.24x -> idf24_0.10x -> id056_0.11x -> 
+id56f_0.10x -> id6b5_0.16x -> idd89_0.16x -> ida2b_0.60x -> id9c9_0.21x -> id841_0.84x -> id99c_0.38x -> idc5f_0.24x -> idf24_0.10x -> id462_0.12x -> 
+id56f_0.10x -> id6b5_0.16x -> idd89_0.16x -> ida2b_0.60x -> id9c9_0.21x -> id841_0.84x -> id99c_0.38x -> idc5f_0.24x -> idf24_0.10x -> id08e_0.11x -> 
+id56f_0.10x -> id6b5_0.16x -> idd89_0.16x -> ida2b_0.60x -> id9c9_0.21x -> id841_0.84x -> id99c_0.38x -> idc5f_0.24x -> id6ad_0.08x -> 
+id56f_0.10x -> id6b5_0.16x -> idd89_0.16x -> ida2b_0.60x -> id9c9_0.21x -> id841_0.84x -> id99c_0.38x -> idc5f_0.24x -> id53b_0.05x -> 
+id56f_0.10x -> id6b5_0.16x -> idd89_0.16x -> ida2b_0.60x -> id9c9_0.21x -> id841_0.84x -> id99c_0.38x -> id68d_0.13x -> 
+id56f_0.10x -> id6b5_0.16x -> idd89_0.16x -> ida2b_0.60x -> id9c9_0.21x -> id841_0.84x -> id99c_0.38x -> id2db_0.13x -> 
+id56f_0.10x -> id6b5_0.16x -> idd89_0.16x -> ida2b_0.60x -> id9c9_0.21x -> id841_0.84x -> id6ea_0.38x -> 
+id56f_0.10x -> id6b5_0.16x -> idd89_0.16x -> ida2b_0.60x -> id9c9_0.21x -> id841_0.84x -> id78c_0.35x -> 
+id56f_0.10x -> id6b5_0.16x -> idd89_0.16x -> ida2b_0.60x -> id9c9_0.21x -> id5c1_0.27x -> 
+id56f_0.10x -> id6b5_0.16x -> idd89_0.16x -> ida2b_0.60x -> id9c9_0.21x -> id519_0.42x -> 
+id56f_0.10x -> id6b5_0.16x -> idd89_0.16x -> ida2b_0.60x -> id158_0.15x -> 
+id56f_0.10x -> id6b5_0.16x -> id316_0.11x -> 
+id56f_0.10x -> id8c2_0.16x -> 
+id56f_0.10x -> id2cc_0.15x -> 
+id3e9_0.01x -> 
+[INFO] processing 90_Conv3d_LeakyReLU_Sum_Clamp_GELU
+一共有 21 条进化轨迹 (叶子节点)
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> ida5d_0.55x -> ide7c_0.71x -> ide66_0.75x -> id39a_1.30x -> idc6a_1.07x -> id756_0.71x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> ida5d_0.55x -> ide7c_0.71x -> ide66_0.75x -> id39a_1.30x -> idc6a_1.07x -> id124_1.04x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> ida5d_0.55x -> ide7c_0.71x -> ide66_0.75x -> id39a_1.30x -> idc6a_1.07x -> id1ce_0.71x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> ida5d_0.55x -> ide7c_0.71x -> ide66_0.75x -> id39a_1.30x -> idb91_0.25x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> ida5d_0.55x -> ide7c_0.71x -> ide66_0.75x -> id39a_1.30x -> idd32_0.64x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> ida5d_0.55x -> ide7c_0.71x -> ide66_0.75x -> id38e_0.60x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> ida5d_0.55x -> ide7c_0.71x -> ide66_0.75x -> id616_0.35x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> ida5d_0.55x -> ide7c_0.71x -> idf73_0.57x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> ida5d_0.55x -> ide7c_0.71x -> id350_0.48x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> ida5d_0.55x -> idac0_0.47x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> ida5d_0.55x -> id1cb_0.06x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> id17e_0.45x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id872_1.38x -> id73b_0.44x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> id1a8_0.80x -> 
+id957_1.52x -> idd64_1.11x -> id997_0.92x -> idf24_0.99x -> 
+id957_1.52x -> idd64_1.11x -> id6bf_0.68x -> 
+id957_1.52x -> idd64_1.11x -> id881_0.67x -> 
+id957_1.52x -> id9cf_0.91x -> 
+id957_1.52x -> ide3f_0.94x -> 
+idbaf_0.72x -> 
+id0ac_0.51x -> 
+[INFO] processing 91_ConvTranspose2d_Softmax_BiasAdd_Scaling_Sigmoid
+一共有 15 条进化轨迹 (叶子节点)
+id89f_0.02x -> id634_0.05x -> idfb1_0.07x -> ida44_0.06x -> idc91_0.02x -> id4af_0.05x -> id769_0.05x -> 
+id89f_0.02x -> id634_0.05x -> idfb1_0.07x -> ida44_0.06x -> idc91_0.02x -> id4af_0.05x -> idc77_0.05x -> 
+id89f_0.02x -> id634_0.05x -> idfb1_0.07x -> ida44_0.06x -> idc91_0.02x -> id4af_0.05x -> id7ee_0.08x -> 
+id89f_0.02x -> id634_0.05x -> idfb1_0.07x -> ida44_0.06x -> idc91_0.02x -> ida7c_0.02x -> 
+id89f_0.02x -> id634_0.05x -> idfb1_0.07x -> ida44_0.06x -> idc91_0.02x -> idac0_0.02x -> 
+id89f_0.02x -> id634_0.05x -> idfb1_0.07x -> ida44_0.06x -> id439_0.01x -> 
+id89f_0.02x -> id634_0.05x -> idfb1_0.07x -> ida44_0.06x -> id90e_0.01x -> 
+id89f_0.02x -> id634_0.05x -> idfb1_0.07x -> id4c6_0.04x -> 
+id89f_0.02x -> id634_0.05x -> idfb1_0.07x -> idf0a_0.04x -> 
+id89f_0.02x -> id634_0.05x -> ida37_0.04x -> 
+id89f_0.02x -> id634_0.05x -> id00d_0.05x -> 
+id89f_0.02x -> id0c5_0.01x -> 
+id89f_0.02x -> id8c9_0.01x -> 
+idc80_0.01x -> 
+id603_0.01x -> 
+[INFO] processing 92_Conv2d_GroupNorm_Tanh_HardSwish_ResidualAdd_LogSumExp
+一共有 17 条进化轨迹 (叶子节点)
+id97a_2.29x -> idf3e_1.84x -> id05d_2.28x -> idf87_2.76x -> id99f_3.62x -> idc0c_2.38x -> id606_1.53x -> idbf5_2.01x -> 
+id97a_2.29x -> idf3e_1.84x -> id05d_2.28x -> idf87_2.76x -> id99f_3.62x -> idc0c_2.38x -> id606_1.53x -> id789_2.44x -> 
+id97a_2.29x -> idf3e_1.84x -> id05d_2.28x -> idf87_2.76x -> id99f_3.62x -> idc0c_2.38x -> id606_1.53x -> id44c_1.90x -> 
+id97a_2.29x -> idf3e_1.84x -> id05d_2.28x -> idf87_2.76x -> id99f_3.62x -> idc0c_2.38x -> id4b7_1.51x -> 
+id97a_2.29x -> idf3e_1.84x -> id05d_2.28x -> idf87_2.76x -> id99f_3.62x -> idc0c_2.38x -> ide0e_1.41x -> 
+id97a_2.29x -> idf3e_1.84x -> id05d_2.28x -> idf87_2.76x -> id99f_3.62x -> id3db_2.07x -> 
+id97a_2.29x -> idf3e_1.84x -> id05d_2.28x -> idf87_2.76x -> id99f_3.62x -> ida73_1.99x -> 
+id97a_2.29x -> idf3e_1.84x -> id05d_2.28x -> idf87_2.76x -> id6d0_2.51x -> 
+id97a_2.29x -> idf3e_1.84x -> id05d_2.28x -> idf87_2.76x -> id31d_2.03x -> 
+id97a_2.29x -> idf3e_1.84x -> id05d_2.28x -> id809_1.34x -> 
+id97a_2.29x -> idf3e_1.84x -> id05d_2.28x -> ide13_2.13x -> 
+id97a_2.29x -> idf3e_1.84x -> idf81_2.18x -> 
+id97a_2.29x -> idf3e_1.84x -> id1c5_1.92x -> 
+id97a_2.29x -> id990_1.65x -> 
+id97a_2.29x -> idbf0_1.54x -> 
+id02a_0.18x -> 
+id737_1.16x -> 
+[INFO] processing 95_Matmul_Add_Swish_Tanh_GELU_Hardtanh
+一共有 18 条进化轨迹 (叶子节点)
+id099_10.56x -> id2db_3.29x -> id9cd_1.88x -> id879_10.84x -> id983_8.49x -> idf60_6.78x -> idb70_6.91x -> idb0d_8.03x -> idce7_9.00x -> id258_2.74x -> 
+id099_10.56x -> id2db_3.29x -> id9cd_1.88x -> id879_10.84x -> id983_8.49x -> idf60_6.78x -> idb70_6.91x -> idb0d_8.03x -> idce7_9.00x -> id8dc_3.36x -> 
+id099_10.56x -> id2db_3.29x -> id9cd_1.88x -> id879_10.84x -> id983_8.49x -> idf60_6.78x -> idb70_6.91x -> idb0d_8.03x -> idce7_9.00x -> id73a_3.00x -> 
+id099_10.56x -> id2db_3.29x -> id9cd_1.88x -> id879_10.84x -> id983_8.49x -> idf60_6.78x -> idb70_6.91x -> idb0d_8.03x -> id7d1_7.96x -> 
+id099_10.56x -> id2db_3.29x -> id9cd_1.88x -> id879_10.84x -> id983_8.49x -> idf60_6.78x -> idb70_6.91x -> idb0d_8.03x -> id761_4.06x -> 
+id099_10.56x -> id2db_3.29x -> id9cd_1.88x -> id879_10.84x -> id983_8.49x -> idf60_6.78x -> idb70_6.91x -> idfc2_4.31x -> 
+id099_10.56x -> id2db_3.29x -> id9cd_1.88x -> id879_10.84x -> id983_8.49x -> idf60_6.78x -> id8a4_2.90x -> 
+id099_10.56x -> id2db_3.29x -> id9cd_1.88x -> id879_10.84x -> id983_8.49x -> id704_4.02x -> 
+id099_10.56x -> id2db_3.29x -> id9cd_1.88x -> id879_10.84x -> id983_8.49x -> id980_2.44x -> 
+id099_10.56x -> id2db_3.29x -> id9cd_1.88x -> id879_10.84x -> id91b_2.93x -> 
+id099_10.56x -> id2db_3.29x -> id9cd_1.88x -> id879_10.84x -> id612_4.68x -> 
+id099_10.56x -> id2db_3.29x -> id9cd_1.88x -> id12a_6.97x -> 
+id099_10.56x -> id2db_3.29x -> idd57_1.08x -> 
+id099_10.56x -> id2db_3.29x -> id44a_1.81x -> 
+id099_10.56x -> idd77_2.41x -> 
+id099_10.56x -> id187_1.92x -> 
+id9e2_10.24x -> 
+id9db_10.22x -> 
+[INFO] processing 97_Matmul_BatchNorm_BiasAdd_Divide_Swish
+一共有 3 条进化轨迹 (叶子节点)
+idd33_5.83x -> id59b_1.03x -> id951_3.61x -> 
+idd33_5.83x -> id59b_1.03x -> idbd6_4.55x -> 
+id1a0_5.21x -> 
+[INFO] processing 99_Matmul_GELU_Softmax
+一共有 36 条进化轨迹 (叶子节点)
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id62c_3.39x -> id840_6.04x -> id559_3.41x -> id2cb_6.95x -> id938_6.04x -> id31a_7.80x -> iddb8_8.56x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idd1e_4.14x -> id44d_7.61x -> idaa0_7.85x -> idf16_9.52x -> id8b8_11.24x -> id9ef_4.79x -> id10b_8.21x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id62c_3.39x -> id840_6.04x -> id559_3.41x -> id2cb_6.95x -> id938_6.04x -> id31a_7.80x -> id00f_2.70x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idd1e_4.14x -> id44d_7.61x -> idaa0_7.85x -> idf16_9.52x -> id8b8_11.24x -> id9ef_4.79x -> id326_4.92x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id62c_3.39x -> id840_6.04x -> id559_3.41x -> id2cb_6.95x -> id938_6.04x -> id31a_7.80x -> id18d_8.77x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idd1e_4.14x -> id44d_7.61x -> idaa0_7.85x -> idf16_9.52x -> id8b8_11.24x -> id4ee_2.97x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idd1e_4.14x -> id44d_7.61x -> idaa0_7.85x -> idf16_9.52x -> id8b8_11.24x -> id0bd_4.28x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id62c_3.39x -> id840_6.04x -> id559_3.41x -> id2cb_6.95x -> id938_6.04x -> idd4f_7.20x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id62c_3.39x -> id840_6.04x -> id559_3.41x -> id2cb_6.95x -> id938_6.04x -> id90f_7.09x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idd1e_4.14x -> id44d_7.61x -> idaa0_7.85x -> idf16_9.52x -> ida3a_7.39x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id62c_3.39x -> id840_6.04x -> id559_3.41x -> id2cb_6.95x -> id674_5.93x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id62c_3.39x -> id840_6.04x -> id559_3.41x -> id2cb_6.95x -> id64f_4.18x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idd1e_4.14x -> id44d_7.61x -> idaa0_7.85x -> idf16_9.52x -> id077_5.42x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idd1e_4.14x -> id44d_7.61x -> idaa0_7.85x -> id53b_8.73x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id62c_3.39x -> id840_6.04x -> id559_3.41x -> id697_3.63x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idd1e_4.14x -> id44d_7.61x -> idaa0_7.85x -> id91d_5.09x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id62c_3.39x -> id840_6.04x -> id559_3.41x -> idcd7_4.19x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idd1e_4.14x -> id44d_7.61x -> idddf_4.15x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id62c_3.39x -> id840_6.04x -> id6a2_2.21x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idd1e_4.14x -> id44d_7.61x -> id40b_6.15x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id62c_3.39x -> idf48_2.98x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idd1e_4.14x -> ide52_5.57x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idd1e_4.14x -> idcac_3.51x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id62c_3.39x -> id287_5.77x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> id818_3.22x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id59d_3.08x -> 
+idcc3_0.29x -> ida61_0.27x -> id335_5.36x -> idec1_2.86x -> 
+idcc3_0.29x -> ida61_0.27x -> idddf_4.57x -> id1a9_3.17x -> 
+idcc3_0.29x -> ida61_0.27x -> id8ba_2.76x -> 
+idcc3_0.29x -> ida61_0.27x -> id778_2.18x -> 
+idcc3_0.29x -> ida61_0.27x -> id6a8_3.57x -> 
+idcc3_0.29x -> ida61_0.27x -> id4cf_0.92x -> 
+idcc3_0.29x -> id79c_0.13x -> 
+idcc3_0.29x -> id2d6_0.26x -> 
+ida77_0.26x -> 
+idd73_0.28x -> 
+[INFO] done. total=81, success=81, skipped=0, failed=0

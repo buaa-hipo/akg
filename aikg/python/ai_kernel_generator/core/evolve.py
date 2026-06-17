@@ -370,6 +370,9 @@ async def new_evolve(
         ])
         
         evolve_from_checkpoint = False
+        
+        # 保存检查点
+        task_processor.save_checkpoint(round_idx + 1, round_implementations, evolve_from_checkpoint)
 
     # ========== 5. 构建最终结果 ==========
     # 按性能排序最佳实现（gen_time越小越好）

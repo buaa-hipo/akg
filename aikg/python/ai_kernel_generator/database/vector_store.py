@@ -87,7 +87,8 @@ class VectorStore(ABC):
             try:
                 embedding = HuggingFaceEmbeddings(
                     model_name=model_name,
-                    model_kwargs={'device': self.config.get("database_config", {}).get("embedding_device", "cpu")},
+                    # model_kwargs={'device': self.config.get("database_config", {}).get("embedding_device", "cpu")},
+                    model_kwargs={'device': os.environ.get("AIKG_MODEL_DEVICE", "cpu")},
                     encode_kwargs={'normalize_embeddings': True}
                 )
                 return embedding

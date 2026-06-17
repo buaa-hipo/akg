@@ -1175,7 +1175,8 @@ if __name__ == "__main__":
             logger.error(f"[{self.op_name}] ncu profile 执行失败，日志如下：\n{log}")
         
         from ai_kernel_generator.core.agent.profiler import Profiler
-        profiler = Profiler(self.config, self.op_name, task_info['framework'], task_info['task_desc'], task_info['coder_code'], task_info['dsl'], ncu_json, task_info.get("optimize_history", ""))
+        profiler = Profiler(self.config, self.op_name, task_info['framework'], task_info['task_desc'], task_info['coder_code'], task_info['dsl'], ncu_json, task_info.get("optimize_history", ""),
+                            task_info['backend'], task_info['arch'])
         result, prompt, reasoning = await profiler.run()
         return success, result, ncu_json, prompt, reasoning
         
