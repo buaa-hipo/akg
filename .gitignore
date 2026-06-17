@@ -73,3 +73,6 @@ aikg/evolve_database/
 aikg/program_database/
 dsa_inputs/
 tokens_cnt.csv
+aikg/examples/submit.sh
+aikg/examples/log/
+aikg/examples/tools/evolve_plots/
