@@ -53,7 +53,7 @@ class Profiler(AgentBase):
         self.format_instructions = self.code_parser.get_format_instructions()
 
         # 初始化模板
-        self.gen_profile_suggestion_template = self.load_template("profiler/gen_profile_suggestion.j2")
+        self.gen_profile_suggestion_template = self.load_template("profiler/gen_profile_suggestion_optimize.j2")
 
         self.gen_profile_suggestion_input = {
             "op_name": self.op_name,

@@ -23,6 +23,7 @@ import httpx
 from langchain_deepseek import ChatDeepSeek
 from langchain_anthropic import ChatAnthropic
 from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 from langchain_core.embeddings import Embeddings
 from langchain_community.embeddings import OpenAIEmbeddings
 import openai
@@ -37,9 +38,10 @@ logger = logging.getLogger(__name__)
 # 环境变量
 OLLAMA_API_BASE_ENV = "AIKG_OLLAMA_API_BASE"
 VLLM_API_BASE_ENV = "AIKG_VLLM_API_BASE"
+LLM_API_TIMEOUT_SECONDS = 2000
 
 
-def create_model(name: Optional[str] = None, config_path: Optional[str] = None) -> Union[ChatDeepSeek, ChatOllama]:
+def create_model(name: Optional[str] = None, config_path: Optional[str] = None) -> Union[ChatDeepSeek, ChatAnthropic, ChatOllama, ChatOpenAI, openai.AsyncOpenAI]:
     """
     根据预设名称创建模型
 
@@ -48,7 +50,7 @@ def create_model(name: Optional[str] = None, config_path: Optional[str] = None) 
         config_path: 配置文件路径，如果为None则使用默认路径
 
     Returns:
-        ChatDeepSeek | ChatOllama: 创建的模型实例
+        ChatDeepSeek | ChatAnthropic | ChatOllama | ChatOpenAI | openai.AsyncOpenAI: 创建的模型实例
     """
     # 定义 thinking_mode 处理函数（提前定义，供环境变量模式使用）
     def _build_thinking_extra_body(thinking_mode: Optional[str],
@@ -108,8 +110,7 @@ def create_model(name: Optional[str] = None, config_path: Optional[str] = None) 
         if extra_body:
             logger.info(f"启用 thinking 模式: {extra_body}")
         
-        # 设置20分钟的timeout
-        timeout = httpx.Timeout(60, read=60 * 20)
+        timeout = httpx.Timeout(60, read=LLM_API_TIMEOUT_SECONDS)
         
         # 使用OpenAI API创建客户端
         model = openai.AsyncOpenAI(
@@ -159,6 +160,28 @@ def create_model(name: Optional[str] = None, config_path: Optional[str] = None) 
                 logger.debug(f"  {key}: {value} (环境变量)")
             else:
                 logger.debug(f"  {key}: {value}")
+
+    def _normalize_responses_api_params(model_params: dict,
+                                        extra_body: Optional[dict]) -> Optional[str]:
+        """Normalize legacy Chat Completions options to Responses API params."""
+        reasoning_effort = None
+        if extra_body:
+            extra_body = dict(extra_body)
+            reasoning_effort = extra_body.pop("reasoning_effort", None)
+            response_format = extra_body.pop("response_format", None)
+            if response_format and "text" not in model_params:
+                model_params["text"] = {"format": response_format}
+            if extra_body:
+                model_params["extra_body"] = extra_body
+
+        if reasoning_effort and "reasoning" not in model_params:
+            model_params["reasoning"] = {"effort": reasoning_effort}
+        elif reasoning_effort:
+            reasoning = dict(model_params.get("reasoning") or {})
+            reasoning.setdefault("effort", reasoning_effort)
+            model_params["reasoning"] = reasoning
+
+        return reasoning_effort
 
     # 判断是否为Ollama模型
     if name.startswith("ollama_"):
@@ -210,8 +233,7 @@ def create_model(name: Optional[str] = None, config_path: Optional[str] = None) 
         else:
             logger.info(f"  环境变量 {VLLM_API_BASE_ENV}: 未设置 (使用默认值)")
 
-        # 设置20分钟的timeout
-        timeout = httpx.Timeout(60, read=60 * 20)
+        timeout = httpx.Timeout(60, read=LLM_API_TIMEOUT_SECONDS)
         # 直接返回openai.AsyncOpenAI客户端
         model = openai.AsyncOpenAI(
             base_url=model_params.pop("api_base"),
@@ -229,6 +251,43 @@ def create_model(name: Optional[str] = None, config_path: Optional[str] = None) 
         extra_body = _build_thinking_extra_body(thinking_mode, extra_body)
         model.other_params = model_params
         model.extra_body = extra_body
+    elif name.startswith("zhipu_"):
+        # 智谱 BigModel 官方 LangChain 示例使用 ChatOpenAI 接入 OpenAI-compatible API。
+        api_key_env = preset_config.get("api_key_env")
+        if not api_key_env:
+            raise ValueError(f"预设 '{name}' 未配置 api_key_env")
+
+        api_key = os.getenv(api_key_env)
+        if not api_key:
+            raise ValueError(f"API密钥未找到。请设置环境变量 {api_key_env}")
+
+        model_params = {k: v for k, v in preset_config.items() if k != "api_key_env"}
+
+        logger.info(
+            f"创建Zhipu OpenAI兼容模型 '{name}': api_base={model_params.get('api_base', 'N/A')}, model={model_params.get('model', 'N/A')}")
+        if api_key_env in os.environ:
+            api_key_value = os.environ[api_key_env]
+            masked_key = api_key_value[:8] + "*" * (len(api_key_value) - 12) + \
+                api_key_value[-4:] if len(api_key_value) > 12 else "***"
+            logger.info(f"  环境变量 {api_key_env}: {masked_key}")
+        else:
+            logger.info(f"  环境变量 {api_key_env}: 未设置")
+
+        timeout = httpx.Timeout(60, read=LLM_API_TIMEOUT_SECONDS)
+        thinking_mode = model_params.pop("thinking_mode", None)
+        extra_body = model_params.pop("extra_body", None)
+        extra_body = _build_thinking_extra_body(thinking_mode, extra_body)
+        if extra_body:
+            model_params["extra_body"] = extra_body
+
+        model_params["openai_api_base"] = model_params.pop("api_base")
+        model_params["openai_api_key"] = api_key
+        model = ChatOpenAI(
+            http_client=httpx.Client(verify=False, timeout=timeout),
+            http_async_client=httpx.AsyncClient(verify=False, timeout=timeout),
+            reasoning_effort=extra_body.get("reasoning_effort", None) if extra_body else None,
+            **model_params
+        )
     elif name.startswith("claude"):
         # 获取API密钥
         api_key_env = preset_config.get("api_key_env")
@@ -264,17 +323,62 @@ def create_model(name: Optional[str] = None, config_path: Optional[str] = None) 
         else:
             logger.info(f"  环境变量 {api_key_env}: 未设置")
 
-        timeout = httpx.Timeout(60, read=60 * 10)
+        timeout = httpx.Timeout(60, read=LLM_API_TIMEOUT_SECONDS)
         
         thinking = extra_body['thinking']
         output_config = extra_body['output_config']
         # 创建Claude模型实例
         model = ChatAnthropic(
             api_key=api_key,
+            timeout=LLM_API_TIMEOUT_SECONDS,
             thinking=thinking,
             output_config=output_config,
             **model_params
         )
+    elif name.startswith("gpt"):
+        # 使用 ChatOpenAI 接入 GPT 系列模型。GPT-5.5 使用 Responses API 参数风格。
+        api_key_env = preset_config.get("api_key_env")
+        if not api_key_env:
+            raise ValueError(f"预设 '{name}' 未配置 api_key_env")
+
+        api_key = os.getenv(api_key_env)
+        if not api_key:
+            raise ValueError(f"API密钥未找到。请设置环境变量 {api_key_env}")
+
+        model_params = {k: v for k, v in preset_config.items() if k != "api_key_env"}
+
+        logger.info(
+            f"创建GPT OpenAI兼容模型 '{name}': api_base={model_params.get('api_base', 'N/A')}, model={model_params.get('model', 'N/A')}")
+        if api_key_env in os.environ:
+            api_key_value = os.environ[api_key_env]
+            masked_key = api_key_value[:8] + "*" * (len(api_key_value) - 12) + \
+                api_key_value[-4:] if len(api_key_value) > 12 else "***"
+            logger.info(f"  环境变量 {api_key_env}: {masked_key}")
+        else:
+            logger.info(f"  环境变量 {api_key_env}: 未设置")
+
+        timeout = httpx.Timeout(60, read=LLM_API_TIMEOUT_SECONDS)
+        thinking_mode = model_params.pop("thinking_mode", None)
+        extra_body = model_params.pop("extra_body", None)
+        extra_body = _build_thinking_extra_body(thinking_mode, extra_body)
+
+        reasoning_effort = _normalize_responses_api_params(model_params, extra_body)
+        if model_params.get("text") or model_params.get("reasoning") or model_params.get("use_responses_api"):
+            model_params.setdefault("use_responses_api", True)
+        responses_text = model_params.pop("text", None)
+
+        model_params["openai_api_base"] = model_params.pop("api_base")
+        model_params["openai_api_key"] = api_key
+        chat_openai_kwargs = {
+            "http_client": httpx.Client(verify=False, timeout=timeout),
+            "http_async_client": httpx.AsyncClient(verify=False, timeout=timeout),
+            **model_params,
+        }
+        if reasoning_effort and not model_params.get("use_responses_api"):
+            chat_openai_kwargs["reasoning_effort"] = reasoning_effort
+        model = ChatOpenAI(**chat_openai_kwargs)
+        if responses_text:
+            model = model.bind(text=responses_text)
     else:
         # 获取API密钥
         api_key_env = preset_config.get("api_key_env")
@@ -309,7 +413,7 @@ def create_model(name: Optional[str] = None, config_path: Optional[str] = None) 
         else:
             logger.info(f"  环境变量 {api_key_env}: 未设置")
 
-        timeout = httpx.Timeout(60, read=60 * 10)
+        timeout = httpx.Timeout(60, read=LLM_API_TIMEOUT_SECONDS)
         # 创建DeepSeek模型实例
         model = ChatDeepSeek(
             api_key=api_key,

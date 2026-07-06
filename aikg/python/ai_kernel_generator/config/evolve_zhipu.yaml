@@ -1,15 +1,15 @@
 # Model preset configuration
 agent_model_config:
-  designer: deepseek_v4_pro
-  coder: deepseek_v4_pro
-  profiler: deepseek_v4_pro
-  conductor: deepseek_v4_pro
-  feature_extractor: deepseek_v4_pro
-  api_generator: deepseek_v4_pro
-  sketch: deepseek_v4_pro
-  selector: deepseek_v4_pro
-  test_case_generator: deepseek_v4_pro
-  default: deepseek_v4_pro
+  designer: zhipu_glm_52_default
+  coder: zhipu_glm_52_default
+  profiler: zhipu_glm_52_default
+  conductor: zhipu_glm_52_default
+  feature_extractor: zhipu_glm_52_default
+  api_generator: zhipu_glm_52_default
+  sketch: zhipu_glm_52_default
+  selector: zhipu_glm_52_default
+  test_case_generator: zhipu_glm_52_default
+  default: zhipu_glm_52_default
 
 # Log configuration
 log_dir: "/ssd/zhangzizheng/aikg_logs"

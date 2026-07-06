@@ -1,6 +1,20 @@
 # 模型预设配置
 # 每个预设包含完整的模型参数
 
+
+gpt-5.5:
+  api_base: "https://yunwu.ai/v1"
+  model: "gpt-5.5"
+  api_key_env: "AIKG_OPENAI_API_KEY"
+  max_tokens: 65535
+  temperature: 0.1
+  use_responses_api: true
+  reasoning:
+    effort: "xhigh"
+  text:
+    format:
+      type: "json_object"
+
 claude-opus-4-7:
   api_base: "https://gw.claudeapi.com"
   model: "claude-opus-4-7"
@@ -449,6 +463,20 @@ openrouter_deepseek_v3_0324_free:
   frequency_penalty: 0.5
   presence_penalty: 0.5
 
+zhipu_glm_52_default:
+  api_base: "https://open.bigmodel.cn/api/paas/v4/"
+  model: "glm-5.2"
+  api_key_env: "AIKG_ZHIPU_API_KEY"
+  max_tokens: 131072
+  temperature: 0.2
+  top_p: 0.9
+  extra_body:
+    thinking:
+      type: "enabled"
+    reasoning_effort: "xhigh"
+    response_format:
+      type: "json_object"
+
 zhipu_glm_46_default:
   api_base: "https://open.bigmodel.cn/api/paas/v4"
   model: "glm-4.6"
@@ -520,4 +548,4 @@ sflow_qwen3_embedding_0.6b:
   dimensions: 512
 
 # 默认embedding配置
-default_embedding_preset: "sflow_qwen3_embedding_8b"  
+default_embedding_preset: "sflow_qwen3_embedding_8b"

@@ -1,15 +1,16 @@
 # Model preset configuration
+
 agent_model_config:
-  designer: deepseek_v4_pro
-  coder: deepseek_v4_pro
-  profiler: deepseek_v4_pro
-  conductor: deepseek_v4_pro
-  feature_extractor: deepseek_v4_pro
-  api_generator: deepseek_v4_pro
-  sketch: deepseek_v4_pro
-  selector: deepseek_v4_pro
-  test_case_generator: deepseek_v4_pro
-  default: deepseek_v4_pro
+  designer: gpt-5.5
+  coder: gpt-5.5
+  profiler: gpt-5.5
+  conductor: gpt-5.5
+  feature_extractor: gpt-5.5
+  api_generator: gpt-5.5
+  sketch: gpt-5.5
+  selector: gpt-5.5
+  test_case_generator: gpt-5.5
+  default: gpt-5.5
 
 # Log configuration
 log_dir: "/ssd/zhangzizheng/aikg_logs"

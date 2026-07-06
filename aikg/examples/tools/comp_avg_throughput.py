@@ -4,8 +4,9 @@ import re
 from pathlib import Path
 
 
-# DEFAULT_LOG_DIR = "/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/log/level2/"
-DEFAULT_LOG_DIR = "/mnt/lustre-client/zhangsongyang/akg_4/aikg/log_dir"
+DEFAULT_LOG_DIR = "/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples/log/level3/"
+# DEFAULT_LOG_DIR = "/mnt/lustre-client/zhangsongyang/akg_4/aikg/log_dir"
+# DEFAULT_LOG_DIR = "/mnt/lustre-client/zhangzizheng/AIKG/save_data/ds_v4_pro/logs/level3"
 THROUGHPUT_PATTERN = re.compile(r"Output Throughput:\s*([\d.]+)")
 USAGE_METADATA_PATTERN = re.compile(r"usage_metadata:\s*\{[^}]*'input_tokens':\s*(\d+)[^}]*'output_tokens':\s*(\d+)")
 

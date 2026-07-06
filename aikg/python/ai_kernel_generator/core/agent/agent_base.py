@@ -13,9 +13,11 @@
 # limitations under the License.
 
 import os
+import json
 import logging
+import asyncio
 from abc import ABC
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 
 try:
     from openai import AsyncOpenAI as OpenAIAsyncClient
@@ -88,6 +90,8 @@ class Jinja2TemplateWrapper:
 
 
 from ai_kernel_generator.core.llm.model_loader import create_model
+from ai_kernel_generator.core.llm.model_loader import CONFIG_PATH as LLM_CONFIG_PATH
+from ai_kernel_generator.core.llm.model_loader import LLM_API_TIMEOUT_SECONDS
 from ai_kernel_generator.utils.common_utils import get_prompt_path
 from ai_kernel_generator.utils.collector import get_collector
 
@@ -156,7 +160,7 @@ class AgentBase(ABC):
             raise Exception(f"文件读取失败: {file_path}, 错误: {str(e)}")
 
     @staticmethod
-    def split_think(content: str) -> tuple[str, str]:
+    def split_think(content: str) -> Tuple[str, str]:
         """按首次出现的 '</think>' 对文本进行拆分。
 
         Args:
@@ -174,6 +178,78 @@ class AgentBase(ABC):
         reasoning_content = content[:pos]
         new_content = content[pos + len(marker):].lstrip("\r\n ")
         return new_content, reasoning_content
+
+    @staticmethod
+    def _content_value_to_text(value: Any) -> str:
+        """Convert provider block values to readable text."""
+        if value is None:
+            return ""
+        if isinstance(value, str):
+            return value
+        if isinstance(value, list):
+            return "\n".join(
+                text for text in (AgentBase._content_value_to_text(item) for item in value) if text
+            )
+        if isinstance(value, dict):
+            for key in ("text", "thinking", "content"):
+                if key in value:
+                    return AgentBase._content_value_to_text(value.get(key))
+            return json.dumps(value, ensure_ascii=False)
+        return str(value)
+
+    @staticmethod
+    def normalize_llm_content(content: Any, reasoning_content: str = "") -> Tuple[str, str]:
+        """Normalize string and content-block responses from different providers."""
+        text_parts = []
+        reasoning_parts = [reasoning_content] if reasoning_content else []
+
+        def add_text(value: Any) -> None:
+            text = AgentBase._content_value_to_text(value)
+            if text:
+                text_parts.append(text)
+
+        def add_reasoning(value: Any) -> None:
+            text = AgentBase._content_value_to_text(value)
+            if text:
+                reasoning_parts.append(text)
+
+        def consume_block(block: Any) -> None:
+            if isinstance(block, str):
+                add_text(block)
+                return
+            if not isinstance(block, dict):
+                add_text(block)
+                return
+
+            block_type = block.get("type")
+            if block_type in {"reasoning", "thinking"}:
+                add_reasoning(block.get("summary"))
+                add_reasoning(block.get("thinking"))
+                return
+            if block_type in {"text", "output_text"} or "text" in block:
+                add_text(block.get("text"))
+                return
+            if "thinking" in block:
+                add_reasoning(block.get("thinking"))
+                return
+            if "content" in block:
+                add_text(block.get("content"))
+
+        if isinstance(content, list):
+            for item in content:
+                consume_block(item)
+            normalized_content = "\n".join(text_parts)
+        elif isinstance(content, dict):
+            consume_block(content)
+            normalized_content = "\n".join(text_parts)
+        else:
+            normalized_content = AgentBase._content_value_to_text(content)
+
+        normalized_content, extracted_reasoning = AgentBase.split_think(normalized_content)
+        if extracted_reasoning:
+            reasoning_parts.append(extracted_reasoning)
+
+        return normalized_content, "\n".join(part for part in reasoning_parts if part)
 
     def load_template(self, template_path: str, template_format: str = "jinja2") -> PromptTemplate:
         """
@@ -322,6 +398,101 @@ class AgentBase(ABC):
 
         logger.debug("=" * 60)
 
+    async def hot_test(self, formatted_prompt: str, model_name: str) -> tuple[str, str, str] | None:
+        """临时绕过 LangChain/OpenAI wrapper，直接用 ZhipuAiClient 非流式调用 GLM。"""
+        if not model_name.startswith("zhipu_"):
+            return None
+
+        import time
+        import yaml
+        from zai import ZhipuAiClient
+
+        with open(LLM_CONFIG_PATH, "r", encoding="utf-8") as f:
+            llm_config = yaml.safe_load(f)
+
+        model_config = llm_config.get(model_name)
+        if not model_config:
+            raise ValueError(f"预设 '{model_name}' 未找到")
+
+        api_key_env = model_config.get("api_key_env")
+        api_key = os.getenv(api_key_env) if api_key_env else None
+        if not api_key:
+            raise ValueError(f"API密钥未找到。请设置环境变量 {api_key_env}")
+
+        extra_body = dict(model_config.get("extra_body") or {})
+        request_kwargs = {
+            "model": model_config["model"],
+            "messages": [
+                {"role": "system", "content": ""},
+                {"role": "user", "content": formatted_prompt},
+            ],
+            "temperature": model_config.get("temperature", 0.2),
+            "max_tokens": model_config.get("max_tokens", 65536),
+            "top_p": model_config.get("top_p", 0.9),
+            "stream": False,
+        }
+        for key in ("thinking", "reasoning_effort", "response_format"):
+            if key in extra_body:
+                request_kwargs[key] = extra_body[key]
+
+        logger.info(
+            "HOT_TEST ZhipuAiClient start: model=%s, max_tokens=%s, reasoning_effort=%s",
+            request_kwargs["model"],
+            request_kwargs["max_tokens"],
+            request_kwargs.get("reasoning_effort"),
+        )
+
+        start_time = time.time()
+
+        def _call_zhipu():
+            client = ZhipuAiClient(api_key=api_key)
+            return client.chat.completions.create(
+                extra_body=extra_body,
+                **request_kwargs
+            )
+        # import pdb;pdb.set_trace()
+        response = await asyncio.wait_for(
+            asyncio.to_thread(_call_zhipu),
+            timeout=LLM_API_TIMEOUT_SECONDS,
+        )
+        total_time = time.time() - start_time
+        # import pdb;pdb.set_trace()
+
+        message = response.choices[0].message
+        content = message.content or ""
+        reasoning_content = getattr(message, "reasoning_content", None) or ""
+        usage = response.usage
+        reasoning_tokens = 0
+        if getattr(usage, "completion_tokens_details", None):
+            reasoning_tokens = getattr(usage.completion_tokens_details, "reasoning_tokens", 0)
+        finish_reason = response.choices[0].finish_reason
+
+        response_metadata = (
+            f"response_metadata: completion_tokens: {usage.completion_tokens}, "
+            f"prompt_tokens: {usage.prompt_tokens}, total_tokens: {usage.total_tokens}, "
+            f"reasoning_tokens: {reasoning_tokens}, finish_reason: {finish_reason}\n"
+            f"llm model: {model_name}, usage_metadata: "
+            f"{{'input_tokens': {usage.prompt_tokens}, "
+            f"'output_tokens': {usage.completion_tokens}, "
+            f"'total_tokens': {usage.total_tokens}, "
+            f"'output_token_details': {{'reasoning': {reasoning_tokens}}}}}"
+        )
+        logger.info(response_metadata)
+        logger.info(
+            "HOT_TEST ZhipuAiClient done: LLM Request Time: %.2fs, Output Throughput: %.2f tokens/s",
+            total_time,
+            usage.completion_tokens / total_time if total_time > 0 else 0.0,
+        )
+
+        with open('tokens_cnt.csv', 'a') as tokens_cnt_f:
+            line = (
+                f"{self.context.get('agent_name', 'null_name')},"
+                f"{usage.prompt_tokens},{reasoning_tokens},{usage.completion_tokens},{total_time:.2f}\n"
+            )
+            tokens_cnt_f.write(line)
+
+        return content, formatted_prompt, reasoning_content
+
     async def run_llm(self, prompt: PromptTemplate, input: Dict[str, Any], model_name: str) -> tuple[str, str, str]:
         """运行LLM
 
@@ -335,6 +506,9 @@ class AgentBase(ABC):
         """
         formatted_prompt = prompt.format(**input)
         self._check_input_dict(input)
+        hot_result = await self.hot_test(formatted_prompt, model_name)
+        if hot_result is not None:
+            return hot_result
         # self.count_tokens(formatted_prompt, model_name, self.context) # 暂不开启token统计
         # 创建模型
         model = create_model(model_name)
@@ -355,8 +529,12 @@ class AgentBase(ABC):
                     "model": model.model_name,
                     "messages": messages,
                     "temperature": model.temperature,
+                    "max_tokens": model.max_tokens,
                     "top_p": model.top_p,
                 }
+                other_params = getattr(model, "other_params", None)
+                if other_params:
+                    create_kwargs.update(other_params)
                 extra_body = getattr(model, "extra_body", None)
                 if extra_body:
                     create_kwargs["extra_body"] = extra_body
@@ -364,7 +542,10 @@ class AgentBase(ABC):
                 if not aikg_stream_output:
                     # 非流式模式
                     create_kwargs["stream"] = False
-                    response = await model.chat.completions.create(**create_kwargs)
+                    response = await asyncio.wait_for(
+                        model.chat.completions.create(**create_kwargs),
+                        timeout=LLM_API_TIMEOUT_SECONDS,
+                    )
 
                     content = response.choices[0].message.content
                     reasoning_content = getattr(response.choices[0].message, 'reasoning_content', "")
@@ -377,17 +558,26 @@ class AgentBase(ABC):
                     create_kwargs["stream"] = True
                     content = ""
                     reasoning_content = ""
-                    stream = await model.chat.completions.create(**create_kwargs)
-                    async for chunk in stream:
-                        delta = chunk.choices[0].delta
-                        if delta.content:
-                            chunk_content = delta.content
-                            print(chunk_content, end='', flush=True)
-                            content += chunk_content
-                        elif getattr(delta, 'reasoning_content', None):
-                            chunk_reasoning = delta.reasoning_content
-                            print(chunk_reasoning, end='', flush=True)
-                            reasoning_content += chunk_reasoning
+                    async def _consume_stream():
+                        stream = await model.chat.completions.create(**create_kwargs)
+                        stream_content = ""
+                        stream_reasoning = ""
+                        async for chunk in stream:
+                            delta = chunk.choices[0].delta
+                            if delta.content:
+                                chunk_content = delta.content
+                                print(chunk_content, end='', flush=True)
+                                stream_content += chunk_content
+                            elif getattr(delta, 'reasoning_content', None):
+                                chunk_reasoning = delta.reasoning_content
+                                print(chunk_reasoning, end='', flush=True)
+                                stream_reasoning += chunk_reasoning
+                        return stream_content, stream_reasoning
+
+                    content, reasoning_content = await asyncio.wait_for(
+                        _consume_stream(),
+                        timeout=LLM_API_TIMEOUT_SECONDS,
+                    )
                     response_metadata = ""
 
             else:
@@ -399,19 +589,41 @@ class AgentBase(ABC):
                 start_time = time.time()
                 
                 if not aikg_stream_output:
-                    raw_result = await chain.ainvoke(input)
+                    raw_result = await asyncio.wait_for(
+                        chain.ainvoke(input),
+                        timeout=LLM_API_TIMEOUT_SECONDS,
+                    )
                     content = raw_result.content
-                    reasoning_content = raw_result.additional_kwargs.get("reasoning_content", "")
+                    if hasattr(raw_result, "reasoning_content"):
+                        # zhipu glm 5.2 use raw_result.reasonint_content
+                        reasoning_content = raw_result.reasoning_content
+                    else:
+                        reasoning_content = raw_result.additional_kwargs.get("reasoning_content", "")
                 else:
                     content = ""
                     reasoning_content = ""
-                    async for raw_result in chain.astream(input):
-                        if raw_result.content != "":
-                            print(raw_result.content, end='', flush=True)
-                            content += raw_result.content
-                        elif "reasoning_content" in raw_result.additional_kwargs:
-                            print(raw_result.additional_kwargs.get("reasoning_content"), end='', flush=True)
-                            reasoning_content += raw_result.additional_kwargs.get("reasoning_content")
+                    async def _consume_chain_stream():
+                        stream_content = ""
+                        stream_reasoning = ""
+                        last_result = None
+                        async for raw_result in chain.astream(input):
+                            last_result = raw_result
+                            chunk_content, chunk_reasoning = self.normalize_llm_content(raw_result.content)
+                            if chunk_content:
+                                print(chunk_content, end='', flush=True)
+                                stream_content += chunk_content
+                            elif chunk_reasoning:
+                                print(chunk_reasoning, end='', flush=True)
+                                stream_reasoning += chunk_reasoning
+                            elif "reasoning_content" in raw_result.additional_kwargs:
+                                print(raw_result.additional_kwargs.get("reasoning_content"), end='', flush=True)
+                                stream_reasoning += raw_result.additional_kwargs.get("reasoning_content")
+                        return stream_content, stream_reasoning, last_result
+
+                    content, reasoning_content, raw_result = await asyncio.wait_for(
+                        _consume_chain_stream(),
+                        timeout=LLM_API_TIMEOUT_SECONDS,
+                    )
                     print()
 
                 # 记录请求结束时间并计算总体时间
@@ -437,44 +649,50 @@ class AgentBase(ABC):
 
         try:
             max_empty_content_retries = 3
+            last_exception = None
             for attempt in range(max_empty_content_retries + 1):
-                content, reasoning_content, response_metadata = await _invoke_once()
+                try:
+                    content, reasoning_content, response_metadata = await _invoke_once()
 
-                logger.debug(f"LLM End:    [status] %s -- [model] %s",
-                             self.context.get('agent_name', ''), effective_model_name)
+                    logger.debug(f"LLM End:    [status] %s -- [model] %s",
+                                self.context.get('agent_name', ''), effective_model_name)
 
-                # 后处理：从 content 中剥离可能包含的 reasoning 片段
-                if 'claude' in model_name:
-                    raw_content = content
-                    content = raw_content[1].get("text")
-                    reasoning_content = raw_content[0].get("thinking")
-                else:
-                    content, extracted_reasoning = self.split_think(content)
-                    if extracted_reasoning:
-                        reasoning_content = extracted_reasoning
+                    # 后处理：统一解析字符串响应和 Claude/OpenAI Responses API 的 content blocks。
+                    content, reasoning_content = self.normalize_llm_content(content, reasoning_content)
+                    last_exception = None
 
-                if content and content.strip():
-                    break
+                    if content and content.strip():
+                        break
 
-                if attempt < max_empty_content_retries:
-                    logger.warning(
-                        "LLM returned empty content: [status] %s -- [model] %s, retrying (%d/%d). reasoning_len=%d",
-                        self.context.get('agent_name', ''),
-                        effective_model_name,
-                        attempt + 1,
-                        max_empty_content_retries,
-                        len(reasoning_content or ""),
-                    )
-                else:
-                    logger.error(
-                        "LLM returned empty content after %d retries: [status] %s -- [model] %s -- reasoning_len=%d",
-                        max_empty_content_retries,
-                        self.context.get('agent_name', ''),
-                        effective_model_name,
-                        len(reasoning_content or ""),
-                    )
-                    raise ValueError(f"LLM returned empty content after {max_empty_content_retries} retries")
-
+                    if attempt < max_empty_content_retries:
+                        logger.warning(
+                            "LLM returned empty content: [status] %s -- [model] %s, retrying (%d/%d). reasoning_len=%d",
+                            self.context.get('agent_name', ''),
+                            effective_model_name,
+                            attempt + 1,
+                            max_empty_content_retries,
+                            len(reasoning_content or ""),
+                        )
+                    else:
+                        logger.error(
+                            "LLM returned empty content after %d retries: [status] %s -- [model] %s -- reasoning_len=%d",
+                            max_empty_content_retries,
+                            self.context.get('agent_name', ''),
+                            effective_model_name,
+                            len(reasoning_content or ""),
+                        )
+                        raise ValueError(f"LLM returned empty content after {max_empty_content_retries} retries")
+                except Exception as e:
+                    last_exception = e
+                    if isinstance(e, asyncio.TimeoutError):
+                        logger.error(
+                            "LLM API timed out after %s seconds, retrying ... ",
+                            LLM_API_TIMEOUT_SECONDS,
+                        )
+                    else:
+                        logger.error(f"LLM ERROR {e}, retrying ... ")
+            if last_exception is not None:
+                raise last_exception
             if os.getenv("AIKG_DATA_COLLECT", "off").lower() == "on":
                 # 使用collector收集数据
                 try:
