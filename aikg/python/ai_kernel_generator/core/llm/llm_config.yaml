@@ -4,6 +4,7 @@
 
 gpt-5.5:
   api_base: "https://yunwu.ai/v1"
+  # api_base: "https://vokotoken.cc/v1"
   model: "gpt-5.5"
   api_key_env: "AIKG_OPENAI_API_KEY"
   max_tokens: 65535

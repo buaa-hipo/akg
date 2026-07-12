@@ -89,7 +89,7 @@ class EvolveRuntimeConfig:
     
     # 采样配置
     handwrite_sample_num: int = 2
-    inspiration_sample_num: int = 1
+    inspiration_sample_num: int = 0
     
     # 运行时计算的属性
     use_islands: bool = field(init=False)

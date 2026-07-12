@@ -101,7 +101,7 @@ class ProgramDatabase():
         # TODO
         logger.info("pd migration")
         
-    def sample_inefficiency_programs(self, sample_num: int=2) -> List[dict]:
+    def sample_inefficiency_programs(self, sample_num: int=1) -> List[dict]:
         # 低效算子是指 profile 中 speedup <= 1.1x 的算子
         # 在**所有**岛屿范围内搜索 低效算子
         # 如果数量不满足 k 个，则返回尽可能多
