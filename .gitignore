@@ -70,8 +70,11 @@ mindspore/version.py
 mindspore/default_config.py
 aikg/triton_database/
 aikg/evolve_database/
+aikg/evolve_database_test_early_stopping/
 aikg/program_database/
 dsa_inputs/
-tokens_cnt.csv
+aikg/examples/tokens_cnt.csv
+aikg/examples/tools/tokens_cnt.csv
 aikg/examples/log/
+aikg/examples/log_test_early_stopping/
 aikg/examples/tools/evolve_plots/

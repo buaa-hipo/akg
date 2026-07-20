@@ -16,8 +16,8 @@ def get_max_speedup(island_dir):
     return max_speedup
 
 if __name__ == '__main__':
-    # base_dir = Path("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level2")
-    base_dir = Path("/mnt/lustre-client/zhangsongyang/akg_4/aikg/evolve_database/level1")
+    base_dir = Path("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level3")
+    # base_dir = Path("/mnt/lustre-client/zhangsongyang/akg_4/aikg/evolve_database/level1")
     
     print_str = []
     speedup_list = []

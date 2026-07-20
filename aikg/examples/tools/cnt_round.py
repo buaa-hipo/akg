@@ -15,7 +15,7 @@ def get_max_round(island_dir):
     return max_round
 
 if __name__ == '__main__':
-    base_dir = Path("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level2")
+    base_dir = Path("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level3")
     
     print_str = []
     for sub_dir in base_dir.iterdir():

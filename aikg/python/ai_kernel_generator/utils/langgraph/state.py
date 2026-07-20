@@ -58,6 +58,7 @@ class KernelGenState(TypedDict, total=False):
     arch: str
     task_type: str  # 任务类型：profile/precision_only
     parent_id: str
+    fallback_id: str
     
     # === Agent 输出字段 ===
     designer_code: Optional[str]

@@ -1,15 +1,15 @@
 # Model preset configuration
 agent_model_config:
-  designer: deepseek_v4_pro
-  coder: deepseek_v4_pro
-  profiler: deepseek_v4_pro
-  conductor: deepseek_v4_pro
-  feature_extractor: deepseek_v4_pro
-  api_generator: deepseek_v4_pro
-  sketch: deepseek_v4_pro
-  selector: deepseek_v4_pro
-  test_case_generator: deepseek_v4_pro
-  default: deepseek_v4_pro
+  designer: deepseek_v4_flash
+  coder: deepseek_v4_flash
+  profiler: deepseek_v4_flash
+  conductor: deepseek_v4_flash
+  feature_extractor: deepseek_v4_flash
+  api_generator: deepseek_v4_flash
+  sketch: deepseek_v4_flash
+  selector: deepseek_v4_flash
+  test_case_generator: deepseek_v4_flash
+  default: deepseek_v4_flash
 
 # Log configuration
 log_dir: "/ssd/zhangzizheng/aikg_logs"

@@ -158,6 +158,11 @@ class Island(Database):
             impl_info["early_stopping_reason"] = reason
             with open(Path(program.file_dir) / "impl_info.json", 'w', encoding='utf-8') as f:
                 json.dump(impl_info, f, ensure_ascii=False, indent=2)
+            
+            # add program to offline evolve database (checkpoint)
+            src_dir = program.file_dir
+            des_dir = Path(self.get_checkpoint_path()) / os.path.basename(src_dir)
+            shutil.copytree(src_dir, des_dir, dirs_exist_ok=True) 
 
     def find_program_by_id(self, id: str) -> Program:
         for p in self.program_list:
@@ -231,16 +236,22 @@ class Island(Database):
                 return True
         return False
     
-    def get_fallback_candidate_list(self, stop_program_id: str, fallback_depth: int) -> list[str]:
-        parent_id = self.get_parent_id(stop_program_id)
-        while parent_id is not None and fallback_depth > 0:
-            parent_id = self.get_parent_id(stop_program_id)
+    def get_ancestor_id(self, program_id: str, fallback_depth: int) -> str | None:
+        ancestor_id = program_id
+        while ancestor_id is not None and fallback_depth > 0:
+            logger.info(f"从 {ancestor_id} 找到父代 {self.get_parent_id(ancestor_id)}")
+            ancestor_id = self.get_parent_id(ancestor_id)
             fallback_depth -= 1
-        
-        if parent_id is not None:
-            child_list = self.get_child_list(parent_id)
-            # 去除有孩子节点的child node，因为其之前被探索过了已经（代表曾经回退过）
-            return [c for c in child_list if self.has_child(c) is False]
+        return ancestor_id
+    
+    def get_fallback_candidate_list(self, stop_program_id: str, fallback_depth: int) -> list[str]:
+        parent_id = self.get_ancestor_id(stop_program_id, fallback_depth)
+        if parent_id is None:
+            return []
+
+        child_list = self.get_child_list(parent_id)
+        # 去除有孩子节点的child node，因为其之前被探索过了已经（代表曾经回退过）
+        return [c for c in child_list if self.has_child(c) is False]
             
     def get_inefficiency_programs(self) -> list[dict]:
         # 低效算子是指 profile 中 speedup <= 1.1x 的算子

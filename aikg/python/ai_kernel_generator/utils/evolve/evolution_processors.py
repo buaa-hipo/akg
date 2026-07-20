@@ -239,10 +239,13 @@ class TaskCreationProcessor:
     def save_checkpoint(
         self,
         round_idx: int,
-        round_implementations: List[Dict[str, Any]] = None,
-        evolve_from_checkpoint: bool = False
     ):
-        self._prepare_island_inspirations(round_idx, round_implementations, evolve_from_checkpoint)
+        assert round_idx > 1
+        
+        for island_idx in range(self.config.num_islands):
+            for pid in range(self.config.tasks_per_island):
+                parent_candidate = self.init_data['parent_candidate']
+                self.init_data['program_database'].save_checkpoint(island_idx, parent_candidate, round_idx)                             
         
     def create_evolve_designer_tasks_for_round(
         self,
@@ -494,44 +497,68 @@ class TaskCreationProcessor:
                     if evolve_from_checkpoint:
                         # 从检查点重启，需要从检查点文件中读取父代ID
                         self.init_data['parent_candidate'] = self.init_data['program_database'].get_checkpoint_parent_id(island_idx)
+                        island = self.init_data['program_database'].get_island(island_idx)
                         if self.init_data['parent_candidate'] is not None:
-                            # 保存父代ID到检查点
-                            self.init_data['program_database'].save_checkpoint(island_idx, self.init_data['parent_candidate'], round_idx)
-                           
-                            parent_implementation = self.init_data['program_database'].get_island(island_idx).find_program_by_id(
-                                self.init_data['parent_candidate']
-                            ).get_impl_info()
-                        else:
-                            raise ValueError("回退搜索停止，进化停止，没有可以进化的父代了！") 
-                    else:
-                        # 不是第一轮迭代
-                        # 查看【父代待选】的收敛情况
-                        early_stopping_reason = self.init_data['program_database'].get_island(island_idx).find_program_by_id(
-                                self.init_data['parent_candidate']
-                        ).get_impl_info().get("early_stopping_reason", None)
-                        if early_stopping_reason:
-                            # Fallback 回退选出父代
-                            self.init_data['fallback_id'] = self.init_data['parent_candidate']
-                            logger.info(f"Fallback to get parent ... ")
-                            self.init_data['parent_candidate'] = self.init_data['program_database'].fallback_search_parent_candidate(
-                                island_idx, self.init_data['parent_candidate']
-                            )
-                        if self.init_data['parent_candidate'] is not None:
-                            # 保存父代ID到检查点
-                            self.init_data['program_database'].save_checkpoint(island_idx, self.init_data['parent_candidate'], round_idx)
-                            
-                            parent_implementation = self.init_data['program_database'].get_island(island_idx).find_program_by_id(
-                                self.init_data['parent_candidate']
-                            ).get_impl_info()
-                            # 查看【父代待选】的收敛情况
-                            early_stopping_reason = parent_implementation.get("early_stopping_reason", None)
+                            parent_candidate = self.init_data['parent_candidate']
+                            parent_program = island.find_program_by_id(parent_candidate)
+                            early_stopping_reason = parent_program.get_impl_info().get("early_stopping_reason", None)
+                            # import pdb;pdb.set_trace()
                             if early_stopping_reason:
                                 # Fallback 回退选出父代
-                                self.init_data['fallback_id'] = self.init_data['parent_candidate']
+                                self.init_data['fallback_id'] = parent_candidate
                                 logger.info(f"Fallback to get parent ... ")
+                                # import pdb;pdb.set_trace()
                                 self.init_data['parent_candidate'] = self.init_data['program_database'].fallback_search_parent_candidate(
-                                    island_idx, self.init_data['parent_candidate']
+                                    island_idx, parent_candidate
                                 )
+                            if self.init_data['parent_candidate'] is not None:
+                                parent_candidate = self.init_data['parent_candidate']
+                                parent_program = island.find_program_by_id(parent_candidate)
+                                if parent_program is None:
+                                    raise ValueError(f"fallback parent candidate not found: {parent_candidate}")
+
+                                # 回退后只应保留未早停的父代；这里做一次兜底校验。
+                                parent_implementation = parent_program.get_impl_info()
+                                if parent_implementation.get("early_stopping_reason", None):
+                                    raise ValueError(f"fallback parent candidate is still early-stopped: {parent_candidate}")
+
+                                # 保存父代ID到检查点
+                                self.init_data['program_database'].save_checkpoint(island_idx, parent_candidate, round_idx)
+                            else:
+                                raise ValueError("回退搜索停止，进化停止，没有可以进化的父代了！")
+                        else:
+                            raise ValueError("检查点父代不存在") 
+                    else:
+                        # 不是第一轮迭代
+                        island = self.init_data['program_database'].get_island(island_idx)
+                        parent_candidate = self.init_data['parent_candidate']
+                        parent_program = island.find_program_by_id(parent_candidate)
+                        if parent_program is None:
+                            raise ValueError(f"parent candidate not found: {parent_candidate}")
+
+                        # 查看【父代待选】的收敛情况
+                        early_stopping_reason = parent_program.get_impl_info().get("early_stopping_reason", None)
+                        if early_stopping_reason:
+                            # Fallback 回退选出父代
+                            self.init_data['fallback_id'] = parent_candidate
+                            logger.info(f"Fallback to get parent ... ")
+                            # import pdb;pdb.set_trace()
+                            self.init_data['parent_candidate'] = self.init_data['program_database'].fallback_search_parent_candidate(
+                                island_idx, parent_candidate
+                            )
+                        if self.init_data['parent_candidate'] is not None:
+                            parent_candidate = self.init_data['parent_candidate']
+                            parent_program = island.find_program_by_id(parent_candidate)
+                            if parent_program is None:
+                                raise ValueError(f"fallback parent candidate not found: {parent_candidate}")
+
+                            # 回退后只应保留未早停的父代；这里做一次兜底校验。
+                            parent_implementation = parent_program.get_impl_info()
+                            if parent_implementation.get("early_stopping_reason", None):
+                                raise ValueError(f"fallback parent candidate is still early-stopped: {parent_candidate}")
+
+                            # 保存父代ID到检查点
+                            self.init_data['program_database'].save_checkpoint(island_idx, parent_candidate, round_idx)
                         else:
                             raise ValueError("回退搜索停止，进化停止，没有可以进化的父代了！")
                 
@@ -915,6 +942,7 @@ class ResultProcessor:
                         
                         # 保存到岛屿存储
                         save_implementation(impl_info, self.config.islands_storage_dirs[island_idx])
+                        # import pdb;pdb.set_trace()
                         await self.init_data['program_database'].insert_island(
                             island_idx,
                             impl_info['impl_code'],

@@ -155,6 +155,8 @@ class ProgramDatabase():
         # 如果收敛就更新 impl_info 里面的收敛原因
         if early_stopping_decision.stop:
             self.update_early_stopping_reason(island_idx, impl_info['id'], '\n'.join(early_stopping_decision.reasons))
+        else:
+            self.update_early_stopping_reason(island_idx, impl_info['id'], "")
         logger.info(f"Early Stopping Score of current kernel {int(100 * early_stopping_decision.score)}")
     
     def update_early_stopping_reason(self, island_idx: int, program_id: str, reason: str):
@@ -189,17 +191,26 @@ class ProgramDatabase():
         从 stop_program_id 所在分支回退，寻找可能的父代候选
         对可能的父代候选进行收敛判定，若不收敛，则返回，若仍收敛则持续回退。
         """
+        island = self.island_list[island_idx]
+        search_from_id = stop_program_id
         fallback_depth = self.fallback_depth
-        fallback_candidate_list = self.island_list[island_idx].get_fallback_candidate_list(
-            stop_program_id, fallback_depth
-        )  # [program_id:str, ... ]
+
         # 若回退到的【父代候选】收敛，则持续回退；持续回退时，步长固定为1；
-        while len(fallback_candidate_list) != 0:
+        while search_from_id is not None:
+            logger.info(f"从 {search_from_id} 开始回退，回退深度 {fallback_depth} 层")
+            fallback_candidate_list = island.get_fallback_candidate_list(
+                search_from_id, fallback_depth
+            )  # [program_id:str, ... ]
+            logger.info(f"回退节点候选列表 {fallback_candidate_list}")
             for candidate in fallback_candidate_list:
-                if self.get_island(island_idx).find_program_by_id(candidate).get_impl_info().get("early_stopping_reason", None):
+                candidate_program = island.find_program_by_id(candidate)
+                if candidate_program is None:
+                    continue
+                if not candidate_program.get_impl_info().get("early_stopping_reason", None):
                     return candidate
+            search_from_id = island.get_ancestor_id(search_from_id, fallback_depth)
+            logger.info(f"本次回退节点不符合要求，继续从 {search_from_id} 回退")
             fallback_depth = 1
-            fallback_candidate_list = self.island_list[island_idx].get_fallback_candidate_list(stop_program_id, fallback_depth)
         return None
     
     def search_parent(self, island_idx: int) -> str:

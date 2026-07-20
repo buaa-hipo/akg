@@ -470,6 +470,7 @@ class Coder(AgentBase):
             Tuple[str, str, str]: 生成的代码、提示信息和推理过程
         """
         try:
+            # import pdb;pdb.set_trace()
             # 从task_info中获取代码信息
             sketch = task_info.get('designer_code', '')
             code_feat = task_info.get('code_feat', "")

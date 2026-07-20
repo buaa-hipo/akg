@@ -328,6 +328,8 @@ async def new_evolve(
 
     # ========== 4. 进化主循环 ==========
     for round_idx in range(checkpoint_round_idx, max_rounds + 1):
+        # 清空上一轮 fallback_id
+        init_data['fallback_id'] = None
         
         # designer 阶段
         tasks, task_mapping = task_processor.create_evolve_designer_tasks_for_round(round_idx, device_pool, task_pool, round_implementations, evolve_from_checkpoint)
@@ -372,7 +374,7 @@ async def new_evolve(
         evolve_from_checkpoint = False
         
         # 保存检查点
-        task_processor.save_checkpoint(round_idx + 1, round_implementations, evolve_from_checkpoint)
+        task_processor.save_checkpoint(round_idx + 1)
 
     # ========== 5. 构建最终结果 ==========
     # 按性能排序最佳实现（gen_time越小越好）

@@ -12,6 +12,12 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 
+DEFAULT_LEVEL2_DIR = Path(
+    # "/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level1/19_ReLU/island_0"
+    "/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level1"
+)
+
+
 def _ensure_project_python_path() -> None:
     """Make the script runnable without installing ai_kernel_generator."""
     current = Path(__file__).resolve()
@@ -48,6 +54,17 @@ class NodeDecision:
     branch: List[KernelNode]
     decision: EarlyStoppingDecision
     ncu_parse_error: Optional[str] = None
+
+
+@dataclass
+class IslandBatchResult:
+    operator: str
+    island_dir: Path
+    first_all_stop_round: Optional[str]
+    node_count: int = 0
+    stop_count: int = 0
+    warning_count: int = 0
+    error: Optional[str] = None
 
 
 def _short_id(value: Optional[str], width: int = 8) -> str:
@@ -460,6 +477,154 @@ def sort_decisions(decisions: List[NodeDecision], sort_by: str) -> List[NodeDeci
     return sorted(decisions, key=lambda item: _node_sort_key(item.node))
 
 
+def _round_sort_key(value: Any) -> Tuple[int, int, str]:
+    try:
+        return 0, int(value), str(value)
+    except (TypeError, ValueError):
+        return 1, 0, str(value)
+
+
+def operator_sort_key(operator: str) -> Tuple[int, int, str]:
+    prefix, sep, _rest = operator.partition("_")
+    if sep:
+        try:
+            return 0, int(prefix), operator
+        except ValueError:
+            pass
+    return 1, 0, operator
+
+
+def find_first_all_stop_round(decisions: List[NodeDecision]) -> Optional[str]:
+    decisions_by_round: Dict[str, List[NodeDecision]] = defaultdict(list)
+
+    for item in decisions:
+        round_value = item.node.impl_info.get("round")
+        if round_value is None:
+            continue
+        decisions_by_round[str(round_value)].append(item)
+
+    for round_value, round_decisions in sorted(
+        decisions_by_round.items(),
+        key=lambda item: _round_sort_key(item[0]),
+    ):
+        if round_decisions and all(item.decision.stop for item in round_decisions):
+            return round_value
+
+    return None
+
+
+def format_first_all_stop(round_value: Optional[str]) -> str:
+    if round_value is None:
+        return "not found"
+    return f"round {round_value} first all stop"
+
+
+def discover_island_dirs(input_dir: Path) -> Tuple[List[Path], List[str]]:
+    input_dir = input_dir.expanduser()
+    warnings: List[str] = []
+
+    if not input_dir.exists():
+        raise FileNotFoundError(f"path not found: {input_dir}")
+    if not input_dir.is_dir():
+        raise NotADirectoryError(f"not a directory: {input_dir}")
+
+    if input_dir.name == "island_0":
+        return [input_dir], warnings
+
+    direct_island_dir = input_dir / "island_0"
+    if direct_island_dir.is_dir():
+        return [direct_island_dir], warnings
+
+    island_dirs = sorted(
+        (
+            path
+            for path in input_dir.glob("*/island_0")
+            if path.is_dir()
+        ),
+        key=lambda path: operator_sort_key(path.parent.name),
+    )
+    for op_dir in sorted(
+        (path for path in input_dir.iterdir() if path.is_dir()),
+        key=lambda path: operator_sort_key(path.name),
+    ):
+        if not (op_dir / "island_0").is_dir():
+            warnings.append(f"skip operator without island_0: {op_dir.name}")
+
+    if not island_dirs:
+        raise ValueError(f"no */island_0 directories found under: {input_dir}")
+
+    return island_dirs, warnings
+
+
+def analyze_island_dir(
+    island_dir: Path,
+    config: EarlyStoppingConfig,
+    sort_by: str,
+) -> Tuple[Dict[str, KernelNode], Dict[str, List[str]], List[NodeDecision], List[str]]:
+    nodes, warnings = load_island_nodes(island_dir)
+    children_map = build_children_map(nodes)
+    decisions = judge_all_nodes(nodes, config)
+    decisions = sort_decisions(decisions, sort_by)
+    return nodes, children_map, decisions, warnings
+
+
+def summarize_batch_island(
+    island_dir: Path,
+    config: EarlyStoppingConfig,
+    sort_by: str,
+) -> IslandBatchResult:
+    operator = island_dir.parent.name
+    try:
+        nodes, _children_map, decisions, warnings = analyze_island_dir(
+            island_dir,
+            config,
+            sort_by,
+        )
+    except Exception as exc:  # noqa: BLE001
+        return IslandBatchResult(
+            operator=operator,
+            island_dir=island_dir,
+            first_all_stop_round=None,
+            error=str(exc),
+        )
+
+    return IslandBatchResult(
+        operator=operator,
+        island_dir=island_dir,
+        first_all_stop_round=find_first_all_stop_round(decisions),
+        node_count=len(nodes),
+        stop_count=sum(1 for item in decisions if item.decision.stop),
+        warning_count=len(warnings),
+    )
+
+
+def print_batch_results(
+    results: List[IslandBatchResult],
+    discover_warnings: List[str],
+) -> None:
+    results = sorted(results, key=lambda item: operator_sort_key(item.operator))
+    rows = [
+        {
+            "operator": item.operator,
+            "first_all_stop": "ERROR" if item.error else format_first_all_stop(item.first_all_stop_round),
+            "stop": "-" if item.error else f"{item.stop_count}/{item.node_count}",
+            "warnings": "-" if item.error else str(item.warning_count),
+            "status": _truncate(item.error, 80) if item.error else "OK",
+        }
+        for item in results
+    ]
+
+    print_table(
+        rows,
+        columns=["operator", "first_all_stop", "stop", "warnings", "status"],
+    )
+
+    for warning in discover_warnings[:10]:
+        print(f"[warn] {warning}")
+    if len(discover_warnings) > 10:
+        print(f"[warn] ... {len(discover_warnings) - 10} more discovery warnings")
+
+
 def print_dataset_summary(
     island_dir: Path,
     nodes: Dict[str, KernelNode],
@@ -495,14 +660,17 @@ def print_dataset_summary(
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Offline early-stopping inspector for one evolve_database island directory."
+            "Offline early-stopping inspector for evolve_database island directories."
         )
     )
     parser.add_argument(
         "--island_dir",
-        default=Path("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level2/62_Matmul_GroupNorm_LeakyReLU_Sum/island_0"),
+        default=DEFAULT_LEVEL2_DIR,
         type=Path,
-        help="Path like .../evolve_database/level2/99_Matmul_GELU_Softmax/island_0",
+        help=(
+            "Path to an island_0 dir, an operator dir containing island_0, "
+            "or a level dir containing */island_0."
+        ),
     )
     parser.add_argument(
         "--config-json",
@@ -567,10 +735,54 @@ def main() -> None:
         config_json=args.config_json,
         set_values=args.set,
     )
-    nodes, warnings = load_island_nodes(args.island_dir)
-    children_map = build_children_map(nodes)
-    decisions = judge_all_nodes(nodes, config)
-    decisions = sort_decisions(decisions, args.sort_by)
+    island_dirs, discover_warnings = discover_island_dirs(args.island_dir)
+
+    if len(island_dirs) > 1:
+        print(f"discovered {len(island_dirs)} island_0 dirs under: {args.island_dir}")
+        print()
+        results = [
+            summarize_batch_island(island_dir, config, args.sort_by)
+            for island_dir in island_dirs
+        ]
+        print_batch_results(results, discover_warnings)
+
+        if args.json_out:
+            args.json_out.parent.mkdir(parents=True, exist_ok=True)
+            with args.json_out.open("w", encoding="utf-8") as f:
+                json.dump(
+                    {
+                        "input_dir": str(args.island_dir),
+                        "config": dataclasses.asdict(config),
+                        "results": [
+                            {
+                                "operator": item.operator,
+                                "island_dir": str(item.island_dir),
+                                "first_all_stop_round": item.first_all_stop_round,
+                                "first_all_stop": format_first_all_stop(
+                                    item.first_all_stop_round
+                                ),
+                                "node_count": item.node_count,
+                                "stop_count": item.stop_count,
+                                "warning_count": item.warning_count,
+                                "error": item.error,
+                            }
+                            for item in results
+                        ],
+                        "discover_warnings": discover_warnings,
+                    },
+                    f,
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            print(f"\njson written to: {args.json_out}")
+        return
+
+    args.island_dir = island_dirs[0]
+    nodes, children_map, decisions, warnings = analyze_island_dir(
+        args.island_dir,
+        config,
+        args.sort_by,
+    )
 
     print_dataset_summary(args.island_dir, nodes, children_map, decisions, warnings)
     print()
@@ -603,6 +815,9 @@ def main() -> None:
             "reasons",
         ],
     )
+    print()
+    first_all_stop_round = find_first_all_stop_round(decisions)
+    print(format_first_all_stop(first_all_stop_round))
 
     if args.detail_id or args.details:
         if args.detail_id and not displayed:

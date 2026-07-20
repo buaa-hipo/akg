@@ -47,7 +47,7 @@ class EarlyStoppingConfig:
     """
 
     # -------- 基本长度要求 --------
-    min_history: int = 7              # 至少多少轮后才开始判停
+    min_history: int = 3              # 至少多少轮后才开始判停
     patience: int = 4                 # 连续多少轮低收益 / 平台后可触发
 
     # -------- 增量收益阈值 --------
@@ -56,8 +56,8 @@ class EarlyStoppingConfig:
 
     # -------- 趋势斜率 --------
     moving_avg_window: int = 3            # 求平均窗口大小 -> 窗口内求得一个平滑点
-    slope_window: int = 5                 # 用最近多少个平滑点估计趋势
-    slope_threshold: float = 0.03        # 平均每步提升斜率阈值
+    slope_window: int = 4                 # 用最近多少个平滑点估计趋势
+    slope_threshold: float = 0.2        # 平均每步提升斜率阈值
 
     # -------- 波动噪声 --------
     noise_tolerance: float = 0.000        # 允许的小波动，可根据测量噪声调
@@ -86,9 +86,9 @@ class EarlyStoppingConfig:
     ncu_plateau_ratio: float = 0.65       # 超过多少比例关键指标都平台化，则认为NCU平台化
 
     # -------- 收敛得分权重 --------
-    weight_gain: float = 0.30
+    weight_gain: float = 0.45
     weight_slope: float = 0.45
-    weight_ncu: float = 0.25
+    weight_ncu: float = 0.10
     # weight_stagnation: float = 0.15
 
     # -------- 最终停止阈值 --------
@@ -96,7 +96,7 @@ class EarlyStoppingConfig:
 
     # -------- 安全限制 --------
     max_depth: Optional[int] = 20               # 超出 max_depth 直接判停
-    hard_no_improve_rounds: Optional[int] = 4   # 若连续4轮几乎无提升，直接停，无需和其他指标加权
+    hard_no_improve_rounds: Optional[int] = 3   # 若连续4轮几乎无提升，直接停，无需和其他指标加权
 
 
 @dataclass
@@ -278,12 +278,13 @@ class BranchEarlyStoppingJudge:
 
         flat_trend = slope <= self.cfg.slope_threshold + self.cfg.noise_tolerance
 
-        # slope越小，越倾向停止；做一个简单归一化
-        denom = self.cfg.slope_threshold + self.cfg.noise_tolerance + EPS
-        score = 1.0 - min(1.0, max(0.0, slope / denom))
-        if slope < 0:
-            score = 1.0
-
+        # slope低于阈值表示收益增长不足，越倾向停止；超过阈值越多，早停分越低。
+        # 使用以 slope_limit 为中心的 S 型曲线，避免阈值以下全部变成 1.0。
+        slope_limit = self.cfg.slope_threshold + self.cfg.noise_tolerance
+        slope_scale = abs(slope_limit) + EPS
+        normalized_delta = (slope - slope_limit) / slope_scale
+        normalized_delta = max(-60.0, min(60.0, normalized_delta))
+        score = 1.0 / (1.0 + math.exp(normalized_delta))
         return {
             "score": score,
             "flat_trend": flat_trend,
