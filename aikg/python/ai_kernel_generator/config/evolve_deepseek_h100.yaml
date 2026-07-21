@@ -1,0 +1,53 @@
+# Model preset configuration
+agent_model_config:
+  designer: deepseek_v4_flash
+  coder: deepseek_v4_flash
+  profiler: deepseek_v4_flash
+  conductor: deepseek_v4_flash
+  feature_extractor: deepseek_v4_flash
+  api_generator: deepseek_v4_flash
+  sketch: deepseek_v4_flash
+  selector: deepseek_v4_flash
+  test_case_generator: deepseek_v4_flash
+  default: deepseek_v4_flash
+
+# Log configuration
+log_dir: "/mnt/lustre-client/zhangzizheng/aikg_logs"
+
+# Workflow configuration
+workflow_config_path: "config/default_workflow.yaml"  # 原 Task 使用
+default_workflow: "default_workflow"  # LangGraphTask 使用
+max_step: 20  # 最大迭代步数
+
+# Parser configuration (for LangGraphTask)
+# parser_config_path: "config/parser_config.yaml"  # 可选，默认使用 config/parser_config.yaml
+
+# Documentation directory configuration
+docs_dir:
+  designer: "resources/docs/sketch_docs"
+  coder: "resources/docs/triton_cuda_docs"
+  sketch: "resources/docs/sketch_docs"
+
+# Performance analysis configuration
+profile_settings:
+  run_times: 50
+  warmup_times: 5
+
+# Verification configuration
+verify_timeout: 300  # Timeout for verification in seconds (default 5 minutes)
+
+# Multi-case testing configuration
+enable_multi_case_verification: false  # For Hint mode only: controls whether to run verification (false = only generate space_config file without verification)
+enable_hint_mode: false  # Hint mode: user provides @hint, Designer generates space_config
+enable_llm_range_inference: false  # LLM inference mode: LLM infers parameter ranges and generates test cases (always runs verification when enabled)
+
+# Hint mode sampling configuration (only used when enable_hint_mode=true and enable_multi_case_verification=true)
+multi_case_num: 10  # Number of test cases to sample
+sampling_strategy: "mixed"  # Sampling strategy: random/boundary/mixed
+sampling_seed: 42  # Random seed for reproducibility
+
+# triton 数据库配置
+database_config:
+  enable_rag: True          # Whether to enable RAG functionality
+  sample_num: 4             # Default sampling number
+  embedding_device: "cuda"    # Embedding model device: cpu or cuda

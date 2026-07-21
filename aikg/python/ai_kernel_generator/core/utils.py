@@ -27,8 +27,8 @@ def check_backend_arch(backend: str, arch: str):
         supported_ascend_archs = ["ascend910b1", "ascend910b2", "ascend910b2c", "ascend910b3", "ascend910b4", "ascend310p3"]
         if arch not in supported_ascend_archs:
             raise ValueError("ascend backend only support ascend910b1/b2/b2c/b3/b4 and ascend310p3")
-    elif backend == "cuda" and arch not in ["a100", "v100", "h20", "l20", "rtx3090"]:
-        raise ValueError("cuda backend only support a100, v100, h20, l20, and rtx3090")
+    elif backend == "cuda" and arch not in ["a100", "h100", "v100", "h20", "l20", "rtx3090"]:
+        raise ValueError("cuda backend only support a100, h100, v100, h20, l20, and rtx3090")
     elif backend == "cpu" and arch not in ["x86_64", "aarch64"]:
         raise ValueError("cpu backend only support x86_64 and aarch64")
 
@@ -125,6 +125,7 @@ VALID_CONFIGS = {
         },
         "cuda": {
             "a100": ["triton_cuda", "cuda_c", "tilelang_cuda"],
+            "h100": ["triton_cuda", "cuda_c", "tilelang_cuda"],
             "h20": ["triton_cuda", "cuda_c", "tilelang_cuda"],
             "l20": ["triton_cuda", "cuda_c", "tilelang_cuda"],
             "rtx3090": ["triton_cuda", "cuda_c", "tilelang_cuda"],

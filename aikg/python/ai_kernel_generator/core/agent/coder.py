@@ -276,30 +276,30 @@ class Coder(AgentBase):
 
         all_code = []
 
-        try:
-            project_root = Path(get_project_root()).parent.parent / "database" / "local"
-            local_dir = Path(project_root) / self.arch / self.dsl
+        # try:
+        #     project_root = Path(get_project_root()).parent.parent / "database" / "local"
+        #     local_dir = Path(project_root) / self.arch / self.dsl
 
-            if not local_dir.exists():
-                logger.warning(f"local示例目录不存在: {local_dir}")
-                return ""
+        #     if not local_dir.exists():
+        #         logger.warning(f"local示例目录不存在: {local_dir}")
+        #         return ""
 
-            # 查找所有Python文件
-            for file_path in local_dir.glob("*.py"):
-                # 检查文件名是否包含op_name（不区分大小写）
-                if file_path.stem.lower() in self.op_name.lower():
-                    try:
-                        with open(file_path, "r", encoding="utf-8") as f:
-                            content = f.read().strip()
-                            if content:
-                                all_code.append(f"# Python File: {file_path.name}\n{content}\n")
-                                logger.info(f"找到匹配的local示例文件: {file_path}")
-                    except Exception as e:
-                        logger.warning(f"读取local示例文件 {file_path} 时发生错误: {str(e)}")
-                        continue
+        #     # 查找所有Python文件
+        #     for file_path in local_dir.glob("*.py"):
+        #         # 检查文件名是否包含op_name（不区分大小写）
+        #         if file_path.stem.lower() in self.op_name.lower():
+        #             try:
+        #                 with open(file_path, "r", encoding="utf-8") as f:
+        #                     content = f.read().strip()
+        #                     if content:
+        #                         all_code.append(f"# Python File: {file_path.name}\n{content}\n")
+        #                         logger.info(f"找到匹配的local示例文件: {file_path}")
+        #             except Exception as e:
+        #                 logger.warning(f"读取local示例文件 {file_path} 时发生错误: {str(e)}")
+        #                 continue
 
-        except Exception as e:
-            logger.warning(f"从local目录获取示例代码失败: {e}")
+        # except Exception as e:
+        #     logger.warning(f"从local目录获取示例代码失败: {e}")
 
         if self.database_config and self.database_config.get("enable_rag", False):
             try:

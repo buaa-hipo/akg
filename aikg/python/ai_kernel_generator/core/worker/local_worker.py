@@ -30,7 +30,37 @@ from ..verifier.profiler_utils import (
 
 logger = logging.getLogger(__name__)
 
-GPU_LOCK_DIR = "/ssd/zhangzizheng/aikg_gpu_locks"
+def _detect_gpu_lock_dir() -> str:
+    configured_dir = os.environ.get("AIKG_GPU_LOCK_DIR")
+    if configured_dir:
+        return configured_dir
+
+    try:
+        result = subprocess.run(
+            ["nvidia-smi", "--list-gpus"],
+            text=True,
+            capture_output=True,
+            timeout=10,
+            check=False,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
+        logger.warning("Failed to detect GPU model for lock dir selection: %s", exc)
+        return "/mnt/lustre-client/zhangzizheng/aikg_gpu_locks"
+
+    if result.returncode != 0:
+        logger.warning(
+            "nvidia-smi --list-gpus failed when selecting lock dir: %s",
+            result.stderr.strip(),
+        )
+        return "/mnt/lustre-client/zhangzizheng/aikg_gpu_locks"
+
+    if "A100" in result.stdout:
+        return "/ssd/zhangzizheng/aikg_gpu_locks"
+    return "/mnt/lustre-client/zhangzizheng/aikg_gpu_locks"
+
+
+GPU_LOCK_DIR = _detect_gpu_lock_dir()
+
 
 NCU_METRICS = ",".join([
     "sm__cycles_active.avg",

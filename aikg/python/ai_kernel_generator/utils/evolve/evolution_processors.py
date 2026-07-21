@@ -106,7 +106,7 @@ class EvolveRuntimeConfig:
         # 设置存储目录
         random_hash = uuid.uuid4().hex[:8]
         self.storage_dir = os.path.expanduser(
-            f"/ssd/zhangzizheng/aikg_evolve/{self.op_name}_{self.dsl}_{self.framework}_{self.backend}_{self.arch}/{random_hash}/"
+            f"/mnt/lustre-client/zhangzizheng/aikg_evolve/{self.op_name}_{self.dsl}_{self.framework}_{self.backend}_{self.arch}/{random_hash}/"
         )
         os.makedirs(self.storage_dir, exist_ok=True)
         

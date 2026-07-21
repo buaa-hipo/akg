@@ -43,6 +43,6 @@ class BackendAdapterCuda(BackendAdapter):
     
     def validate_arch(self, arch: str) -> bool:
         """Validate CUDA architecture."""
-        supported_archs = ["a100", "v100", "h20", "l20", "rtx3090"]
+        supported_archs = ["a100", "h100", "v100", "h20", "l20", "rtx3090"]
         return arch in supported_archs
 
