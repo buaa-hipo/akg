@@ -74,7 +74,11 @@ aikg/evolve_database_test_early_stopping/
 aikg/program_database/
 dsa_inputs/
 aikg/examples/tokens_cnt.csv
+aikg/examples/tokens_cnt.csv
 aikg/examples/tools/tokens_cnt.csv
+aikg/examples/tools/cnt_round.csv
+aikg/examples/tools/max_speedup.csv
+aikg/examples/auto_submit.log
 aikg/examples/log/
 aikg/examples/log_test_early_stopping/
 aikg/examples/tools/evolve_plots/

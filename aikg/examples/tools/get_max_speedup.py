@@ -1,3 +1,4 @@
+import csv
 import json
 from pathlib import Path
 
@@ -16,8 +17,9 @@ def get_max_speedup(island_dir):
     return max_speedup
 
 if __name__ == '__main__':
-    base_dir = Path("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level3")
+    base_dir = Path("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level2")
     # base_dir = Path("/mnt/lustre-client/zhangsongyang/akg_4/aikg/evolve_database/level1")
+    csv_path = Path(__file__).with_name("max_speedup.csv")
     
     print_str = []
     speedup_list = []
@@ -35,6 +37,11 @@ if __name__ == '__main__':
     sorted_print_str = sorted(print_str, key=lambda x: int(x.split("_")[0]))
     for s in sorted_print_str:
         print(s)
+
+    sorted_speedup_list = sorted(speedup_list, key=lambda x: int(x[0].split("_")[0]))
+    with open(csv_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerows((name, f"{speedup:.2f}") for name, speedup in sorted_speedup_list)
     
     print(f"平均加速比 {sum_speedup / cnt_num:.2f}")
     
