@@ -18,7 +18,7 @@ async def build_coder_database(triton_file_dir: Path, step: int = 3):
 async def main():
     coder_database = CoderDatabase(config={'agent_model_config': {'feature_extractor': 'deepseek_r1_default'}})
     import pdb;pdb.set_trace()
-    origin_database_path = Path('/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/triton_database/nvidia/TritonBench_G_v1')
+    origin_database_path = Path('/mnt/lustre-client/zhangzizheng/AIKG/save_data/triton_database/nvidia/TritonBench_G_v1')
     cnt = 0
     all_py = [py for py in origin_database_path.glob('*.py')]
     all_py.sort()

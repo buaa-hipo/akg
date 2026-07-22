@@ -14,6 +14,7 @@
 
 import logging
 import random
+import os
 from typing import List, Dict
 from pathlib import Path
 from langchain_core.documents import Document
@@ -26,7 +27,9 @@ from ai_kernel_generator.utils.common_utils import get_md5_hash
 logger = logging.getLogger(__name__)
 
 # Path(get_project_root()).parent.parent /mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/
-DEFAULT_CODER_DATABASE_PATH = Path(get_project_root()).parent.parent / "triton_database" / "nvidia" / "TritonBench_G_v1"
+# DEFAULT_CODER_DATABASE_PATH = Path(get_project_root()).parent.parent / "triton_database" / "nvidia" / "TritonBench_G_v1"
+DEFAULT_CODER_DATABASE_PATH = Path("/home/zhangzizheng/AIKG/triton_database/nvidia/TritonBench_G_v1") if os.path.exists("/home/zhangzizheng/AIKG/triton_database/nvidia/TritonBench_G_v1") else Path("/mnt/lustre-client/zhangzizheng/AIKG/save_data/triton_database/nvidia/TritonBench_G_v1")
+
 
 class CoderDatabase(Database):
     # 单例模式实现
