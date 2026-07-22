@@ -581,6 +581,7 @@ class LocalWorker(WorkerInterface):
         env['PYTHONUNBUFFERED'] = '1'
 
         ncu_bin = '/mnt/lustre-client/zhangzizheng/gpu5_install/NVIDIA-Nsight-Compute-2025.4/ncu'
+        ncu_bin = ncu_bin if os.path.exists(ncu_bin) else '/mnt/lustre-client/zhangzizheng/gpu00_install/NVIDIA-Nsight-Compute-2025.4/ncu'
 
         cmd = [
             ncu_bin,

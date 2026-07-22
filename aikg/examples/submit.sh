@@ -23,7 +23,7 @@ mkdir -p "log/$DIR"
 
 # 执行命令
 nohup python run_torch_evolve_triton.py \
-    --config_name "evolve_openai.yaml" \
+    --config_name "evolve_deepseek_h100.yaml" \
     --op-name "$OP_NAME" \
     --task-desc "/mnt/lustre-client/zhangzizheng/AIKG/KernelBench/KernelBench/$DIR/$FULL_OP_NAME.py" \
     --evolve-database "$DIR/$FULL_OP_NAME" \

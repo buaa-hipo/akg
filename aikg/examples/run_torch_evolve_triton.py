@@ -82,7 +82,7 @@ async def run_torch_evolve_triton(op_name: str, task_desc: str, evolve_database:
     config.dsl = "triton_cuda"  # 使用triton_cuda替代通用的triton
     config.framework = "torch"
     config.backend = "cuda"
-    config.arch = "a100"
+    config.arch = "h100"
 
     # 进化参数
     config.max_rounds = 10
@@ -96,7 +96,7 @@ async def run_torch_evolve_triton(op_name: str, task_desc: str, evolve_database:
     config.parent_selection_prob = 0.5
 
     # 设备配置
-    config.device_list = [1]
+    config.device_list = [0]
 
     # 配置文件路径
     config.config_path = str(Path(get_project_root()) / "config" / config_name)

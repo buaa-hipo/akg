@@ -105,9 +105,14 @@ class EvolveRuntimeConfig:
         
         # 设置存储目录
         random_hash = uuid.uuid4().hex[:8]
-        self.storage_dir = os.path.expanduser(
-            f"/mnt/lustre-client/zhangzizheng/aikg_evolve/{self.op_name}_{self.dsl}_{self.framework}_{self.backend}_{self.arch}/{random_hash}/"
-        )
+        if os.path.exists("/mnt/lustre-client/zhangzizheng/aikg_evolve"):
+            self.storage_dir = os.path.expanduser(
+                f"/mnt/lustre-client/zhangzizheng/aikg_evolve/{self.op_name}_{self.dsl}_{self.framework}_{self.backend}_{self.arch}/{random_hash}/"
+            )
+        else:
+            self.storage_dir = os.path.expanduser(
+                f"/home/zhangzizheng/AIKG_LOGS/aikg_evolve/{self.op_name}_{self.dsl}_{self.framework}_{self.backend}_{self.arch}/{random_hash}/"
+            )
         os.makedirs(self.storage_dir, exist_ok=True)
         
         # 初始化岛屿存储目录
