@@ -16,7 +16,8 @@ def get_max_round(island_dir):
     return max_round
 
 if __name__ == '__main__':
-    base_dir = Path("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level2")
+    # base_dir = Path("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level2")
+    base_dir = Path("/home/zhangzizheng/AIKG/akg/aikg/evolve_database/level2")
     csv_path = Path(__file__).with_name("cnt_round.csv")
     
     print_str = []

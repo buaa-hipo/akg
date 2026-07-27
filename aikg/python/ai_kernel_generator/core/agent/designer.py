@@ -171,7 +171,7 @@ class Designer(AgentBase):
         self.format_instructions = self.code_parser.get_format_instructions()
 
         # 初始化designer生成模板
-        self.designer_prompt = self.load_template("designer/gen_sketch_optimize.j2")
+        self.designer_prompt = self.load_template("designer/gen_sketch.j2")
 
         self.base_doc = {
             "dsl": self.dsl,

@@ -280,6 +280,13 @@ def get_init_inputs():
 
 本轮需要在草图中添加最优切分方式，并在结尾通过 `@llm_hint("available_tiling")` 补充更多切分配置，方便后续 Coder 使用 autotune 或多配置探索。
 
+一定要尽量让 Coder 能够使用 autotune！
+一定要尽量让 Coder 能够使用 autotune！
+一定要尽量让 Coder 能够使用 autotune！
+一定要尽量让 Coder 能够使用 autotune！
+
+Autotune 可以在很大程度上提高生成算子的性能！
+
 请使用 `available_tiling` 作为标准拼写；如历史流程依赖旧拼写，可同时兼容写出 `avaliable_tiling`。
 
 示例：
@@ -306,7 +313,7 @@ BLOCK_SIZE = 128, PARALLEL_NUM = 8
 - 中间缓冲区或寄存器/local memory 的使用意图。
 - 输出写回方式和边界处理。
 - 性能意图，例如 coalesced load/store、复用输入、减少重复读写、减少分支、提升 occupancy、降低访存带宽压力。
-- 如果存在可选 tiling 或 autotune 搜索空间，说明候选配置及选择理由。
+- 如果存在可选 tiling 或 autotune 搜索空间，说明候选配置及选择理由。一定要尽量让 Coder 能够应用 autotune！一定要尽量让 Coder 能够应用 autotune！一定要尽量让 Coder 能够应用 autotune！
 - 如果需要后续 Coder 添加 assert，请在 `设计适用范围` 中明确约束。
 
 设计时请避免：

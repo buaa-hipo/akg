@@ -1,6 +1,20 @@
 # 模型预设配置
 # 每个预设包含完整的模型参数
 
+gpt-5.5:
+  api_base: "https://yunwu.ai/v1"
+  # api_base: "https://vokotoken.cc/v1"
+  model: "gpt-5.5-2"
+  api_key_env: "AIKG_OPENAI_2_API_KEY"
+  max_tokens: 65535
+  temperature: 0.1
+  use_responses_api: true
+  reasoning:
+    effort: "xhigh"
+  text:
+    format:
+      type: "json_object"
+
 
 gpt-5.5:
   api_base: "https://yunwu.ai/v1"

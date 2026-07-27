@@ -1,6 +1,7 @@
 import asyncio
 import fcntl
 import os
+import signal
 import shutil
 import subprocess
 import tempfile
@@ -9,8 +10,8 @@ import logging
 import sys
 import io
 import json
-from typing import List, Tuple, Dict, Any, Union, Optional, Sequence
-from contextlib import ExitStack, asynccontextmanager
+from typing import Callable, List, Tuple, Dict, Any, Union, Optional, Sequence, Set
+from contextlib import ExitStack, asynccontextmanager, suppress
 
 from pathlib import Path
 
@@ -22,6 +23,7 @@ from .interface import WorkerInterface
 from ..async_pool.device_pool import DevicePool
 from ..verifier.profiler_utils import (
     run_profile_scripts_and_collect_results,
+    read_profile_result_from_json,
     run_msprof,
     analyze_prof_data,
     run_nsys,
@@ -29,6 +31,20 @@ from ..verifier.profiler_utils import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class GPUContaminationError(RuntimeError):
+    """Raised when an external process starts using the target GPU during a run."""
+
+    def __init__(self, device_id: int, external_pids: Set[int]):
+        self.device_id = device_id
+        self.external_pids = external_pids
+        self.output_log = ""
+        super().__init__(
+            f"GPU_{device_id} was used by external pids during execution: "
+            f"{sorted(external_pids)}"
+        )
+
 
 def _detect_gpu_lock_dir() -> str:
     configured_dir = os.environ.get("AIKG_GPU_LOCK_DIR")
@@ -351,6 +367,650 @@ class LocalWorker(WorkerInterface):
         logger.error(f"等待 GPU_{actual_device_id} 资源超时 {timeout_minutes} 分钟，退出等待")
         raise TimeoutError(f"GPU_{actual_device_id} 资源等待超时")
 
+    def _gpu_contamination_max_retries(self) -> int:
+        raw_value = os.environ.get("AIKG_GPU_CONTAMINATION_MAX_RETRIES", "10")
+        try:
+            return max(0, int(raw_value))
+        except ValueError:
+            logger.warning(
+                "Invalid AIKG_GPU_CONTAMINATION_MAX_RETRIES=%r, using default 10",
+                raw_value,
+            )
+            return 3
+
+    def _gpu_monitor_interval_seconds(self) -> float:
+        raw_value = os.environ.get("AIKG_GPU_MONITOR_INTERVAL_SECONDS", "1.0")
+        try:
+            return max(0.2, float(raw_value))
+        except ValueError:
+            logger.warning(
+                "Invalid AIKG_GPU_MONITOR_INTERVAL_SECONDS=%r, using default 1.0",
+                raw_value,
+            )
+            return 1.0
+
+    @staticmethod
+    def _parse_gpu_pid_output(output: str) -> Set[int]:
+        pids = set()
+        for line in output.splitlines():
+            value = line.strip()
+            if value.isdigit():
+                pids.add(int(value))
+        return pids
+
+    async def _query_gpu_compute_pids(self, device_id: int, task_id: str) -> Set[int]:
+        process = None
+        try:
+            process = await asyncio.create_subprocess_exec(
+                "nvidia-smi",
+                f"--id={device_id}",
+                "--query-compute-apps=pid",
+                "--format=csv,noheader,nounits",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=10)
+            if process.returncode != 0:
+                logger.warning(
+                    "[%s] nvidia-smi pid query failed for GPU_%s: %s",
+                    task_id,
+                    device_id,
+                    stderr.decode(errors='replace').strip(),
+                )
+                return set()
+            return self._parse_gpu_pid_output(stdout.decode(errors='replace'))
+        except asyncio.CancelledError:
+            if process is not None and process.returncode is None:
+                with suppress(ProcessLookupError):
+                    process.kill()
+                with suppress(Exception):
+                    await process.wait()
+            raise
+        except asyncio.TimeoutError:
+            if process is not None and process.returncode is None:
+                with suppress(ProcessLookupError):
+                    process.kill()
+                with suppress(Exception):
+                    await process.wait()
+            logger.warning("[%s] nvidia-smi pid query timed out for GPU_%s", task_id, device_id)
+            return set()
+        except FileNotFoundError:
+            logger.warning("[%s] nvidia-smi not found, GPU exclusivity monitor disabled", task_id)
+            return set()
+        except Exception as exc:
+            logger.warning(
+                "[%s] Failed to query GPU_%s compute pids: %s",
+                task_id,
+                device_id,
+                exc,
+                exc_info=True,
+            )
+            return set()
+
+    @staticmethod
+    def _read_ppid_from_proc(pid: int) -> Optional[int]:
+        try:
+            with open(f"/proc/{pid}/stat", "r", encoding="utf-8") as f:
+                stat = f.read()
+            fields = stat.rsplit(") ", 1)[1].split()
+            if len(fields) > 1:
+                return int(fields[1])
+        except Exception:
+            return None
+        return None
+
+    def _get_descendant_pids(self, root_pid: int) -> Set[int]:
+        children_by_ppid: Dict[int, List[int]] = {}
+        try:
+            proc_entries = os.listdir("/proc")
+        except Exception:
+            return {root_pid}
+
+        for entry in proc_entries:
+            if not entry.isdigit():
+                continue
+            pid = int(entry)
+            ppid = self._read_ppid_from_proc(pid)
+            if ppid is not None:
+                children_by_ppid.setdefault(ppid, []).append(pid)
+
+        related_pids = {root_pid}
+        stack = [root_pid]
+        while stack:
+            parent = stack.pop()
+            for child in children_by_ppid.get(parent, []):
+                if child in related_pids:
+                    continue
+                related_pids.add(child)
+                stack.append(child)
+        return related_pids
+
+    def _get_related_process_pids(self, root_pid: int) -> Set[int]:
+        related_pids = self._get_descendant_pids(root_pid)
+        related_pids.add(root_pid)
+
+        try:
+            root_pgid = os.getpgid(root_pid)
+        except OSError:
+            root_pgid = None
+
+        if root_pgid is None:
+            return related_pids
+
+        try:
+            proc_entries = os.listdir("/proc")
+        except Exception:
+            return related_pids
+
+        for entry in proc_entries:
+            if not entry.isdigit():
+                continue
+            pid = int(entry)
+            try:
+                if os.getpgid(pid) == root_pgid:
+                    related_pids.add(pid)
+            except OSError:
+                continue
+        return related_pids
+
+    async def _monitor_gpu_exclusivity(
+        self,
+        device_id: int,
+        root_pid: int,
+        task_id: str,
+        operation_name: str,
+    ):
+        interval_seconds = self._gpu_monitor_interval_seconds()
+        while True:
+            compute_pids = await self._query_gpu_compute_pids(device_id, task_id)
+            if compute_pids:
+                related_pids = self._get_related_process_pids(root_pid)
+                external_pids = compute_pids - related_pids
+                if external_pids:
+                    logger.warning(
+                        "[%s] %s detected external GPU_%s pids: %s "
+                        "(own process group/tree: %s)",
+                        task_id,
+                        operation_name,
+                        device_id,
+                        sorted(external_pids),
+                        sorted(related_pids),
+                    )
+                    raise GPUContaminationError(device_id, external_pids)
+            await asyncio.sleep(interval_seconds)
+
+    def _signal_process_group(
+        self,
+        process: asyncio.subprocess.Process,
+        sig: signal.Signals,
+        task_id: str,
+        reason: str,
+    ):
+        if process.returncode is not None:
+            return
+
+        try:
+            process_pgid = os.getpgid(process.pid)
+        except OSError:
+            process_pgid = None
+
+        logger.warning("[%s] Stopping process pid=%s due to %s", task_id, process.pid, reason)
+
+        if process_pgid is not None and process_pgid != os.getpgrp():
+            try:
+                os.killpg(process_pgid, sig)
+                return
+            except ProcessLookupError:
+                return
+            except OSError as exc:
+                logger.warning(
+                    "[%s] Failed to signal process group %s: %s",
+                    task_id,
+                    process_pgid,
+                    exc,
+                )
+
+        try:
+            if sig == signal.SIGTERM:
+                process.terminate()
+            else:
+                process.kill()
+        except ProcessLookupError:
+            pass
+
+    async def _stop_process_and_collect_output(
+        self,
+        process: asyncio.subprocess.Process,
+        communicate_task: asyncio.Task,
+        task_id: str,
+        reason: str,
+    ) -> Tuple[bytes, bytes]:
+        self._signal_process_group(process, signal.SIGTERM, task_id, reason)
+        try:
+            return await asyncio.wait_for(asyncio.shield(communicate_task), timeout=5)
+        except asyncio.TimeoutError:
+            self._signal_process_group(process, signal.SIGKILL, task_id, reason)
+            try:
+                return await asyncio.wait_for(asyncio.shield(communicate_task), timeout=5)
+            except Exception:
+                return b"", b""
+        except Exception:
+            return b"", b""
+
+    async def _run_monitored_gpu_subprocess_once(
+        self,
+        cmd: List[str],
+        cwd: str,
+        env: Dict[str, str],
+        actual_device_id: int,
+        task_id: str,
+        timeout: int,
+        operation_name: str,
+    ) -> Tuple[int, bytes, bytes]:
+        process = await asyncio.create_subprocess_exec(
+            *cmd,
+            cwd=cwd,
+            env=env,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            start_new_session=True,
+        )
+
+        communicate_task = asyncio.create_task(process.communicate())
+        monitor_task = asyncio.create_task(
+            self._monitor_gpu_exclusivity(
+                actual_device_id,
+                process.pid,
+                task_id,
+                operation_name,
+            )
+        )
+
+        try:
+            done, _ = await asyncio.wait(
+                {communicate_task, monitor_task},
+                timeout=timeout,
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+            if not done:
+                await self._stop_process_and_collect_output(
+                    process,
+                    communicate_task,
+                    task_id,
+                    f"{operation_name} timeout",
+                )
+                raise asyncio.TimeoutError()
+
+            if monitor_task in done:
+                try:
+                    monitor_task.result()
+                except GPUContaminationError as exc:
+                    stdout, stderr = await self._stop_process_and_collect_output(
+                        process,
+                        communicate_task,
+                        task_id,
+                        f"{operation_name} GPU contamination",
+                    )
+                    exc.output_log = (
+                        stdout.decode(errors='replace')
+                        + "\n"
+                        + stderr.decode(errors='replace')
+                    )
+                    raise
+
+            stdout, stderr = await communicate_task
+            return process.returncode, stdout, stderr
+        finally:
+            if not monitor_task.done():
+                monitor_task.cancel()
+                with suppress(asyncio.CancelledError):
+                    await monitor_task
+            if not communicate_task.done():
+                await self._stop_process_and_collect_output(
+                    process,
+                    communicate_task,
+                    task_id,
+                    f"{operation_name} cleanup",
+                )
+
+    async def _run_gpu_exclusive_subprocess(
+        self,
+        cmd: List[str],
+        cwd: str,
+        env: Dict[str, str],
+        device_id: Optional[int],
+        task_id: str,
+        timeout: int,
+        operation_name: str,
+        cleanup_on_contamination: Optional[Callable[[], None]] = None,
+    ) -> Tuple[int, bytes, bytes]:
+        max_retries = self._gpu_contamination_max_retries()
+        last_error: Optional[GPUContaminationError] = None
+
+        for attempt in range(max_retries + 1):
+            if attempt > 0:
+                logger.info(
+                    "[%s] Retrying %s after GPU contamination (%s/%s)",
+                    task_id,
+                    operation_name,
+                    attempt,
+                    max_retries,
+                )
+
+            async with self.gpu_execution_lock(device_id, task_id) as actual_device_id:
+                try:
+                    return await self._run_monitored_gpu_subprocess_once(
+                        cmd,
+                        cwd,
+                        env,
+                        actual_device_id,
+                        task_id,
+                        timeout,
+                        operation_name,
+                    )
+                except GPUContaminationError as exc:
+                    last_error = exc
+                    if cleanup_on_contamination is not None:
+                        try:
+                            cleanup_on_contamination()
+                        except Exception as cleanup_exc:
+                            logger.warning(
+                                "[%s] Failed to clean partial %s artifacts: %s",
+                                task_id,
+                                operation_name,
+                                cleanup_exc,
+                            )
+                    if attempt >= max_retries:
+                        logger.error(
+                            "[%s] %s aborted after %s GPU contamination retries: %s",
+                            task_id,
+                            operation_name,
+                            max_retries,
+                            exc,
+                        )
+                        raise
+                    logger.warning(
+                        "[%s] %s will restart after GPU contamination: %s",
+                        task_id,
+                        operation_name,
+                        exc,
+                    )
+
+        if last_error is not None:
+            raise last_error
+        raise RuntimeError(f"{operation_name} did not start")
+
+    async def _run_monitored_gpu_subprocess_with_retry_on_device(
+        self,
+        cmd: List[str],
+        cwd: str,
+        env: Dict[str, str],
+        actual_device_id: int,
+        task_id: str,
+        timeout: int,
+        operation_name: str,
+        cleanup_on_contamination: Optional[Callable[[], None]] = None,
+    ) -> Tuple[int, bytes, bytes]:
+        max_retries = self._gpu_contamination_max_retries()
+        last_error: Optional[GPUContaminationError] = None
+
+        for attempt in range(max_retries + 1):
+            if attempt > 0:
+                logger.info(
+                    "[%s] Retrying %s after GPU contamination (%s/%s)",
+                    task_id,
+                    operation_name,
+                    attempt,
+                    max_retries,
+                )
+
+            try:
+                return await self._run_monitored_gpu_subprocess_once(
+                    cmd,
+                    cwd,
+                    env,
+                    actual_device_id,
+                    task_id,
+                    timeout,
+                    operation_name,
+                )
+            except GPUContaminationError as exc:
+                last_error = exc
+                if cleanup_on_contamination is not None:
+                    try:
+                        cleanup_on_contamination()
+                    except Exception as cleanup_exc:
+                        logger.warning(
+                            "[%s] Failed to clean partial %s artifacts: %s",
+                            task_id,
+                            operation_name,
+                            cleanup_exc,
+                        )
+                if attempt >= max_retries:
+                    logger.error(
+                        "[%s] %s aborted after %s GPU contamination retries: %s",
+                        task_id,
+                        operation_name,
+                        max_retries,
+                        exc,
+                    )
+                    raise
+                logger.warning(
+                    "[%s] %s will restart after GPU contamination: %s",
+                    task_id,
+                    operation_name,
+                    exc,
+                )
+                await asyncio.to_thread(self.waiting_for_resources, actual_device_id)
+
+        if last_error is not None:
+            raise last_error
+        raise RuntimeError(f"{operation_name} did not start")
+
+    async def _run_profile_script_monitored_on_device(
+        self,
+        extract_dir: str,
+        script_name: str,
+        result_json_name: str,
+        task_id: str,
+        actual_device_id: int,
+        timeout: int = 300,
+    ) -> float:
+        script_path = os.path.join(extract_dir, script_name)
+        if not os.path.exists(script_path):
+            logger.error(f"[{task_id}] Profile script {script_name} not found.")
+            return float('inf')
+
+        result_json_path = os.path.join(extract_dir, result_json_name)
+
+        def cleanup_partial_profile_result():
+            with suppress(FileNotFoundError):
+                os.remove(result_json_path)
+
+        cleanup_partial_profile_result()
+
+        env = os.environ.copy()
+        env['PYTHONUNBUFFERED'] = '1'
+        try:
+            returncode, stdout, stderr = await self._run_monitored_gpu_subprocess_with_retry_on_device(
+                [sys.executable, script_name],
+                extract_dir,
+                env,
+                actual_device_id,
+                task_id,
+                timeout,
+                f"Profile script {script_name}",
+                cleanup_on_contamination=cleanup_partial_profile_result,
+            )
+        except asyncio.TimeoutError:
+            cleanup_partial_profile_result()
+            logger.error(f"[{task_id}] Profile script {script_name} timed out.")
+            return float('inf')
+        except GPUContaminationError as exc:
+            cleanup_partial_profile_result()
+            logger.error(f"[{task_id}] Profile script {script_name} aborted due to repeated GPU contamination: {exc}")
+            return float('inf')
+
+        output_log = stdout.decode(errors='replace') + "\n" + stderr.decode(errors='replace')
+        if returncode != 0:
+            logger.error(f"[{task_id}] Profile script {script_name} failed with log:\n{output_log}")
+            return float('inf')
+
+        return read_profile_result_from_json(extract_dir, result_json_name)
+
+    async def _run_profile_scripts_and_collect_results_monitored(
+        self,
+        extract_dir: str,
+        op_name: str,
+        task_id: str,
+        actual_device_id: int,
+    ) -> Tuple[float, float]:
+        base_time = await self._run_profile_script_monitored_on_device(
+            extract_dir,
+            f"profile_{op_name}_base.py",
+            "base_profile_result.json",
+            task_id,
+            actual_device_id,
+        )
+        if math.isinf(base_time):
+            return float('inf'), float('inf')
+
+        gen_time = await self._run_profile_script_monitored_on_device(
+            extract_dir,
+            f"profile_{op_name}_generation.py",
+            "generation_profile_result.json",
+            task_id,
+            actual_device_id,
+        )
+        if math.isinf(gen_time):
+            return float('inf'), float('inf')
+
+        logger.info(f"[{task_id}] Profile results: base={base_time:.2f} us, gen={gen_time:.2f} us")
+        return base_time, gen_time
+
+    @staticmethod
+    def _cleanup_nsys_outputs(script_dir: str, output_name: str):
+        for path in Path(script_dir).glob(f"{output_name}*"):
+            try:
+                if path.is_dir():
+                    shutil.rmtree(path)
+                else:
+                    path.unlink()
+            except FileNotFoundError:
+                continue
+            except Exception as exc:
+                logger.warning("Failed to remove partial nsys artifact %s: %s", path, exc)
+
+    async def _run_nsys_monitored_on_device(
+        self,
+        script_path: str,
+        op_name: str,
+        task_id: str,
+        actual_device_id: int,
+        timeout: int = 600,
+    ) -> Tuple[bool, str, Optional[str]]:
+        script_dir = os.path.dirname(script_path)
+        script_name = os.path.basename(script_path)
+        output_name = "nsys_report_" + script_name.replace(".py", "")
+        report_path = os.path.join(script_dir, output_name + ".nsys-rep")
+
+        def cleanup_partial_nsys_outputs():
+            self._cleanup_nsys_outputs(script_dir, output_name)
+
+        cleanup_partial_nsys_outputs()
+
+        env = os.environ.copy()
+        env['PYTHONUNBUFFERED'] = '1'
+        cmd = ["nsys", "profile", f"--output={output_name}", sys.executable, script_name]
+        logger.debug(f"[{task_id}:{op_name}] Running monitored nsys profile: {' '.join(cmd)}")
+
+        try:
+            returncode, stdout, stderr = await self._run_monitored_gpu_subprocess_with_retry_on_device(
+                cmd,
+                script_dir,
+                env,
+                actual_device_id,
+                task_id,
+                timeout,
+                f"nsys profile {script_name}",
+                cleanup_on_contamination=cleanup_partial_nsys_outputs,
+            )
+        except FileNotFoundError as exc:
+            return False, f"nsys not found: {exc}", None
+        except asyncio.TimeoutError:
+            cleanup_partial_nsys_outputs()
+            return False, f"nsys profile timed out after {timeout} seconds", None
+        except GPUContaminationError as exc:
+            cleanup_partial_nsys_outputs()
+            return False, str(exc), None
+
+        output_log = stdout.decode(errors='replace') + "\n" + stderr.decode(errors='replace')
+        if returncode != 0:
+            cleanup_partial_nsys_outputs()
+            return False, output_log, None
+        if os.path.exists(report_path):
+            return True, "", report_path
+        return False, f"未找到nsys报告文件: {report_path}\n{output_log}", None
+
+    async def _run_nsys_profiling_monitored(
+        self,
+        extract_dir: str,
+        op_name: str,
+        task_id: str,
+        warmup_times: int,
+        run_times: int,
+        actual_device_id: int,
+    ) -> Tuple[float, float]:
+        base_script = os.path.join(extract_dir, f"profile_{op_name}_base.py")
+        success, error, base_rep_path = await self._run_nsys_monitored_on_device(
+            base_script,
+            op_name,
+            task_id,
+            actual_device_id,
+        )
+        if not success or not base_rep_path:
+            logger.error(f"[{task_id}] Base nsys failed: {error}")
+            return float('inf'), float('inf')
+
+        gen_script = os.path.join(extract_dir, f"profile_{op_name}_generation.py")
+        success, error, gen_rep_path = await self._run_nsys_monitored_on_device(
+            gen_script,
+            op_name,
+            task_id,
+            actual_device_id,
+        )
+        if not success or not gen_rep_path:
+            logger.error(f"[{task_id}] Generation nsys failed: {error}")
+            return float('inf'), float('inf')
+
+        success, error, base_time = await asyncio.to_thread(
+            analyze_nsys_data,
+            base_rep_path,
+            warmup_times,
+            run_times,
+            "base",
+            op_name,
+            task_id,
+        )
+        if not success:
+            logger.error(f"[{task_id}] Base nsys analysis failed: {error}")
+            return float('inf'), float('inf')
+
+        success, error, gen_time = await asyncio.to_thread(
+            analyze_nsys_data,
+            gen_rep_path,
+            warmup_times,
+            run_times,
+            "generation",
+            op_name,
+            task_id,
+        )
+        if not success:
+            logger.error(f"[{task_id}] Generation nsys analysis failed: {error}")
+            return float('inf'), float('inf')
+
+        return base_time, gen_time
+
     @asynccontextmanager
     async def gpu_execution_lock(self, device_id: Optional[int], task_id: str):
         actual_device_id = self._resolve_device_id(device_id)
@@ -426,41 +1086,37 @@ class LocalWorker(WorkerInterface):
                 python_exe = sys.executable
                 cmd = [python_exe, script_name]
                 logger.info(f"[{task_id}] Running verification for {op_name}")
-                async with self.gpu_execution_lock(device_id, task_id):
-                    process = await asyncio.create_subprocess_exec(
-                        *cmd,
-                        cwd=extract_dir,
-                        env=env,
-                        stdout=asyncio.subprocess.PIPE,
-                        stderr=asyncio.subprocess.PIPE
+                try:
+                    returncode, stdout, stderr = await self._run_gpu_exclusive_subprocess(
+                        cmd,
+                        extract_dir,
+                        env,
+                        device_id,
+                        task_id,
+                        timeout,
+                        "Verification",
                     )
+                except asyncio.TimeoutError:
+                    logger.error(f"[{task_id}] Verification timed out.")
+                    return False, f"Verification timed out after {timeout} seconds.", {}
+                except GPUContaminationError as exc:
+                    logger.error(f"[{task_id}] Verification aborted due to repeated GPU contamination: {exc}")
+                    return False, str(exc), {}
 
-                    try:
-                        stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=timeout)
-                        returncode = process.returncode
+                output_log = stdout.decode(errors='replace') + "\n" + stderr.decode(errors='replace')
+                success = (returncode == 0)
 
-                        output_log = stdout.decode(errors='replace') + "\n" + stderr.decode(errors='replace')
-                        success = (returncode == 0)
+                # 收集执行过程中生成的 JSON 文件
+                artifacts = collect_json_artifacts(extract_dir)
+                if artifacts:
+                    logger.info(f"[{task_id}] Collected {len(artifacts)} artifact files: {list(artifacts.keys())}")
 
-                        # 收集执行过程中生成的 JSON 文件
-                        artifacts = collect_json_artifacts(extract_dir)
-                        if artifacts:
-                            logger.info(f"[{task_id}] Collected {len(artifacts)} artifact files: {list(artifacts.keys())}")
+                if success:
+                    logger.info(f"[{task_id}] Verification passed.")
+                else:
+                    logger.error(f"[{task_id}] Verification failed with log:\n{output_log}")
 
-                        if success:
-                            logger.info(f"[{task_id}] Verification passed.")
-                        else:
-                            logger.error(f"[{task_id}] Verification failed with log:\n{output_log}")
-
-                        return success, output_log, artifacts
-                    except asyncio.TimeoutError:
-                        try:
-                            process.kill()
-                            await process.communicate()
-                        except ProcessLookupError:
-                            pass
-                        logger.error(f"[{task_id}] Verification timed out.")
-                        return False, f"Verification timed out after {timeout} seconds.", {}
+                return success, output_log, artifacts
 
         except Exception as e:
             logger.error(f"[{task_id}] LocalWorker verification failed: {e}", exc_info=True)
@@ -510,9 +1166,17 @@ class LocalWorker(WorkerInterface):
 
                 # 4. Execute profiling based on backend/dsl
                 try:
-                    async with self.gpu_execution_lock(device_id, task_id):
-                        if "triton_cuda" in dsl or "triton_ascend" in dsl or backend == "cpu":
-                            # Triton/CPU: run profile scripts directly (in sync context)
+                    if "triton_cuda" in dsl:
+                        async with self.gpu_execution_lock(device_id, task_id) as actual_device_id:
+                            base_time, gen_time = await self._run_profile_scripts_and_collect_results_monitored(
+                                extract_dir,
+                                op_name,
+                                task_id,
+                                actual_device_id,
+                            )
+                    elif "triton_ascend" in dsl or backend == "cpu":
+                        async with self.gpu_execution_lock(device_id, task_id):
+                            # Triton Ascend/CPU: keep the existing synchronous helper path.
                             loop = asyncio.get_running_loop()
                             base_time, gen_time = await loop.run_in_executor(
                                 None,
@@ -520,7 +1184,8 @@ class LocalWorker(WorkerInterface):
                                 extract_dir, op_name, task_id
                             )
                             logger.info(f"[{task_id}] Profile results: base={base_time:.2f} us, gen={gen_time:.2f} us")
-                        elif backend == "ascend":
+                    elif backend == "ascend":
+                        async with self.gpu_execution_lock(device_id, task_id):
                             # Ascend: use msprof
                             loop = asyncio.get_running_loop()
                             base_time, gen_time = await loop.run_in_executor(
@@ -528,17 +1193,20 @@ class LocalWorker(WorkerInterface):
                                 self._run_msprof_profiling,
                                 extract_dir, op_name, task_id, warmup_times, run_times
                             )
-                        elif backend == "cuda":
-                            # CUDA: use nsys
-                            loop = asyncio.get_running_loop()
-                            base_time, gen_time = await loop.run_in_executor(
-                                None,
-                                self._run_nsys_profiling,
-                                extract_dir, op_name, task_id, warmup_times, run_times
+                    elif backend == "cuda":
+                        async with self.gpu_execution_lock(device_id, task_id) as actual_device_id:
+                            # CUDA: use nsys under the same runtime GPU exclusivity monitor.
+                            base_time, gen_time = await self._run_nsys_profiling_monitored(
+                                extract_dir,
+                                op_name,
+                                task_id,
+                                warmup_times,
+                                run_times,
+                                actual_device_id,
                             )
-                        else:
-                            logger.warning(f"[{task_id}] Unsupported backend for profiling: {backend}")
-                            return {'gen_time': float('inf'), 'base_time': 0.0, 'speedup': 0.0, 'artifacts': {}}
+                    else:
+                        logger.warning(f"[{task_id}] Unsupported backend for profiling: {backend}")
+                        return {'gen_time': float('inf'), 'base_time': 0.0, 'speedup': 0.0, 'artifacts': {}}
 
                     # 5. Calculate speedup
                     speedup = base_time / gen_time if gen_time > 0 else 0.0
@@ -603,44 +1271,48 @@ class LocalWorker(WorkerInterface):
         ]
 
         logger.info(f"[{task_id}] Running ncu profiling for {op_name}")
-        async with self.gpu_execution_lock(device_id, task_id):
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                cwd=extract_dir,
-                env=env,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+        ncu_csv_path = os.path.join(extract_dir, "ncu_temp.csv")
+
+        def cleanup_partial_ncu_csv():
+            with suppress(FileNotFoundError):
+                os.remove(ncu_csv_path)
+
+        try:
+            returncode, stdout, stderr = await self._run_gpu_exclusive_subprocess(
+                cmd,
+                extract_dir,
+                env,
+                device_id,
+                task_id,
+                timeout * 10,
+                "NCU Profile",
+                cleanup_on_contamination=cleanup_partial_ncu_csv,
             )
+        except asyncio.TimeoutError:
+            logger.error(f"[{task_id}] NCU Profile timed out.")
+            return False, f"NCU Profile timed out after {timeout} seconds.", {}, "{}"
+        except GPUContaminationError as exc:
+            cleanup_partial_ncu_csv()
+            logger.error(f"[{task_id}] NCU Profile aborted due to repeated GPU contamination: {exc}")
+            return False, str(exc), {}, "{}"
 
-            try:
-                stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=timeout*10)
-                returncode = process.returncode
+        output_log = stdout.decode(errors='replace') + "\n" + stderr.decode(errors='replace')
+        success = (returncode == 0)
+        ncu_json = "{}"
 
-                output_log = stdout.decode(errors='replace') + "\n" + stderr.decode(errors='replace')
-                success = (returncode == 0)
-                ncu_json = "{}"
+        # 收集执行过程中生成的 JSON 文件
+        artifacts = collect_json_artifacts(extract_dir)
+        if artifacts:
+            logger.info(f"[{task_id}] Collected {len(artifacts)} artifact files: {list(artifacts.keys())}")
 
-                # 收集执行过程中生成的 JSON 文件
-                artifacts = collect_json_artifacts(extract_dir)
-                if artifacts:
-                    logger.info(f"[{task_id}] Collected {len(artifacts)} artifact files: {list(artifacts.keys())}")
+        if success:
+            logger.info(f"[{task_id}] NCU Profile passed.")
+            ncu_df = load_ncu_metrics(f"{extract_dir}/ncu_temp.csv", None)
+            ncu_json = metrics_to_prompt(ncu_df)
+        else:
+            logger.error(f"[{task_id}] NCU Profile failed with log:\n{output_log}")
 
-                if success:
-                    logger.info(f"[{task_id}] NCU Profile passed.")
-                    ncu_df = load_ncu_metrics(f"{extract_dir}/ncu_temp.csv", None)
-                    ncu_json = metrics_to_prompt(ncu_df)
-                else:
-                    logger.error(f"[{task_id}] NCU Profile failed with log:\n{output_log}")
-
-                return success, output_log, artifacts, ncu_json
-            except asyncio.TimeoutError:
-                try:
-                    process.kill()
-                    await process.communicate()
-                except ProcessLookupError:
-                    pass
-                logger.error(f"[{task_id}] NCU Profile timed out.")
-                return False, f"NCU Profile timed out after {timeout} seconds.", {}, "{}"
+        return success, output_log, artifacts, ncu_json
 
 
     def _run_msprof_profiling(self, extract_dir: str, op_name: str, task_id: str, warmup_times: int, run_times: int) -> Tuple[float, float]:

@@ -3,426 +3,778 @@
 算子代码作弊检查工具
 ====================
 
-使用 MAKG 项目的 CodeChecker 静态分析 Triton 算子代码，检测是否存在以下作弊行为：
-  1. 直接调用 torch.nn.*/torch.nn.functional.* 等高层 API 替代 Triton kernel 实现
-  2. 使用 eval/exec/getattr 等动态机制绕过白名单检测
-  3. 通过通配符导入 (from torch.nn import *) 绕过别名追踪
-  4. 导入原始 *_torch.py 参考实现作为 fallback
-  5. 没有定义任何 @triton.jit kernel 函数
-  6. 定义了 kernel 但从未通过 kernel[grid](...) 语法调用
-  7. Python 语法错误 / 编译错误
-  8. 文件为空或只包含中文注释
+这个脚本是 MAKG CodeChecker 的项目内包装器。它不重新实现 MAKG 的
+检查规则，而是负责：
+
+1. 自动定位 MAKG/python 并导入最新版 CodeChecker
+2. 扫描单个 .py 文件，或目录中的 impl_code.py / *_triton_*.py 实现文件
+3. 调用 MAKG 的 blocking base checkers 与非阻塞 Triton diagnostics
+4. 将 MAKG 返回的错误整理成适合人工排查的中文报告
+
+当前 MAKG CodeChecker 的主要逻辑：
+
+- blocking base_checkers:
+  empty_code, python_syntax, py_compile, import_availability,
+  stray_chinese, triton_dsl_compliance
+- non-blocking triton_checkers:
+  api_signature, high_confidence_semantics，Ascend 下额外包含 ascend_semantics
 
 用法：
-    # 1) 在 MAKG 目录下直接运行（脚本能自动找到 MAKG/python）
-    python examples/code_cheat_check.py <路径>
+    python code_cheat_check.py /path/to/impl_code.py
+    python code_cheat_check.py /path/to/evolve_database --only-cheat
+    python code_cheat_check.py /path/to/target --makg-path /home/zhangzizheng/AIKG/MAKG
 
-    # 2) 指定单个 .py 文件
-    python examples/code_cheat_check.py /path/to/your_impl_code.py
-
-    # 3) 指定一个目录（递归扫描所有 *.py）
-    python examples/code_cheat_check.py /path/to/evolve_database
-
-    # 4) 在其他项目目录（如 akg）下运行时，需要 --makg-path 参数
-    python /path/to/code_cheat_check.py /path/to/target --makg-path /mnt/lustre-client/zhangzizheng/AIKG/MAKG
-
-参数：
-    --backend    目标后端 (cuda / ascend), 默认 cuda
-    --dsl        DSL 类型 (triton_cuda / triton_ascend), 默认 triton_cuda
-    --makg-path  MAKG 项目根目录路径，用于定位 MAKG/python
-    --summary    只输出汇总报告，不输出每个文件的详细错误
-    --only-cheat 只输出存在作弊问题的文件（忽略语法/编译/空文件等其他错误）
+返回码：
+    0  未发现作弊类 blocking 问题
+    1  发现作弊类 blocking 问题
+    2  工具自身错误，例如无法导入 MAKG CodeChecker
 """
 
-import asyncio
+from __future__ import annotations
+
 import argparse
+import asyncio
+import fnmatch
+import importlib.machinery
+import importlib.util
 import json
-import sys
-import ast
 import logging
-import py_compile
+import os
+import sys
+import types
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Set
 
 
 # ---------------------------------------------------------------------------
-# Path 配置：自动定位 MAKG/python
+# MAKG 路径定位
 # ---------------------------------------------------------------------------
 
-def resolve_makg_python_path(explicit_makg_root: Optional[str] = None) -> Path:
+_CODE_CHECKER_REL = Path("akg_agents/op/utils/code_checker")
+_DEFAULT_IMPL_PATTERNS = (
+    "impl_code.py",
+    "*_triton.py",
+    "*_triton_cuda.py",
+    "*_triton_ascend.py",
+)
+
+
+def _makg_python_from_candidate(candidate: Path) -> Optional[Path]:
+    """Return MAKG/python if candidate looks like MAKG root or python dir."""
+    candidate = candidate.resolve()
+    if (candidate / _CODE_CHECKER_REL).is_dir():
+        return candidate
+
+    python_dir = candidate / "python"
+    if (python_dir / _CODE_CHECKER_REL).is_dir():
+        return python_dir.resolve()
+
+    return None
+
+
+def _dedupe_paths(paths: Iterable[Path]) -> List[Path]:
+    seen: Set[str] = set()
+    out: List[Path] = []
+    for path in paths:
+        try:
+            key = str(path.resolve())
+        except OSError:
+            key = str(path)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(path)
+    return out
+
+
+def _ancestor_candidates(seed: Path) -> Iterable[Path]:
+    """Yield likely MAKG roots around a file/directory path."""
+    try:
+        seed = seed.resolve()
+    except OSError:
+        return
+
+    starts = [seed]
+    if seed.is_file():
+        starts.append(seed.parent)
+
+    for start in starts:
+        yield start
+        for parent in start.parents:
+            yield parent
+            # Project layout used here:
+            #   /home/zhangzizheng/AIKG/akg/...
+            #   /home/zhangzizheng/AIKG/MAKG/...
+            yield parent / "MAKG"
+            if parent.name == "akg":
+                yield parent.parent / "MAKG"
+
+
+def resolve_makg_python_path(explicit_makg_path: Optional[str] = None) -> Path:
     """
-    定位 MAKG/python 目录，优先级：
-      1. 命令行传入的 --makg-path
-      2. 环境变量 MAKG_ROOT
-      3. 脚本所在目录向上查找 MAKG
-      4. 当前工作目录向上查找 MAKG
+    定位 MAKG/python 目录。
+
+    支持 --makg-path 传 MAKG 根目录或 MAKG/python 目录；没有显式参数时，
+    会尝试环境变量和当前项目常见的 sibling MAKG 布局。
     """
     candidates: List[Path] = []
 
-    if explicit_makg_root:
-        candidates.append(Path(explicit_makg_root).resolve())
+    if explicit_makg_path:
+        candidates.append(Path(explicit_makg_path))
 
-    script_dir = Path(__file__).resolve().parent
-    # 脚本在 MAKG/examples/ -> 向上一级就是 MAKG 根
-    if (script_dir.parent / "python" / "akg_agents").is_dir():
-        candidates.append(script_dir.parent.resolve())
-    # 脚本直接在 MAKG 根目录
-    if (script_dir / "python" / "akg_agents").is_dir():
-        candidates.append(script_dir.resolve())
+    if os.environ.get("MAKG_PYTHON"):
+        candidates.append(Path(os.environ["MAKG_PYTHON"]))
+    if os.environ.get("MAKG_ROOT"):
+        candidates.append(Path(os.environ["MAKG_ROOT"]))
 
-    import os
-    if "MAKG_ROOT" in os.environ:
-        candidates.append(Path(os.environ["MAKG_ROOT"]).resolve())
+    script_path = Path(__file__).resolve()
+    candidates.extend(_ancestor_candidates(script_path))
+    candidates.extend(_ancestor_candidates(Path.cwd()))
 
-    # 从 CWD 向上查找
-    cur = Path.cwd().resolve()
-    while cur.parent != cur:
-        if (cur / "python" / "akg_agents").is_dir():
-            candidates.append(cur)
-            break
-        cur = cur.parent
-
-    for candidate in candidates:
-        python_dir = candidate / "python"
-        if python_dir.is_dir() and (python_dir / "akg_agents" / "op" / "utils" / "code_checker").is_dir():
+    tried: List[Path] = []
+    for candidate in _dedupe_paths(candidates):
+        tried.append(candidate)
+        python_dir = _makg_python_from_candidate(candidate)
+        if python_dir is not None:
             return python_dir
 
+    tried_text = "\n  ".join(str(p) for p in tried[:30])
+    if len(tried) > 30:
+        tried_text += f"\n  ... 共尝试 {len(tried)} 个路径"
     raise RuntimeError(
-        "无法定位 MAKG 项目根目录。请通过 --makg-path 参数指定 MAKG 根路径，\n"
-        "或将脚本放到 MAKG/examples/ 目录下运行。\n"
-        "已尝试路径: \n  " + "\n  ".join(str(p) for p in candidates)
+        "无法定位 MAKG CodeChecker。请通过 --makg-path 指定 MAKG 根目录或 MAKG/python。\n"
+        f"已尝试路径:\n  {tried_text}"
     )
 
 
+def prepend_python_paths(paths: Sequence[Path]) -> None:
+    for path in reversed([p.resolve() for p in paths if p]):
+        path_text = str(path)
+        if path_text not in sys.path:
+            sys.path.insert(0, path_text)
+
+
+def _install_namespace_package(name: str, package_dir: Path) -> types.ModuleType:
+    module = types.ModuleType(name)
+    module.__path__ = [str(package_dir)]
+    module.__package__ = name
+    spec = importlib.machinery.ModuleSpec(name, loader=None, is_package=True)
+    spec.submodule_search_locations = [str(package_dir)]
+    module.__spec__ = spec
+    sys.modules[name] = module
+    return module
+
+
+def _purge_akg_agents_modules() -> None:
+    for name in list(sys.modules):
+        if name == "akg_agents" or name.startswith("akg_agents."):
+            sys.modules.pop(name, None)
+
+
+def _import_code_checker_lightweight(makg_python: Path):
+    """Load only akg_agents.op.utils.code_checker, bypassing top-level deps."""
+    _purge_akg_agents_modules()
+
+    akg_agents_dir = makg_python / "akg_agents"
+    op_dir = akg_agents_dir / "op"
+    utils_dir = op_dir / "utils"
+    checker_dir = utils_dir / "code_checker"
+    init_file = checker_dir / "__init__.py"
+    if not init_file.is_file():
+        raise RuntimeError(f"找不到 CodeChecker __init__.py: {init_file}")
+
+    akg_pkg = _install_namespace_package("akg_agents", akg_agents_dir)
+    op_pkg = _install_namespace_package("akg_agents.op", op_dir)
+    utils_pkg = _install_namespace_package("akg_agents.op.utils", utils_dir)
+    akg_pkg.op = op_pkg
+    op_pkg.utils = utils_pkg
+
+    package_name = "akg_agents.op.utils.code_checker"
+    spec = importlib.util.spec_from_file_location(
+        package_name,
+        init_file,
+        submodule_search_locations=[str(checker_dir)],
+    )
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"无法创建 CodeChecker import spec: {init_file}")
+
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[package_name] = module
+    utils_pkg.code_checker = module
+    spec.loader.exec_module(module)
+    return module.CodeChecker
+
+
+def import_code_checker_class(makg_python: Path, logger: logging.Logger):
+    """
+    Import MAKG CodeChecker.
+
+    Normal import executes akg_agents/__init__.py, which may require workflow/LLM
+    dependencies that are irrelevant for this static checker. If that import fails,
+    fall back to isolated loading of the code_checker package only.
+    """
+    try:
+        from akg_agents.op.utils.code_checker import CodeChecker  # type: ignore
+
+        return CodeChecker, "normal", ""
+    except ImportError as normal_exc:
+        logger.warning("正常导入 MAKG CodeChecker 失败，尝试轻量加载: %s", normal_exc)
+        try:
+            return _import_code_checker_lightweight(makg_python), "lightweight", str(normal_exc)
+        except Exception as fallback_exc:
+            raise RuntimeError(
+                "无法导入 MAKG CodeChecker。\n"
+                f"正常导入错误: {type(normal_exc).__name__}: {normal_exc}\n"
+                f"轻量加载错误: {type(fallback_exc).__name__}: {fallback_exc}"
+            ) from fallback_exc
+
+
 # ---------------------------------------------------------------------------
-# 主检查逻辑
+# 报告模型与分类
 # ---------------------------------------------------------------------------
-
-class CheatCheckReport:
-    """单个文件的检查报告"""
-
-    def __init__(self, file_path: Path):
-        self.file_path = file_path
-        self.errors: List[Dict] = []              # 来自 CodeChecker 的阻塞错误
-        self.diagnostic_errors: List[Dict] = []   # Triton 诊断问题
-        self.syntax_error: Optional[str] = None
-        self.compile_error: Optional[str] = None
-        self.is_empty: bool = False
-        self.has_cheat_issue: bool = False        # 是否有作弊相关问题
-        self.check_success: bool = False          # CodeChecker 是否成功运行
-
-    @property
-    def has_any_issue(self) -> bool:
-        return (
-            bool(self.errors)
-            or bool(self.diagnostic_errors)
-            or self.syntax_error is not None
-            or self.compile_error is not None
-            or self.is_empty
-        )
-
 
 _CHEAT_ERROR_TYPES: Set[str] = {
-    # Triton DSL 合规性 (作弊)
-    "no_triton_kernel",
-    "triton_kernel_not_called",
+    # MAKG triton_dsl_compliance_checker blocking errors
     "framework_model_import_fallback",
     "torch_wildcard_import",
+    "sub_expr_local_test_in_impl",
+    "no_triton_kernel",
+    "triton_kernel_not_called",
+    "triton_block_ptr_while_loop",
+    "triton_dot_explicit_precision",
     "torch_api_not_allowlisted",
     "torch_api_dynamic_lookup",
-    "torch_api_dynamic_bypass",
-    "sub_expr_local_test_in_impl",
-    # 动态执行
+    "torch_api_dynamic_bypass",  # old MAKG compatibility
     "dynamic_python_execution",
     "dynamic_import",
-    # Triton 其他语义风险（也视为作弊线索）
-    "triton_dot_explicit_precision",
-    "triton_block_ptr_while_loop",
-    "triton_api_missing",
-    "triton_api_bad_kwarg",
+}
+
+_CATEGORY_BY_ERROR_TYPE: Dict[str, str] = {
+    "empty_code": "空代码",
+    "syntax_error": "Python 语法错误",
+    "compile_error": "Python 编译错误",
+    "import_error": "导入模块不可用",
+    "stray_chinese_text": "疑似中文描述混入",
+    "framework_model_import_fallback": "导入参考 torch 实现",
+    "torch_wildcard_import": "torch 通配符导入",
+    "sub_expr_local_test_in_impl": "impl 中包含本地测试代码",
+    "no_triton_kernel": "Triton kernel 缺失",
+    "triton_kernel_not_called": "Triton kernel 未启动",
+    "triton_block_ptr_while_loop": "Triton DSL 已知失败模式",
+    "triton_dot_explicit_precision": "tl.dot 显式精度参数",
+    "torch_api_not_allowlisted": "host 侧 torch/nn/F 非白名单调用",
+    "torch_api_dynamic_lookup": "动态查找 torch API",
+    "torch_api_dynamic_bypass": "动态绕过 torch API 白名单",
+    "dynamic_python_execution": "eval/exec/compile 动态执行",
+    "dynamic_import": "动态 import 绕过",
+}
+
+_CATEGORY_BY_RULE_ID: Dict[str, str] = {
+    "TRITON_API_MISSING": "Triton API 缺失",
+    "TRITON_API_BAD_KWARG": "Triton API 参数不兼容",
+    "TRITON_API_TOO_MANY_POSITIONAL_ARGS": "Triton API 位置参数过多",
+    "TRITON_UNSUPPORTED_CONTROL_FLOW": "Triton kernel 控制流风险",
+    "TRITON_RUNTIME_PY_IF": "Triton kernel 数据依赖 Python if",
+    "TRITON_PROGRAM_ID_AXIS": "tl.program_id axis 非法",
+    "TRITON_STATIC_RANGE_NON_CONSTEXPR": "tl.static_range 非 constexpr",
+    "TRITON_DYNAMIC_SHAPE_IN_ALLOC": "Triton 动态 shape 分配",
+    "TRITON_EXPAND_DIMS_TUPLE_AXIS": "tl.expand_dims axis 不兼容",
+    "TRITON_CONSTEXPR_TO_METHOD": "constexpr 标量调用 .to()",
+    "TRITON_DUPLICATE_KERNEL_ARGUMENT": "kernel 启动参数重复",
+    "TRITON_ASCEND_MIXED_SCALAR_SLICE_INDEX": "Ascend Triton 混合索引风险",
+    "TRITON_DIAGNOSTIC_CHECKER_INTERNAL_ERROR": "Triton 诊断器内部错误",
 }
 
 
-def _classify_error_type(err_type: str) -> str:
-    """把各种错误类型分类到可读的中文类别"""
-    if err_type in ("no_triton_kernel", "triton_kernel_not_called"):
-        return "Triton kernel 缺失"
-    if err_type in ("framework_model_import_fallback",):
-        return "导入参考 torch 实现 (fallback 作弊)"
-    if err_type == "torch_wildcard_import":
-        return "torch 通配符导入"
-    if err_type in ("torch_api_not_allowlisted",):
-        return "调用 torch/nn/F 高层 API (作弊)"
-    if err_type in ("torch_api_dynamic_lookup",):
-        return "动态查找 torch API (绕过白名单)"
-    if err_type in ("dynamic_python_execution",):
-        return "eval/exec 动态执行"
-    if err_type in ("dynamic_import",):
-        return "动态 import 绕过"
-    if err_type == "sub_expr_local_test_in_impl":
-        return "impl 中包含测试代码 (if __name__ == '__main__')"
-    if err_type == "syntax_error":
-        return "Python 语法错误"
-    if err_type == "compile_error":
-        return "Python 编译错误"
-    if err_type == "import_error":
-        return "导入模块不可用"
-    if err_type.startswith("triton_"):
-        return "Triton 语义 / API 风险"
-    return err_type
+@dataclass
+class CheatCheckReport:
+    """单个文件的检查报告。"""
+
+    file_path: Path
+    passed: bool = False
+    error_message: str = ""
+    errors: List[Dict[str, Any]] = field(default_factory=list)
+    diagnostic_passed: bool = True
+    diagnostic_errors: List[Dict[str, Any]] = field(default_factory=list)
+    diagnostic_error_message: str = ""
+    read_error: Optional[str] = None
+    checker_exception: Optional[str] = None
+
+    @property
+    def has_blocking_issue(self) -> bool:
+        return bool(self.errors) or self.read_error is not None or self.checker_exception is not None
+
+    @property
+    def has_diagnostic_issue(self) -> bool:
+        return bool(self.diagnostic_errors)
+
+    @property
+    def has_any_issue(self) -> bool:
+        return self.has_blocking_issue or self.has_diagnostic_issue
+
+    @property
+    def has_cheat_issue(self) -> bool:
+        return any(is_cheat_error(err) for err in self.errors)
+
+    @property
+    def has_tool_error(self) -> bool:
+        return self.read_error is not None or self.checker_exception is not None
+
+
+def is_cheat_error(err: Dict[str, Any]) -> bool:
+    return str(err.get("error_type") or "") in _CHEAT_ERROR_TYPES
+
+
+def _as_int(value: Any, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _normalize_error(err: Any) -> Dict[str, Any]:
+    if isinstance(err, dict):
+        return dict(err)
+    return {
+        "line": _as_int(getattr(err, "line", 0)),
+        "error_type": str(getattr(err, "error_type", "unknown")),
+        "detail": str(getattr(err, "detail", err)),
+        "suggestion": str(getattr(err, "suggestion", "")),
+        "code_snippet": str(getattr(err, "code_snippet", "")),
+    }
+
+
+def _normalize_diagnostic(item: Any) -> Dict[str, Any]:
+    if isinstance(item, dict):
+        diag = dict(item)
+    else:
+        location = getattr(item, "location", None)
+        diag = {
+            "line": getattr(location, "lineno", -1),
+            "column": getattr(location, "col", 0),
+            "end_line": getattr(location, "end_lineno", -1),
+            "end_column": getattr(location, "end_col", 0),
+            "severity": getattr(item, "severity", ""),
+            "rule_id": getattr(item, "rule_id", ""),
+            "title": getattr(item, "title", ""),
+            "detail": getattr(item, "message", ""),
+            "suggestion": getattr(item, "hint", ""),
+            "tags": sorted(getattr(item, "tags", set()) or []),
+        }
+
+    if "detail" not in diag and "message" in diag:
+        diag["detail"] = diag.get("message")
+    if "suggestion" not in diag and "hint" in diag:
+        diag["suggestion"] = diag.get("hint")
+    return diag
+
+
+def _line_label(line: Any, column: Any = None) -> str:
+    line_num = _as_int(line, 0)
+    if line_num <= 0:
+        return "全局"
+    col_num = _as_int(column, -1)
+    if col_num >= 0:
+        return f"第 {line_num} 行:{col_num}"
+    return f"第 {line_num} 行"
+
+
+def _error_category(error_type: str) -> str:
+    if error_type in _CATEGORY_BY_ERROR_TYPE:
+        return _CATEGORY_BY_ERROR_TYPE[error_type]
+    if error_type in _CATEGORY_BY_RULE_ID:
+        return _CATEGORY_BY_RULE_ID[error_type]
+    if error_type.startswith("TRITON_"):
+        return "Triton 诊断"
+    if error_type.startswith("triton_"):
+        return "Triton DSL 合规问题"
+    return error_type or "unknown"
+
+
+# ---------------------------------------------------------------------------
+# 检查执行
+# ---------------------------------------------------------------------------
+
+
+def build_checker_config(args: argparse.Namespace) -> Dict[str, Any]:
+    """Build an explicit config matching MAKG's current default checker groups."""
+    base_checkers: Any = "all"
+    if args.skip_import_check:
+        base_checkers = [
+            "empty_code",
+            "python_syntax",
+            "py_compile",
+            "stray_chinese",
+            "triton_dsl_compliance",
+        ]
+
+    diagnostic_cfg: Dict[str, Any] = {
+        "enabled": not args.no_diagnostics,
+        "only_errors": True,
+        "dedup": True,
+    }
+    if args.diagnostic_blocking:
+        diagnostic_cfg["blocking"] = True
+
+    return {
+        "code_checker": {
+            "base_checkers": base_checkers,
+            "triton_checkers": "all",
+        },
+        "code_diagnostic_checker": diagnostic_cfg,
+    }
 
 
 async def check_single_file(
     file_path: Path,
-    checker_obj,
+    checker_obj: Any,
     logger: logging.Logger,
 ) -> CheatCheckReport:
-    report = CheatCheckReport(file_path)
+    report = CheatCheckReport(file_path=file_path)
 
     try:
         code = file_path.read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError) as e:
-        report.syntax_error = f"读取文件失败: {e}"
+    except (OSError, UnicodeDecodeError) as exc:
+        report.read_error = f"{type(exc).__name__}: {exc}"
         return report
 
-    if not code.strip():
-        report.is_empty = True
-        return report
-
-    # 先用 ast.parse 快速语法检查
     try:
-        ast.parse(code)
-    except SyntaxError as e:
-        report.syntax_error = f"SyntaxError at line {e.lineno}: {e.msg}"
-        return report
-
-    # 用 py_compile 检查
-    try:
-        py_compile.compile(str(file_path), doraise=True)
-    except py_compile.PyCompileError as e:
-        report.compile_error = f"PyCompileError: {e.msg}"
-
-    # 调用 MAKG CodeChecker
-    try:
-        passed, _err_msg, errors = await checker_obj.check(code)
-        report.check_success = True
-        report.errors = list(errors)
-        report.has_cheat_issue = any(
-            (e.get("error_type") or "") in _CHEAT_ERROR_TYPES for e in errors
+        passed, error_message, errors = await checker_obj.check(
+            code,
+            task_info={"task_id": file_path.name, "file_path": str(file_path)},
         )
-        # Triton 诊断（非阻塞）
-        if hasattr(checker_obj, "last_diagnostic_errors") and checker_obj.last_diagnostic_errors:
-            for diag in checker_obj.last_diagnostic_errors:
-                # Issue 对象可能是 dataclass，也可能是 dict
-                if isinstance(diag, dict):
-                    report.diagnostic_errors.append(diag)
-                else:
-                    try:
-                        report.diagnostic_errors.append({
-                            "rule_id": getattr(diag, "rule_id", ""),
-                            "severity": getattr(diag, "severity", ""),
-                            "title": getattr(diag, "title", ""),
-                            "message": getattr(diag, "message", ""),
-                            "line": getattr(getattr(diag, "location", None), "lineno", -1),
-                        })
-                    except Exception:
-                        report.diagnostic_errors.append({"detail": str(diag)})
-    except Exception as e:
-        logger.warning(f"CodeChecker 抛出异常 ({file_path}): {type(e).__name__}: {e}")
+        report.passed = bool(passed)
+        report.error_message = error_message or ""
+        report.errors = [_normalize_error(err) for err in (errors or [])]
+        report.diagnostic_passed = bool(getattr(checker_obj, "last_diagnostic_passed", True))
+        report.diagnostic_errors = [
+            _normalize_diagnostic(item)
+            for item in (getattr(checker_obj, "last_diagnostic_errors", []) or [])
+        ]
+        report.diagnostic_error_message = str(
+            getattr(checker_obj, "last_diagnostic_error_message", "") or ""
+        )
+    except Exception as exc:
+        report.checker_exception = f"{type(exc).__name__}: {exc}"
+        logger.exception("CodeChecker failed for %s", file_path)
 
     return report
 
 
-def find_python_files(target: Path) -> List[Path]:
+def _matches_patterns(path: Path, root: Path, patterns: Sequence[str]) -> bool:
+    rel = path.relative_to(root).as_posix()
+    return any(
+        fnmatch.fnmatch(path.name, pattern) or fnmatch.fnmatch(rel, pattern)
+        for pattern in patterns
+    )
+
+
+def find_python_files(
+    target: Path,
+    *,
+    include_patterns: Sequence[str],
+    all_python: bool,
+) -> List[Path]:
     if target.is_file():
-        if target.suffix == ".py":
-            return [target]
-        return []
+        return [target] if target.suffix == ".py" else []
     if not target.is_dir():
         return []
-    # 排除常见无关目录，只检查看起来像算子实现的文件名
-    skip_dirs = {"__pycache__", ".venv", "venv", "site-packages", "node_modules", ".git"}
+
+    skip_dirs = {
+        ".git",
+        ".hg",
+        ".mypy_cache",
+        ".pytest_cache",
+        ".ruff_cache",
+        ".venv",
+        "__pycache__",
+        "node_modules",
+        "site-packages",
+        "venv",
+    }
     files: List[Path] = []
-    for p in sorted(target.rglob("*.py")):
-        if any(seg in skip_dirs for seg in p.parts):
+    for path in sorted(target.rglob("*.py")):
+        if any(part in skip_dirs for part in path.parts):
             continue
-        files.append(p)
-    return files
+        files.append(path)
+
+    patterns = list(include_patterns)
+    if not patterns and not all_python:
+        patterns = list(_DEFAULT_IMPL_PATTERNS)
+    if not patterns:
+        return files
+
+    return [path for path in files if _matches_patterns(path, target, patterns)]
 
 
 # ---------------------------------------------------------------------------
-# 输出格式
+# 输出
 # ---------------------------------------------------------------------------
 
-def _format_error_detail(err: Dict) -> str:
-    line = err.get("line", 0) or 0
-    detail = err.get("detail") or err.get("message") or ""
-    suggestion = err.get("suggestion") or ""
-    rule = err.get("error_type") or err.get("rule_id") or ""
-    snippet = err.get("code_snippet") or ""
 
-    lines = [f"  [{rule}] 第 {line} 行: {detail}"]
+def _format_error_detail(err: Dict[str, Any]) -> str:
+    error_type = str(err.get("error_type") or "unknown")
+    detail = str(err.get("detail") or err.get("message") or err.get("title") or "")
+    suggestion = str(err.get("suggestion") or err.get("hint") or "")
+    snippet = str(err.get("code_snippet") or "")
+
+    lines = [f"      [{error_type}] {_line_label(err.get('line'))}: {detail}"]
     if suggestion:
-        lines.append(f"         建议: {suggestion}")
+        lines.append(f"        建议: {suggestion}")
     if snippet:
-        lines.append(f"         代码: {snippet}")
+        lines.append(f"        代码: {snippet}")
     return "\n".join(lines)
 
 
-def print_report(report: CheatCheckReport, only_cheat: bool, summary_only: bool):
+def _format_diagnostic_detail(diag: Dict[str, Any]) -> str:
+    rule_id = str(diag.get("rule_id") or "unknown")
+    severity = str(diag.get("severity") or "")
+    title = str(diag.get("title") or "")
+    detail = str(diag.get("detail") or diag.get("message") or "")
+    suggestion = str(diag.get("suggestion") or diag.get("hint") or "")
+    tags = diag.get("tags") or []
+    tag_text = f" tags={','.join(map(str, tags))}" if tags else ""
+
+    head = f"      [{rule_id}] {_line_label(diag.get('line'), diag.get('column'))}"
+    if severity:
+        head += f" {severity}"
+    if title:
+        head += f": {title}"
+    if tag_text:
+        head += tag_text
+
+    lines = [head]
+    if detail:
+        lines.append(f"        {detail}")
+    if suggestion:
+        lines.append(f"        建议: {suggestion}")
+    return "\n".join(lines)
+
+
+def _report_status(report: CheatCheckReport) -> str:
+    if report.has_tool_error:
+        return "TOOL_ERROR"
+    if report.has_cheat_issue:
+        return "CHEAT"
+    if report.errors:
+        return "FAIL"
+    if report.diagnostic_errors:
+        return "DIAG"
+    return "PASS"
+
+
+def _group_errors(errors: Iterable[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for err in errors:
+        error_type = str(err.get("error_type") or "unknown")
+        grouped.setdefault(_error_category(error_type), []).append(err)
+    return grouped
+
+
+def _group_diagnostics(diagnostics: Iterable[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for diag in diagnostics:
+        rule_id = str(diag.get("rule_id") or "unknown")
+        grouped.setdefault(_error_category(rule_id), []).append(diag)
+    return grouped
+
+
+def print_report(report: CheatCheckReport, *, only_cheat: bool, summary_only: bool) -> None:
     if only_cheat and not report.has_cheat_issue:
         return
-
     if summary_only and not report.has_any_issue:
         return
 
-    status_icon = "✓" if not report.has_any_issue else ("🔥" if report.has_cheat_issue else "✗")
-    status_text = "PASS" if not report.has_any_issue else ("CHEAT" if report.has_cheat_issue else "FAIL")
+    status = _report_status(report)
+    print(f"\n[{status}] {report.file_path}")
 
-    print(f"\n{status_icon} [{status_text}]  {report.file_path}")
+    cheat_count = sum(1 for err in report.errors if is_cheat_error(err))
+    other_blocking_count = len(report.errors) - cheat_count
+    diag_count = len(report.diagnostic_errors)
 
-    if summary_only and report.has_any_issue:
-        cheat_count = sum(1 for e in report.errors if (e.get("error_type") or "") in _CHEAT_ERROR_TYPES)
-        other_count = len(report.errors) - cheat_count + len(report.diagnostic_errors)
-        extra = []
-        if report.is_empty:
-            extra.append("空文件")
-        if report.syntax_error:
-            extra.append("语法错误")
-        if report.compile_error:
-            extra.append("编译错误")
-        parts = []
+    if summary_only:
+        parts: List[str] = []
+        if report.read_error:
+            parts.append("读取失败")
+        if report.checker_exception:
+            parts.append("checker 异常")
         if cheat_count:
-            parts.append(f"作弊问题 {cheat_count} 个")
-        if other_count:
-            parts.append(f"其他问题 {other_count} 个")
-        if extra:
-            parts.append(", ".join(extra))
-        if parts:
-            print(f"    摘要: " + "; ".join(parts))
+            parts.append(f"作弊/DSL 合规问题 {cheat_count} 个")
+        if other_blocking_count:
+            parts.append(f"其他 blocking 问题 {other_blocking_count} 个")
+        if diag_count:
+            parts.append(f"Triton 诊断 {diag_count} 个")
+        print("    摘要: " + ("; ".join(parts) if parts else "无问题"))
         return
 
-    if report.is_empty:
-        print("    -> 文件为空")
-        return
+    if report.read_error:
+        print(f"    读取失败: {report.read_error}")
+    if report.checker_exception:
+        print(f"    CodeChecker 异常: {report.checker_exception}")
 
-    if report.syntax_error:
-        print(f"    -> {report.syntax_error}")
-
-    if report.compile_error:
-        print(f"    -> {report.compile_error}")
-
-    # 按类别分组输出
-    by_category: Dict[str, List[Dict]] = {}
-    for err in report.errors:
-        cat = _classify_error_type(err.get("error_type", ""))
-        by_category.setdefault(cat, []).append(err)
-
-    if by_category:
-        for cat, errs in sorted(by_category.items()):
-            print(f"    -- {cat} (共 {len(errs)} 处) --")
-            for err in errs:
-                print(_format_error_detail(err))
+    for category, errors in _group_errors(report.errors).items():
+        print(f"    -- {category} (共 {len(errors)} 处) --")
+        for err in errors:
+            print(_format_error_detail(err))
 
     if report.diagnostic_errors:
-        print(f"    -- Triton 诊断 (共 {len(report.diagnostic_errors)} 处) --")
-        for diag in report.diagnostic_errors:
-            line = diag.get("line", -1)
-            rule = diag.get("rule_id", "")
-            title = diag.get("title", "")
-            message = diag.get("message", "")
-            print(f"      [{rule}] 第 {line} 行: {title}")
-            if message:
-                print(f"               {message}")
+        print(f"    -- Triton 非阻塞诊断 (共 {len(report.diagnostic_errors)} 处) --")
+        for category, diagnostics in _group_diagnostics(report.diagnostic_errors).items():
+            print(f"       {category} (共 {len(diagnostics)} 处)")
+            for diag in diagnostics:
+                print(_format_diagnostic_detail(diag))
 
 
-def print_overall_summary(reports: List[CheatCheckReport], total_files: int):
-    cheat_files = sum(1 for r in reports if r.has_cheat_issue)
-    failed_files = sum(1 for r in reports if r.has_any_issue and not r.has_cheat_issue)
-    pass_files = sum(1 for r in reports if not r.has_any_issue)
+def print_overall_summary(reports: List[CheatCheckReport], total_files: int) -> None:
+    cheat_files = sum(1 for report in reports if report.has_cheat_issue)
+    tool_error_files = sum(1 for report in reports if report.has_tool_error)
+    blocking_only_files = sum(
+        1 for report in reports
+        if report.errors and not report.has_cheat_issue and not report.has_tool_error
+    )
+    diagnostic_only_files = sum(
+        1 for report in reports
+        if report.diagnostic_errors and not report.has_blocking_issue
+    )
+    pass_files = sum(1 for report in reports if not report.has_any_issue)
 
     cheat_error_total = sum(
-        sum(1 for e in r.errors if (e.get("error_type") or "") in _CHEAT_ERROR_TYPES)
-        for r in reports
+        sum(1 for err in report.errors if is_cheat_error(err))
+        for report in reports
     )
-    other_error_total = sum(
-        len(r.errors) + len(r.diagnostic_errors) for r in reports
-    ) - cheat_error_total
+    other_blocking_total = sum(len(report.errors) for report in reports) - cheat_error_total
+    diagnostic_total = sum(len(report.diagnostic_errors) for report in reports)
 
-    bar_width = 40
-    total = len(reports) or 1
-    cheat_pct = int(cheat_files / total * bar_width)
-    fail_pct = int(failed_files / total * bar_width)
-    pass_pct = bar_width - cheat_pct - fail_pct
-
-    print("\n" + "=" * 70)
+    print("\n" + "=" * 72)
     print("检查汇总")
-    print("=" * 70)
-    print(f"  总文件数          : {total_files}")
-    print(f"  成功解析          : {len(reports)}")
-    print(f"  存在作弊问题      : {cheat_files}")
-    print(f"  其他错误          : {failed_files}")
-    print(f"  通过              : {pass_files}")
+    print("=" * 72)
+    print(f"  总文件数              : {total_files}")
+    print(f"  完成检查              : {len(reports)}")
+    print(f"  作弊/DSL 合规问题文件 : {cheat_files}")
+    print(f"  其他 blocking 问题文件: {blocking_only_files}")
+    print(f"  仅 Triton 诊断文件    : {diagnostic_only_files}")
+    print(f"  工具/读取错误文件     : {tool_error_files}")
+    print(f"  完全通过              : {pass_files}")
     print()
-    print(
-        "  状态条: "
-        + "🔥" * cheat_pct
-        + "✗" * fail_pct
-        + "✓" * pass_pct
-    )
-    print(f"  作弊类错误总数    : {cheat_error_total}")
-    print(f"  其他错误 / 诊断   : {other_error_total}")
+    print(f"  作弊/DSL 合规错误总数 : {cheat_error_total}")
+    print(f"  其他 blocking 错误总数: {other_blocking_total}")
+    print(f"  Triton 诊断总数       : {diagnostic_total}")
 
     if cheat_files:
-        print("\n存在作弊嫌疑的文件列表:")
-        for r in reports:
-            if r.has_cheat_issue:
-                print(f"  - {r.file_path}")
+        print("\n存在作弊/DSL 合规问题的文件:")
+        for report in reports:
+            if report.has_cheat_issue:
+                print(f"  - {report.file_path}")
 
-    print("\n" + "=" * 70)
+    if tool_error_files:
+        print("\n工具/读取错误文件:")
+        for report in reports:
+            if report.has_tool_error:
+                print(f"  - {report.file_path}")
+
+    print("=" * 72)
+
+
+def write_json_report(path: Path, reports: List[CheatCheckReport]) -> None:
+    data = []
+    for report in reports:
+        data.append(
+            {
+                "file": str(report.file_path),
+                "status": _report_status(report),
+                "passed": report.passed,
+                "has_cheat_issue": report.has_cheat_issue,
+                "has_blocking_issue": report.has_blocking_issue,
+                "has_diagnostic_issue": report.has_diagnostic_issue,
+                "read_error": report.read_error,
+                "checker_exception": report.checker_exception,
+                "errors": report.errors,
+                "diagnostic_passed": report.diagnostic_passed,
+                "diagnostic_errors": report.diagnostic_errors,
+            }
+        )
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------
-# CLI 入口
+# CLI
 # ---------------------------------------------------------------------------
+
 
 def _build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="使用 MAKG CodeChecker 检查算子代码是否存在作弊行为",
+        description="使用最新版 MAKG CodeChecker 检查 Triton 算子实现是否存在作弊/DSL 合规问题",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
         "target",
         nargs="?",
         default=".",
-        help="要检查的 .py 文件或目录（递归扫描目录下所有 *.py）",
+        help="要检查的 .py 文件或目录（目录默认只扫描实现文件模式）",
     )
     parser.add_argument(
         "--backend",
         default="cuda",
         choices=["cuda", "ascend"],
-        help="目标后端 (默认: cuda)",
+        help="目标后端，默认 cuda",
     )
     parser.add_argument(
         "--dsl",
         default="triton_cuda",
         choices=["triton_cuda", "triton_ascend"],
-        help="DSL 类型 (默认: triton_cuda)",
+        help="DSL 类型，默认 triton_cuda",
     )
     parser.add_argument(
         "--makg-path",
         default=None,
-        help="MAKG 项目根目录路径，用于定位 MAKG/python。若脚本在 MAKG 内则可省略",
+        help="MAKG 根目录或 MAKG/python 目录；默认会自动探测 sibling MAKG",
+    )
+    parser.add_argument(
+        "--extra-python-path",
+        action="append",
+        default=[],
+        help="额外加入 sys.path 的路径，可重复传；用于减少本地模块 import_error 误报",
+    )
+    parser.add_argument(
+        "--include",
+        action="append",
+        default=[],
+        metavar="GLOB",
+        help=(
+            "目录扫描时指定实现文件 glob，可重复传；默认 "
+            "impl_code.py,*_triton.py,*_triton_cuda.py,*_triton_ascend.py"
+        ),
+    )
+    parser.add_argument(
+        "--all-python",
+        action="store_true",
+        help="目录扫描时检查所有 *.py（会包含 *_torch.py、verify_*.py、profile_*.py）",
     )
     parser.add_argument(
         "--summary",
         action="store_true",
-        help="只输出汇总报告，不输出每个文件的详细错误",
+        help="只输出异常文件的一行摘要和总汇总",
     )
     parser.add_argument(
         "--only-cheat",
         action="store_true",
-        help="只输出存在作弊嫌疑的文件，忽略纯语法 / 编译 / 导入错误",
+        help="只输出存在作弊/DSL 合规问题的文件",
+    )
+    parser.add_argument(
+        "--no-diagnostics",
+        action="store_true",
+        help="关闭 MAKG 的非阻塞 Triton diagnostics，只跑 blocking checks",
+    )
+    parser.add_argument(
+        "--skip-import-check",
+        action="store_true",
+        help="跳过 import_availability；适合未安装 torch/triton 的轻量环境",
+    )
+    parser.add_argument(
+        "--diagnostic-blocking",
+        action="store_true",
+        help="将 MAKG Triton diagnostics 也作为 blocking errors 返回（默认不阻塞）",
     )
     parser.add_argument(
         "--json",
@@ -441,72 +793,84 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 
 async def _run_async(args: argparse.Namespace) -> int:
     logging.basicConfig(
-        level=logging.DEBUG if args.verbose else logging.WARNING,
+        level=logging.DEBUG if args.verbose else logging.ERROR,
         format="%(levelname)s: %(message)s",
     )
     logger = logging.getLogger("code_cheat_check")
 
-    # 1. 定位 MAKG/python 并注入 sys.path
-    makg_python = resolve_makg_python_path(args.makg_path)
-    if str(makg_python) not in sys.path:
-        sys.path.insert(0, str(makg_python))
-    logger.info(f"使用 MAKG/python: {makg_python}")
-
-    # 2. 导入 CodeChecker
     try:
-        from akg_agents.op.utils.code_checker import CodeChecker  # type: ignore
-    except ImportError as e:
-        print(f"[ERROR] 无法导入 MAKG CodeChecker: {e}", file=sys.stderr)
-        print("请确认 --makg-path 指向正确的 MAKG 项目根目录。", file=sys.stderr)
+        makg_python = resolve_makg_python_path(args.makg_path)
+    except RuntimeError as exc:
+        print(f"[ERROR] {exc}", file=sys.stderr)
         return 2
 
-    # 3. 构建 CodeChecker 实例
-    checker = CodeChecker(backend=args.backend, dsl=args.dsl)
+    extra_paths = [Path(item) for item in args.extra_python_path]
+    prepend_python_paths([makg_python, *extra_paths])
+    logger.info("使用 MAKG/python: %s", makg_python)
 
-    # 4. 扫描目标文件
+    try:
+        CodeChecker, import_mode, import_note = import_code_checker_class(makg_python, logger)
+    except RuntimeError as exc:
+        print(f"[ERROR] {exc}", file=sys.stderr)
+        print(f"        已加入 sys.path: {makg_python}", file=sys.stderr)
+        return 2
+
+    checker_config = build_checker_config(args)
+    checker = CodeChecker(backend=args.backend, dsl=args.dsl, config=checker_config)
+
     target_path = Path(args.target).resolve()
-    files = find_python_files(target_path)
+    files = find_python_files(
+        target_path,
+        include_patterns=args.include,
+        all_python=args.all_python,
+    )
     if not files:
-        print(f"[WARN] 在 {target_path} 未找到任何 .py 文件")
-        return 1
+        if target_path.is_dir() and not args.all_python and not args.include:
+            pattern_text = ",".join(_DEFAULT_IMPL_PATTERNS)
+            print(f"[WARN] 在 {target_path} 未找到匹配默认实现文件模式的 .py: {pattern_text}")
+            print("       如需扫描所有 .py，请加 --all-python")
+        else:
+            print(f"[WARN] 在 {target_path} 未找到任何匹配条件的 .py 文件")
+        return 0
 
-    print(f"扫描目标: {target_path}")
-    print(f"待检查文件: {len(files)}")
-    print(f"后端/DSL   : {args.backend} / {args.dsl}")
+    print(f"扫描目标    : {target_path}")
+    print(f"待检查文件  : {len(files)}")
+    print(f"MAKG/python : {makg_python}")
+    print(f"导入模式    : {import_mode}")
+    print(f"后端/DSL    : {args.backend} / {args.dsl}")
+    if target_path.is_dir():
+        if args.all_python:
+            print("文件过滤    : 所有 *.py")
+        else:
+            patterns = args.include or list(_DEFAULT_IMPL_PATTERNS)
+            print(f"文件过滤    : {','.join(patterns)}")
+    print(f"诊断检查    : {'关闭' if args.no_diagnostics else '开启'}")
+    if args.skip_import_check:
+        print("import 检查 : 跳过")
+    if args.diagnostic_blocking:
+        print("诊断模式    : blocking")
+    if import_note and args.verbose:
+        print(f"正常导入失败: {import_note}")
 
-    # 5. 逐个检查
     reports: List[CheatCheckReport] = []
     for file_path in files:
         report = await check_single_file(file_path, checker, logger)
+        if args.diagnostic_blocking:
+            report.diagnostic_errors = []
         reports.append(report)
         print_report(report, only_cheat=args.only_cheat, summary_only=args.summary)
 
-    # 6. 汇总
-    print_overall_summary(reports, len(files))
+    print_overall_summary(reports, total_files=len(files))
 
-    # 7. 可选 JSON 输出
     if args.json_output:
         out_path = Path(args.json_output).resolve()
-        json_data = []
-        for r in reports:
-            json_data.append({
-                "file": str(r.file_path),
-                "is_empty": r.is_empty,
-                "syntax_error": r.syntax_error,
-                "compile_error": r.compile_error,
-                "has_cheat_issue": r.has_cheat_issue,
-                "check_success": r.check_success,
-                "errors": r.errors,
-                "diagnostic_errors": r.diagnostic_errors,
-            })
-        out_path.write_text(json.dumps(json_data, ensure_ascii=False, indent=2), encoding="utf-8")
+        write_json_report(out_path, reports)
         print(f"\n详细 JSON 报告已保存: {out_path}")
 
-    # 返回值：0=无任何问题，1=有作弊，2=工具错误
-    if any(r.has_cheat_issue for r in reports):
+    if any(report.has_tool_error for report in reports):
+        return 2
+    if any(report.has_cheat_issue for report in reports):
         return 1
-    if any(r.has_any_issue for r in reports):
-        return 0  # 非作弊错误不视为失败（与用户需求对齐）
     return 0
 
 

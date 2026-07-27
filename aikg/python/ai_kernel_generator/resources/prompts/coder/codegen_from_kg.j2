@@ -79,7 +79,7 @@
 
 **注意以下规则和举例均是使用autotune的情况，如果不计划使用autotune，则正常生成即可，无需关注**
 
-- 对算子应用自动调优，可以极大增强性能。
+- 对算子应用自动调优，可以极大增强性能。一定要尽量使用autotune！一定要尽量使用autotune！一定要尽量使用autotune！一定要尽量使用autotune！并调整适配**多个参数的形状排列组合**来尝试达到更高的性能！
 - 仅在 @triton.autotune(configs=[...]) 中定义搜索空间。
 - 若应用autotune，禁止在 Python 端显式传 BLOCK_*。
 - 由于autotune会重复运行多次修改运行中值，所以对于非constexpr的参数（比如输出参数）都要用restore_value(list[str])重置

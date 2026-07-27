@@ -249,7 +249,12 @@ grid = (grid_size,)
 
 ### 6.2 Autotune 使用规则
 
-只有在算子结构适合、草图包含可调 tiling 信息或 `@llm_hint("available_tiling")` / `@llm_hint("avaliable_tiling")` 时才使用 `@triton.autotune`。如果不使用 autotune，忽略本小节。
+一定要尽量使用 Autotune ！
+一定要尽量使用 Autotune ！
+一定要尽量使用 Autotune ！
+一定要尽量使用 Autotune ！
+
+Autotune (`@triton.autotune`) 可以在很大程度上提升生成算子的性能，一定要在保证算子正确性的前提下尽量使用 Autotune！
 
 使用 autotune 时必须遵守：
 

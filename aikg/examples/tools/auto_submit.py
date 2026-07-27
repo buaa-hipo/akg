@@ -7,8 +7,7 @@ from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
 
-
-EXAMPLES_DIR = Path("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/examples")
+EXAMPLES_DIR = Path(os.getcwd())
 KERNELBENCH_DIR = Path("/mnt/lustre-client/zhangzizheng/AIKG/KernelBench/KernelBench")
 
 
@@ -87,6 +86,11 @@ def build_kernel_tasks(level: str, index_range: tuple[int, int]) -> list[KernelT
         kernel_file = kernels_by_index[index]
         full_op_name = kernel_file.stem
         op_name = full_op_name.split("_", maxsplit=1)[1]
+        if "3D_tensor_matrix_multiplication" in op_name:
+            op_name = "three_D_tensor_matrix_multiplication"
+        elif "4D_tensor_matrix_multiplication" in op_name:
+            op_name = "four_D_tensor_matrix_multiplication"
+        
         evolve_database = f"{level}/{full_op_name}"
         log_path = EXAMPLES_DIR / "log" / level / f"{full_op_name}.log"
         tasks.append(

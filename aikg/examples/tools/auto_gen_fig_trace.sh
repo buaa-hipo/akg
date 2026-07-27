@@ -2,7 +2,7 @@
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LEVEL2_DIR="${1:-/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database/level2}"
+LEVEL2_DIR="${1:-/mnt/lustre-client/zhangzizheng/AIKG/save_data/ds_v4_flash_h100/evolve_database/level1}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 
 if [[ ! -d "${LEVEL2_DIR}" ]]; then
