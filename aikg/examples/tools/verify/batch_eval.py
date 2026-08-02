@@ -32,7 +32,8 @@ TOOL_DIR = Path(__file__).resolve().parent
 SPEEDUP_EVAL = TOOL_DIR / "triton_speedup_eval.py"
 DEFAULT_BATCH_ROOT = TOOL_DIR / "batch_eval_runs"
 # DEFAULT_EVOLVE_DATABASE = Path("/home/zhangzizheng/AIKG/akg/aikg/evolve_database")
-DEFAULT_EVOLVE_DATABASE = Path("/mnt/lustre-client/zhangzizheng/AIKG/save_data/gpt_5_5_h100/evolve_database")
+# DEFAULT_EVOLVE_DATABASE = Path("/mnt/lustre-client/zhangzizheng/AIKG/akg/aikg/evolve_database")
+DEFAULT_EVOLVE_DATABASE = Path("/mnt/lustre-client/zhangzizheng/AIKG/save_data/gpt_5_5_a100/evolve_database")
 # DEFAULT_EVOLVE_DATABASE = Path("/mnt/lustre-client/zhangzizheng/AIKG/save_data/ds_v4_flash_h100/evolve_database")
 
 

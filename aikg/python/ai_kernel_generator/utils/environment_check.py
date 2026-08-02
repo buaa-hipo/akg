@@ -97,7 +97,7 @@ def check_env(framework=None, backend=None, dsl=None, config_path=None, config=N
     if not is_remote:
         if backend == 'cuda':
             try:
-                result = subprocess.run(['nvidia-smi'], capture_output=True, timeout=5)
+                result = subprocess.run(['nvidia-smi'], capture_output=True, timeout=15)
                 if result.returncode != 0:
                     issues.append("⚠️ CUDA设备可能不可用")
             except:

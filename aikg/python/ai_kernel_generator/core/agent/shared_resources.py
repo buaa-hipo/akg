@@ -54,18 +54,62 @@ def _reset_cache_if_pid_changed_locked() -> None:
     _CODER_DATABASE = None
 
 
+def _get_nested_config(config: Optional[dict], section: str, key: str) -> Optional[Any]:
+    section_config = (config or {}).get(section, {})
+    if isinstance(section_config, dict):
+        return section_config.get(key)
+    return None
+
+
+def _get_service_url(config: Optional[dict], kind: str) -> str:
+    service_config = (config or {}).get("service_config", {})
+    database_config = (config or {}).get("database_config", {})
+    service_config = service_config if isinstance(service_config, dict) else {}
+    database_config = database_config if isinstance(database_config, dict) else {}
+
+    if kind == "cross_encoder":
+        candidates = [
+            service_config.get("cross_encoder_url"),
+            service_config.get("model_service_url"),
+            os.getenv("AIKG_CROSS_ENCODER_SERVICE_URL"),
+            os.getenv("AIKG_MODEL_SERVICE_URL"),
+        ]
+    elif kind == "coder_database":
+        candidates = [
+            database_config.get("service_url"),
+            database_config.get("model_service_url"),
+            service_config.get("coder_database_url"),
+            service_config.get("model_service_url"),
+            os.getenv("AIKG_CODER_DATABASE_SERVICE_URL"),
+            os.getenv("AIKG_MODEL_SERVICE_URL"),
+        ]
+    else:
+        candidates = []
+
+    for value in candidates:
+        if value:
+            return str(value).rstrip("/")
+    return ""
+
+
 def get_cross_encoder(config: Optional[dict] = None):
-    del config  # keep signature uniform for future extension
     global _CROSS_ENCODER
 
     with _RESOURCE_LOCK:
         _reset_cache_if_pid_changed_locked()
         if _CROSS_ENCODER is None:
-            # local import to avoid circular import
-            from ai_kernel_generator.core.agent.filter import CrossEncoderSimilarity
+            service_url = _get_service_url(config, "cross_encoder")
+            if service_url:
+                from ai_kernel_generator.client.model_service_client import RemoteCrossEncoderSimilarity
 
-            _CROSS_ENCODER = CrossEncoderSimilarity()
-            logger.info("Shared CrossEncoderSimilarity initialized for pid=%s", _RESOURCE_PID)
+                _CROSS_ENCODER = RemoteCrossEncoderSimilarity(service_url)
+                logger.info("Remote CrossEncoderSimilarity initialized for pid=%s", _RESOURCE_PID)
+            else:
+                # local import to avoid circular import
+                from ai_kernel_generator.core.agent.filter import CrossEncoderSimilarity
+
+                _CROSS_ENCODER = CrossEncoderSimilarity()
+                logger.info("Shared CrossEncoderSimilarity initialized for pid=%s", _RESOURCE_PID)
         return _CROSS_ENCODER
 
 
@@ -75,10 +119,18 @@ def get_coder_database(config: Optional[dict] = None):
     with _RESOURCE_LOCK:
         _reset_cache_if_pid_changed_locked()
         if _CODER_DATABASE is None:
-            from ai_kernel_generator.database.coder_database import CoderDatabase
+            service_url = _get_service_url(config, "coder_database")
+            if service_url:
+                from ai_kernel_generator.client.model_service_client import RemoteCoderDatabase
 
-            _CODER_DATABASE = CoderDatabase(config=config)
-            logger.info("Shared CoderDatabase initialized for pid=%s", _RESOURCE_PID)
+                database_path = _get_nested_config(config, "database_config", "database_path") or ""
+                _CODER_DATABASE = RemoteCoderDatabase(service_url, config=config, database_path=database_path)
+                logger.info("Remote CoderDatabase initialized for pid=%s", _RESOURCE_PID)
+            else:
+                from ai_kernel_generator.database.coder_database import CoderDatabase
+
+                _CODER_DATABASE = CoderDatabase(config=config)
+                logger.info("Shared CoderDatabase initialized for pid=%s", _RESOURCE_PID)
         return _CODER_DATABASE
 
 

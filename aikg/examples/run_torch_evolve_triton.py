@@ -82,10 +82,10 @@ async def run_torch_evolve_triton(op_name: str, task_desc: str, evolve_database:
     config.dsl = "triton_cuda"  # 使用triton_cuda替代通用的triton
     config.framework = "torch"
     config.backend = "cuda"
-    config.arch = "h100"
+    config.arch = "a100"
 
     # 进化参数
-    config.max_rounds = 5
+    config.max_rounds = 10
     config.parallel_num = 1         # coder_parallel_num 和 parallel_num 不可同时选，当前开发 coder_parallel_num
     config.coder_parallel_num = 3   # 每次岛屿任务并行探索Coder的数量
 

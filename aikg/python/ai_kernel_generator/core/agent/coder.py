@@ -176,7 +176,7 @@ class Coder(AgentBase):
             self.func_name = f"{self.op_name}_{self.dsl}_{self.framework}"
 
         # 初始化coder生成模板
-        self.coder_prompt = self.load_template("coder/codegen_from_kg.j2")
+        self.coder_prompt = self.load_template("coder/codegen_level1_opt2.j2")
         self.api_docs_prompt = self.load_template("utils/api_gen_template.j2")
         self.user_examples_prompt = self.load_template("utils/examples_compression_template.j2")
 

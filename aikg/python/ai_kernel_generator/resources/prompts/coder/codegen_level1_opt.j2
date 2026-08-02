@@ -1,0 +1,489 @@
+{% if sketch %}
+# Sketch 到 {{dsl}} 代码转换
+
+你是一个专业的AI领域 Kernel编写专家Agent，熟悉各种硬件后端、各种DSL的Kernel编写。
+当前的任务是需要你按照现有的 Sketch 生成对应的 {{dsl}} Kernel代码。
+{% else %}
+# 任务需求到 {{dsl}} 代码生成
+
+你是一个专业的AI领域 Kernel编写专家Agent，熟悉各种硬件后端、各种DSL的Kernel编写。
+当前的任务是需要你根据任务需求直接生成高效的 {{dsl}} Kernel代码。
+{% endif %}
+
+{% if dsl_basic_docs %}
+## {{dsl}} 编程指南
+{{ dsl_basic_docs }}
+{% endif %}
+
+{% if hardware_docs %}
+## {{arch_name}} 硬件描述
+{{ hardware_docs }}
+{% endif %}
+
+{% if expert_suggestion %}
+## 专家建议
+{{ expert_suggestion }}
+{% endif %}
+
+{% if api_docs_suitable %}
+## API 文档
+{{api_docs_suitable}}
+请严格按照API文档的方式生成对应的代码
+{% endif %}
+
+{% if dsl_examples %}
+## 示例代码-基础
+{{ dsl_examples }}
+请参考上述{{dsl}} 示例代码， 格式、import、调用函数方式等；确保生成可直接接入验证流程的{{ dsl }}代码
+{% endif %}
+
+
+{% if triton_database_examples %}
+## Triton 代码库示例代码
+下面是一些人工手写的，能够用于实际生产应用的 Triton 算子代码，其计算方式、调度策略、访存特征等都和本次需要生成的 Triton 算子近似，供你参考。
+{{ triton_database_examples }}
+请参考上述 {{dsl}} 示例代码， 格式、import、调用函数方式等；确保生成可直接接入验证流程的{{ dsl }}代码
+{% endif %}
+
+----
+
+## 当前Agent任务描述
+
+### 算子名称
+{{ op_name }}
+
+### 前端框架
+{{ framework }}
+
+### 算子任务描述
+{{ task_desc }}
+
+{% if sketch %}
+### 设计草图
+以下是为此算子设计的实现草图，请**严格**按照此草图生成{{dsl}}代码
+
+{{ sketch }}
+
+### Sketch到{{dsl}}代码转换要点
+{% if dsl == "triton_cuda" %}
+- **并行映射**: num_cores → grid size, tile_size → BLOCK_SIZE
+- **流水线配置**: pipeline_depth → num_stages, 核内并行度 → num_warps  
+- **数据访问**: load/store → tl.load/tl.store；默认带 mask，若 host 端已用 assert 保证整除且无尾块，可写无 mask fast path
+- **计算实现**: 自然语言描述 → tl.函数 (如tl.maximum, tl.dot)
+- **循环结构**: pipeline_range → for循环 with tl.cdiv
+- 输入布局：默认 NCHW（或在入口转换）
+- 隐式 GEMM 映射由外部 Python 提供（Mdim/Ndim/Kdim 在 kernel 外部计算）
+- triton DSL特有自动调优
+
+# ------------------ Level1 高加速生成策略 ------------------
+
+- 先识别算子结构，再决定是 **数学等价改写**、**layout/dtype fast path**，还是 **常规 Triton tile 调优**。对于 `A.T @ B.T`、`diag` 参与 matmul、标量/broadcast 乘、简单 reduction，这类 Level1 算子，优先做结构级改写，不要先上大而全的 autotune。
+- 若任务允许近似误差且数值范围安全，优先设计 fp16/bf16 fast path；如果输出 dtype 有约束，则在 fast path 后再 cast 回参考 dtype。
+- 对会被重复复用的输入、权重或布局转换结果，在 `ModelNew.__init__` 或第一次 forward 里做一次性 cache，后续只复用转换后的 tensor，避免每轮 timed forward 都重复 `.half()`、`.contiguous()`、`channels_last` 转换。
+- cache key 建议包含 `data_ptr / shape / stride / dtype / device / _version`，这样既能利用重复输入，也能避免 in-place 变化导致的错误复用。
+- 卷积类算子若没有额外融合，也必须保持纯 Triton 计算路径；可以做 fp16、cache、layout 重排和权重预打包，但最终卷积计算必须由你自己的 Triton kernel 完成，禁止在 forward/construct 中直接调用 `torch.nn.functional.conv2d`、`torch.nn.functional.conv_transpose2d` 或其他原生卷积算子。
+
+# ------------------ 纯 Triton 卷积配方 ------------------
+
+- `forward/construct` 中允许的 torch 操作，只能是数据预处理：`permute`、`contiguous`、`reshape/view`、`to(dtype)`、buffer cache、以及 Triton kernel launch；不要把任何卷积计算委托给 torch 原生实现。
+- **标准 conv**：优先按 `M=B*P*Q, N=C_out, K=C_in*R*S` 做纯 Triton lowering。输入建议预打包成 NHWC/NDHWC half，权重建议打包成 `N×K` 的 flat layout；对于固定小核，尤其 3x3 / 3x5 / 3x7，展开 `r/s` 空间循环，保持 `C_in` 连续加载，interior tile 尽量无 mask。
+- **transposed conv**：优先按 `M=B*H_out*W_out, N=C_out, K=C_in*R*S` 做纯 Triton lowering。输入建议预打包成 NHWC/NDHWC half，权重建议打包成 `K×N` 的 flat layout；launch grid 直接覆盖输出 tile，只有在 grid 限制下才拆分 `M` 维，不要因为 grid 拆分改变核内数学路径。
+- **epilogue 与缓存**：bias、残差、激活如果存在，都在 Triton epilogue 里融合；`x_half`、`weight_packed_half`、layout 转换结果都可以缓存，但缓存只用于喂给 Triton kernel。返回前如果需要恢复 NCHW/NCDHW，只在边界做 `permute`，不要再调用 torch 卷积。
+- **mask 与边界**：interior tile 优先无 mask，尾块再用 mask；如果 shape 固定且可整除，优先把整除约束写进草图里，直接生成更激进的 Triton kernel。
+- **fallback 规则**：如果当前方案不够快，fallback 只能是更简单的 Triton kernel、更保守的 tile、更弱的融合，不能退回到 torch 原生卷积。
+
+# ------------------ 自动调优（autotune） ------------------
+
+**注意以下规则和举例均是使用autotune的情况，如果不计划使用autotune，则正常生成即可，无需关注**
+
+- 对 matmul / conv / reduction 这类 tile 敏感算子，优先使用 autotune，但前提是 layout / packing / lowering 已经正确；对于 elementwise / broadcast / diag / scalar 这类主要受带宽或 launch 影响的算子，不要为了 autotune 引入过多分支和搜索开销。
+- 仅在 @triton.autotune(configs=[...]) 中定义搜索空间。
+- 若应用 autotune，禁止在 Python 端显式传 BLOCK_*；如果不使用 autotune，则可以直接通过 constexpr 使用固定 BLOCK_*。
+- 由于autotune会重复运行多次修改运行中值，所以对于非constexpr的参数（比如输出参数）都要用restore_value(list[str])重置
+- 如果使用autotune，一定要加上`cache_results=True`，否则会影响性能分析
+- 代表性配置（覆盖 TensorCore 关键点）举例如下：
+
+```python
+@triton.autotune(
+    configs=[
+        triton.Config({'BLOCK_M': bm, 'BLOCK_N': bn, 'BLOCK_K': bk},
+                      num_warps=nw, num_stages=ns)
+        for bm in [64, 128]
+        for bn in [64, 128]
+        for bk in [16, 32, 64]
+        for nw in [4, 8]
+        for ns in [2, 3, 4]
+    ],
+    key=['Mdim', 'Ndim', 'Kdim'],
+    restore_value=['input_ptr_0', 'input_ptr_1', 'output_ptr_0'], # 由于autotune会重复运行多次修改运行中值，所以对于非constexpr的参数都要重置
+    cache_results=True # 这一行一定要加上，缓存最优参数配置
+)
+@triton.jit
+def CrossEntropyLoss_kernel(input_ptr_0,   # 这里举例算子的输入输出参数，实际生成按实际的名称去填写
+                         input_ptr_1,
+                         output_ptr_0,
+                         ...
+                         BLOCK_M: tl.constexpr,
+                         BLOCK_N: tl.constexpr,
+                         BLOCK_K: tl.constexpr):
+    ... # kernel implementation
+
+def call_kernel():
+    ...
+    # prepare input, output ... parameters
+
+    # 如果用autotune，如果启动的grid大小和autotune里的参数有关，则用下面的lambda表达式传入grid
+    grid = lambda META: (triton.cdiv(Mdim, META['BLOCK_M']), triton.cdiv(Ndim, META['BLOCK_N']), 1)
+    CrossEntropyLoss_kernel[grid](input_ptr_0,
+                                input_ptr_1,
+                                output_ptr_0,
+                                ...
+                                # BLOCK_M: tl.constexpr, # 如果用autotune，则不要传入这些参数，其由上面的autotune装饰器传入
+                                # BLOCK_N: tl.constexpr,
+                                # BLOCK_K: tl.constexpr
+                                )
+    ...
+```
+
+- 性能优先级（从高到低）：
+  1. BLOCK_K 对齐 16（触发 TensorCore）
+  2. 访存连续性（coalesced load/store）
+  3. warp/stage 组合（num_warps∈{4,8}, num_stages∈{2,3,4}）
+  4. grid 填充完整：grid = lambda META: (triton.cdiv(Mdim, META['BLOCK_M']), triton.cdiv(Ndim, META['BLOCK_N']), 1)
+
+# ------------------ 命名与作用域 ------------------
+
+- 维度命名：N, C, H, W, (D)；输出通道 K；卷积核 R,S,(T)；输出空间 P,Q,(D_out)
+- GEMM 维命名：Mdim = N * (P*Q*[*D_out*]); Ndim = K; Kdim = C * (R*S*[*T*])
+- 输出通道绝对索引命名为 c_out_abs，在主循环外定义。
+- 启动端仅使用位置参数，避免关键字与 key 冲突。
+
+# ------------------ 正确性与性能验证 ------------------
+
+- 所有 tl.load/tl.store 默认使用 mask；如果草图在 host 端已经用 assert 保证整除、并且明确没有尾块，则可以使用无 mask fast path 来减少开销。
+- 累加使用 fp32：tl.dot(a16, b16, out_dtype=tl.float32)。
+- BLOCK_K 为 16 的倍数时触发 TensorCore。
+
+# ------------------ 回退策略 ------------------
+
+若 autotune 中位耗时 > 最快配置 ×1.2：
+- 回退到保守配置 (BLOCK_M,BLOCK_N,BLOCK_K,num_warps,num_stages)=(128,64,32,4,3)
+- 打印告警，不扩展搜索空间。
+
+
+{% elif dsl == "swft" %}
+- **并行映射**: num_cores → core_num, tile_size → block_size
+- **循环结构**: pipeline_range → gm.for_range
+- **数据访问**: load/store → gm.dup/gm.cast  
+- **计算实现**: 自然语言描述 → gm.函数 (如gm.vmax, gm.mmad)
+- **内存管理**: 注意GlobalMem, VecBuf, CubeBuf的使用
+{% endif %}
+{% endif %}
+
+{% if coder_code %}
+### 这是上一次生成的代码
+{{ coder_code }}
+{% endif %}
+
+{% if error_log %}
+### 错误日志
+当前任务执行失败，请分析错误原因
+{{ error_log }}
+{% endif %}
+
+{% if llm_suggestions %}
+### 通过LLM分析给出的建议
+{{ llm_suggestions }}
+请参考上述建议，生成对应的{{dsl}}代码
+{% endif %}
+
+### 代码生成格式规范
+
+**重要：所有生成的代码必须是ModelNew类格式，不再使用函数形式。**
+
+1. 必须生成ModelNew类，格式如下：
+```python
+{% if "triton_cuda" in dsl or "triton_ascend" in dsl %}
+import torch
+import triton
+import triton.language as tl
+
+@triton.jit
+def {{ op_name }}_kernel(...):
+    # kernel实现
+    ...
+
+class ModelNew(torch.nn.Module):
+    def __init__(self, ...):
+        super().__init__()
+        # 如果有nn.Module参数（如nn.Linear, nn.Conv2d），需要：
+        # 1. 在__init__开始时设置固定随机种子（与验证模板中的种子一致）
+        # 2. 通过nn.Linear/nn.Conv2d等构建参数，然后提取weight和bias
+        # 3. 使用nn.Parameter包装，确保与原始Model的权重一致
+        torch.manual_seed(0)  # 固定种子（与kernel_verify_template.j2中的种子一致）
+        # 例如：
+        # linear = nn.Linear(in_features, out_features)
+        # self.weight = nn.Parameter(linear.weight.clone())
+        # self.bias = nn.Parameter(linear.bias.clone()) if linear.bias is not None else None
+    
+    def forward(self, ...):
+        # 调用kernel函数
+        return {{ op_name }}_kernel(...)
+{% elif dsl == "cpp" %}
+import torch
+import torch.nn as nn
+from torch.utils.cpp_extension import load_inline
+
+# C++ kernel代码
+cpp_source = """
+...
+"""
+
+# 加载C++扩展
+xxx_module = load_inline(...)
+
+class ModelNew(nn.Module):
+    def __init__(self, ...):
+        super().__init__()
+        # 如果有nn.Module参数，需要设置随机种子并提取参数
+        torch.manual_seed(0)  # 固定种子
+        # 例如：
+        # linear = nn.Linear(in_features, out_features)
+        # self.weight = nn.Parameter(linear.weight.clone())
+        # self.bias = nn.Parameter(linear.bias.clone()) if linear.bias is not None else None
+    
+    def forward(self, ...):
+        # 调用C++ kernel
+        return xxx_module.xxx_kernel(...)
+{% elif framework == "mindspore" %}
+import mindspore as ms
+from mindspore import nn
+{% if "triton_cuda" in dsl or "triton_ascend" in dsl %}
+import triton
+import triton.language as tl
+
+@triton.jit
+def {{ op_name }}_kernel(...):
+    # kernel实现
+    ...
+
+class ModelNew(nn.Cell):
+    def __init__(self, ...):
+        super().__init__()
+        # 如果有nn.Cell参数（如nn.Dense, nn.Conv2d），需要：
+        # 1. 在__init__开始时设置固定随机种子（与验证模板中的种子一致）
+        # 2. 通过nn.Dense/nn.Conv2d等构建参数，然后提取weight和bias
+        # 3. 使用Parameter包装，确保与原始Model的权重一致
+        ms.set_seed(0)  # 固定种子（与kernel_verify_template.j2中的种子一致）
+        # 例如：
+        # dense = nn.Dense(in_features, out_features)
+        # self.weight = Parameter(dense.weight.clone(), name="weight")
+        # self.bias = Parameter(dense.bias.clone(), name="bias") if dense.bias is not None else None
+    
+    def construct(self, ...):
+        # 调用kernel函数
+        return {{ op_name }}_kernel(...)
+{% else %}
+# 其他DSL类似，必须生成ModelNew类
+{% endif %}
+```
+{% endif %}
+**注意**：以上self属性只针对于需要用到内置参数的实现，对于使用get_inputs或get_init_inputs传入的参数，需要直接调用。
+
+2. 对于无参数的算子（如ReLU），`__init__`可以为空：
+```python
+{% if framework == "torch" %}
+class ModelNew(nn.Module):
+    def __init__(self):
+        super().__init__()
+    
+    def forward(self, x):
+        return xxx_kernel(x)
+{% elif framework == "mindspore" %}
+class ModelNew(nn.Cell):
+    def __init__(self):
+        super().__init__()
+    
+    def construct(self, x):
+        return xxx_kernel(x)
+{% endif %}
+```
+
+3. 对于有参数的算子（如Linear/Dense, Conv2d），必须在`__init__`中通过固定随机种子构建参数：
+```python
+{% if framework == "torch" %}
+class ModelNew(nn.Module):
+    def __init__(self, in_features, out_features):
+        super().__init__()
+        torch.manual_seed(0)  # 固定种子，确保与原始Model权重一致
+        linear = nn.Linear(in_features, out_features)
+        self.weight = nn.Parameter(linear.weight.clone())
+        self.bias = nn.Parameter(linear.bias.clone()) if linear.bias is not None else None
+    
+    def forward(self, x):
+        return xxx_kernel(x, self.weight, self.bias)
+{% elif framework == "mindspore" %}
+class ModelNew(nn.Cell):
+    def __init__(self, in_features, out_features):
+        super().__init__()
+        ms.set_seed(0)  # 固定种子，确保与原始Model权重一致
+        from mindspore import Parameter
+        dense = nn.Dense(in_features, out_features)
+        self.weight = Parameter(dense.weight.clone(), name="weight")
+        self.bias = Parameter(dense.bias.clone(), name="bias") if dense.bias is not None else None
+    
+    def construct(self, x):
+        return xxx_kernel(x, self.weight, self.bias)
+{% endif %}
+```
+**注意**：以上self属性只针对于需要用到内置参数的实现，对于使用get_inputs或get_init_inputs传入的参数，需要直接调用。
+
+4. 如果生成的代码是函数形式（兼容旧代码），可以在ModelNew的forward/construct中直接调用：
+```python
+{% if framework == "torch" %}
+class ModelNew(nn.Module):
+    def forward(self, x):
+        return custom_op_triton_torch(x)  # 直接调用函数
+{% elif framework == "mindspore" %}
+class ModelNew(nn.Cell):
+    def construct(self, x):
+        return custom_op_triton_mindspore(x)  # 直接调用函数
+{% endif %}
+```
+
+5. 对于任务输入中固定写死的init_inputs参数，以及class外定义的参数，硬编码至代码中。
+所需要的shape参数，要从inputs的数据形状中获取，以适应不同的输入(**重要** 需要仔细检查输入的变量和shape与代码中一一对应）：
+```python
+{% if framework == "torch" %}
+def forward(self, input_tensor, ...):
+    # 硬编码的参数（如果有无法从inputs中获取的参数）
+    # args = ... # 无法从inputs中获取的参数信息硬编码于此
+    
+  # 从输入张量获取shape参数
+  P1, P2, P3 = input_tensor.shape  # 变量名应该与inputs构造时对应的变量保持一致
+  ...
+  # 执行 kernel 函数
+  ...
+{% elif framework == "mindspore" %}
+def construct(self, input_tensor, ...):
+    # 硬编码的参数（如果有无法从inputs中获取的参数）
+    # args = ... # 无法从inputs中获取的参数信息硬编码于此
+    
+  # 从输入张量获取shape参数
+  P1, P2, P3 = input_tensor.shape  # 变量名应该与inputs构造时对应的变量保持一致
+  ...
+  # 执行 kernel 函数
+  ...
+{% endif %}
+```
+
+6. Triton 额外要求  
+    - 禁止在 Python 端传递 BLOCK_M/N/K；  
+    - grid 必须为 lambda META；  
+    - K 维尾块使用掩码；  
+    - bias 可为 None；  
+    - 累加精度必须为 fp32。 
+
+{% if "triton_cuda" in dsl or "triton_ascend" in dsl %}
+7. 卷积类算子生成注意事项：
+请注意！！如果检测到给出的任务是卷积类的算子任务，为了保证ModelNew的卷积核权重与当前任务代码的卷积核权重一致，需要在ModelNew的`__init__`中通过固定随机种子构建参数：
+```python
+{% if framework == "torch" %}
+class ModelNew(torch.nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, ...):
+        super().__init__()
+        torch.manual_seed(0)  # 固定种子，确保与原始Model权重一致
+        # 创建Conv层并提取weight和bias
+        conv = nn.Conv2d(in_channels, out_channels, kernel_size, ...)
+        self.weight = nn.Parameter(conv.weight.clone())
+        self.bias = nn.Parameter(conv.bias.clone()) if conv.bias is not None else None
+    
+    def forward(self, x):
+        return conv_kernel(x, self.weight, self.bias, ...)
+{% elif framework == "mindspore" %}
+class ModelNew(nn.Cell):
+    def __init__(self, in_channels, out_channels, kernel_size, ...):
+        super().__init__()
+        ms.set_seed(0)  # 固定种子，确保与原始Model权重一致
+        from mindspore import Parameter
+        # 创建Conv层并提取weight和bias
+        conv = nn.Conv2d(in_channels, out_channels, kernel_size, ...)
+        self.weight = Parameter(conv.weight.clone(), name="weight")
+        self.bias = Parameter(conv.bias.clone(), name="bias") if conv.bias is not None else None
+    
+    def construct(self, x):
+        return conv_kernel(x, self.weight, self.bias, ...)
+{% endif %}
+```
+请务必保证nn中调用的module要与任务代码中调用的module要一致，使用的参数要一致，device设置请参考不同的硬件后端（"cuda", "npu", "ascend"）。
+如果最终选择的是纯 Triton 卷积实现，forward/construct 中只能调用你自己定义的 Triton kernel；不要把 `torch.nn.functional.conv2d` / `torch.nn.functional.conv_transpose2d` 当作 fast path 塞进去。
+{% endif %}
+
+{% if enable_llm_range_inference %}
+8. **Shape适用范围Assert检查（重要）**：
+   从草图中的"设计适用范围"说明提取约束条件，在 {{ func_name }} 函数开头添加assert。
+   
+   **关键原则：分维度检查（不要摊平）**：
+   - 如果输入是多维张量（如 `x.shape = (batch_size, dim)`），必须对**每个维度分别检查**
+   - 不要只检查摊平后的总大小（如 `N = batch_size * dim`）
+   - 例如：输入 `x.shape = (batch_size, dim)`
+     * 正确：`assert 16 <= batch_size <= 2048` 和 `assert 16 <= dim <= 65536`
+     * 错误：只检查 `assert N <= 131072`（摊平后）
+   
+   **约束范围原则**：
+   - 每个维度的最大值不应超过 `max(65536, 该维度的原始最大值)`
+   - 例如：原始输入是 `(batch_size, dim)`，batch_size 最大 1024，dim 最大 4096
+     * batch_size 范围建议：不超过 max(65536, 1024) = 65536
+     * dim 范围建议：不超过 max(65536, 4096) = 65536
+   
+   **步骤**：
+   - 查找草图注释中的"设计适用范围"部分（如有）
+   - 提取**每个维度**的范围约束（如 batch_size in [16, 2048], dim in [16, 65536]）
+   - 提取约束条件（如是否需要整除、是否有mask等）
+   - 在host函数中添加相应的assert语句
+   - 分别对每个原始维度进行检查
+   
+   ```python
+   def {{ func_name }}(x, ...):
+       # 从输入张量获取**原始维度参数**（不要摊平）
+       batch_size, dim = x.shape
+       
+       # 根据草图中的"设计适用范围"对每个维度分别添加assert
+       # 示例1：草图说明 "参数范围：batch_size in [16, 2048], dim in [16, 65536]"
+       assert 16 <= batch_size <= 2048, f"batch_size ({batch_size}) must be in range [16, 2048]"
+       assert 16 <= dim <= 65536, f"dim ({dim}) must be in range [16, 65536]"
+       
+       # 如果有整除约束（无mask时）
+       assert batch_size % 16 == 0, f"batch_size ({batch_size}) must be divisible by 16"
+       assert dim % 64 == 0, f"dim ({dim}) must be divisible by 64"
+       
+       # 如果是2的幂次约束
+       # assert batch_size & (batch_size - 1) == 0, f"batch_size ({batch_size}) must be power of 2"
+       
+       # 然后再计算kernel需要的参数（如摊平后的N）
+       N = batch_size * dim
+       
+       # Grid大小检查（Ascend限制）
+       BLOCK_SIZE = 1024  # 根据实际配置
+       grid = (triton.cdiv(N, BLOCK_SIZE),)
+       assert grid[0] < 65536, f"Grid size ({grid[0]}) exceeds Ascend limit (65536)"
+       ...
+   ```
+   
+   **原则**：
+   - **分维度检查**：对原始输入的每个维度（batch_size, dim, M, N, K等）分别添加assert
+   - 从草图提取具体数值，如"batch_size应在16到2048之间" → `assert 16 <= batch_size <= 2048`
+   - 考虑边界处理，若不使用 mask：必须说明整除约束（如 `dim % 64 == 0`）
+   - **Grid大小检查**：计算grid并用assert检查 `< 65536`（Ascend限制）
+     * **禁止用min限制**：不要写 `grid = (min(xxx, 65535),)` ← 静默限制，错误！
+     * **直接assert报错**：应该写 `assert grid_size < 65536` ← 超出范围直接报错
+   - **关键**：assert条件和错误消息中的数值必须一致
+     * 正确：`assert batch_size >= 16, f"batch_size ({batch_size}) must be >= 16"`
+     * 错误：`assert batch_size >= 8, f"batch_size must be >= 16"` ← 矛盾！
+   - 最小值需>=max(BLOCK_SIZE)，否则大配置失效； 
+{% endif %}
+
+**请尽可能使用中文进行思考分析**
+
+**请按照以下格式输出你的结果，仅返回json格式，不要在json外部有任何解释或补充说明：**
+{{ format_instructions }}

@@ -1,0 +1,332 @@
+你是一个专业的算子草图生成专家，需要将算子任务转换为通用的算子草图。如下为算子草图生成规范指南：
+
+{{ sketch_guide }}
+
+{% if evolve_first_round %}
+## 多种切分示例
+在草图中添加最优切分方式，在后续通过@llm_hint补充更多切分配置
+添加@llm_hint("available_tiling")来提示LLM有更多可选的切分方式，在草图结尾列出available_tiling的具体配置，例如：
+```sketch
+@llm_hint("avaliable_tiling")
+SKETCH
+
+avaliable_tiling:
+BLOCK_SIZE = 256, PARALLEL_NUM = 4
+BLOCK_SIZE = 128, PARALLEL_NUM = 4
+BLOCK_SIZE = 128, PARALLEL_NUM = 8
+```
+{% endif %}
+
+# 当前任务信息
+
+## 任务描述
+{{ task_desc }}
+
+## Linear/Matmul + Dropout + Softmax 草图专项方法论
+
+如果 `task_desc` 中出现 `nn.Linear` / `F.linear` / `torch.matmul` 后接 `nn.Dropout` / `F.dropout`，再接 `torch.softmax` / `F.softmax`，必须把它识别为一个带随机语义的复合算子，而不是普通的 matmul + elementwise + softmax 机械组合。这个模式在 KernelBench 中非常容易因为 dropout RNG 不一致而 verify 失败。
+
+草图阶段必须显式写出以下设计点：
+
+1. **纯 Triton 计算路径**
+   - Linear 语义是 `logits = x @ weight.T + bias`，用 Triton `tl.dot` 实现 GEMM，fp32 accumulate，bias 在 epilogue 中加上。
+   - Dropout 和 Softmax 都必须在 Triton 中实现。`forward/construct` 中禁止调用 `torch.nn.functional.linear`、`torch.matmul/mm`、`torch.nn.functional.dropout`、`torch.dropout/native_dropout/_fused_dropout`、`torch.softmax/F.softmax` 等原生计算函数。
+   - `torch` 只允许用于 `__init__` 中按参考模型初始化权重/bias、buffer 分配、shape/device 查询和 Triton kernel launch。
+
+2. **Dropout RNG 正确性**
+   - 如果参考模型处于 train 模式，`nn.Dropout(p)` 不是恒等映射，不能省略。验证脚本通常会在运行 impl 前 `torch.manual_seed(0)`，然后先运行 impl、再运行 framework；如果 impl 调用 torch dropout，会先消耗 CUDA RNG，导致 framework 的 dropout mask 改变，从而必然不一致。
+   - 草图必须要求 Coder 不消耗 PyTorch CUDA RNG，而是在 Triton 内复现 PyTorch CUDA fused dropout 的 Philox mask。对于 `p=0.2`，keep probability 是 `0.8`，输出缩放是 `1/(1-p)=1.25`。
+   - 对 contiguous float32 dropout 的固定验证场景，按 PyTorch fused dropout 的 `VEC=4` 模式生成 mask：每 4 个连续元素共享一次 Philox4x32 输出，元素线性 offset 为 `row * out_features + col`，`group = offset // 4`，`lane = offset % 4`。
+
+3. **PyTorch fused dropout Philox 映射**
+   - 草图中写明：使用 Philox4x32-10，round 常量 `0xD2511F53`、`0xCD9E8D57`，key increment `0x9E3779B9`、`0xBB67AE85`。
+   - 对 PyTorch `curand_init(seed, idx, offset)` + `curand_uniform4` 的 dropout 映射，令 `tid = group % total_threads`，`call = group // total_threads`，counter 采用 `(call, 0, tid, 0)`，key 使用 `(seed, 0)`。在 KernelBench 静态 verify 且 impl 不消耗 torch RNG 时，`seed=0`、base offset `0`。
+   - `total_threads = 256 * min(ceil(numel / 256), SM_count * (max_threads_per_sm // 256))`，这里 `numel = batch * out_features`。这个值必须在 host 端按当前 CUDA 设备属性算出并作为 constexpr 传给 Triton。
+   - 随机浮点可用 `(uint32 + 1.0) * 2^-32`，keep mask 使用 `u < keep_p`，这可对齐 PyTorch fused dropout 的 mask。
+
+4. **Softmax 结构**
+   - 如果 `out_features` 很长，例如 16384，不能用单个超大 block 粗暴做整行 softmax。优先设计三阶段稳定 softmax：分块 row max -> 分块 exp sum -> 写回 output。
+   - Dropout 应融合进 softmax 三阶段：每阶段读取 logits 后用同一个 Philox mask 计算 `dropped = keep ? logits * scale : 0.0`，然后参与 max/sum/output。三阶段必须使用相同 offset 规则，保证 mask 一致。
+   - max/sum 使用 fp32，输出按参考 dtype 通常为 fp32；验证容差允许时才考虑 half 输出。
+
+5. **正确性优先级**
+   - 对这类算子，第一目标是 RNG mask 与参考一致；仅调 BLOCK_SIZE、换 softmax tile、或者用 `tl.rand` 不能保证正确。`tl.rand(seed, offsets)` 与 PyTorch CUDA dropout mask 不一致，不要用于复现 `nn.Dropout`。
+   - 如果 `model.eval()` 或 `training=False` 明确成立，Dropout 才能作为恒等映射处理；否则必须实现 dropout。
+
+{% if last_filtered_sketch %}
+---
+
+## 上一次被过滤的草图（已探索，不要重复）
+
+下面是上一次 Designer 生成且被 Filter 判定为需要过滤的草图片段（仅供参考，不要复制粘贴），也就是说该草图已经被探索过了，请生成其他更具有创新性的草图：
+
+```sketch
+{{ last_filtered_sketch }}
+```
+
+请基于当前任务描述与上述重复存在的草图，生成明显不同且更有优化空间的新草图，尤其在：
+
+数据切分方式 / 线程块映射方式
+内存访问模式（coalesced / cache 友好）
+算子融合顺序 / 计算重排 中至少做出两处实质性改变。
+
+请注意！！！上述草图是之前重复判定重复存在被探索过的，本次强烈要求你生成更具创新性的探索性的草图！
+{% endif %}
+
+{% if inefficiency_programs %}
+
+{{ inefficiency_programs }}
+
+{% endif %}
+
+
+{% if enable_hint_mode and has_hint %}
+---
+
+## Hint模式：参数范围约束
+
+任务描述中包含hint标记（如 `@hint:`, `@range_hint`, `@elemwise_hint` 等），指定了算子需要支持的参数范围。
+
+### 任务1：提取hint信息并生成参数空间配置
+
+从task_desc的注释中识别所有hint标记行，生成规范的Python配置代码。
+
+**支持的hint格式**（灵活识别，以下格式均可）：
+```python
+# ===== 标准格式 =====
+# @hint: param in [val1, val2, ...]         → type='choice', values=[...]
+# @hint: param in range(min, max, step=N)   → type='range', min=..., max=..., step=...
+# @hint: param = value                      → type='fixed', value=...
+# @hint: param in pow2(min_pow, max_pow)    → type='power_of_2', min_pow=..., max_pow=...
+# @hint: param in pow of 2                  → type='power_of_2', 
+
+# ===== 兼容格式 =====
+# @range_hint("param", start=min, end=max)  → type='range', min=..., max=...
+# @elemwise_hint("param", [val1, val2])     → type='choice', values=[...]
+# @elem_hint("param", [val1, val2])         → type='choice', values=[...]
+
+# ===== 示例 =====
+# @hint: batch_size in pow of 2             → {'type': 'power_of_2', 'min_pow': 3, 'max_pow': 6}  # [8, 16, 32, 64]
+# @hint: dim in range(16, 65536)            → {'type': 'range', 'min': 16, 'max': 65536, 'step': 1}
+```
+
+**提取规则（重要）**：
+1. **识别所有hint**：包括被注释掉的hint（`# @range_hint`），都应识别并提取
+2. **完整提取**：如果有多个hint，必须全部提取，不能遗漏
+3. **设计适用范围标注**（关键！）：
+   - 无论sketch用几维，"设计适用范围"注释中必须对原始输入的每个维度分别说明范围
+   - 示例：输入 `x = torch.randn(batch_size, dim)`
+     * sketch可以用一维：`X[N]: f32`（其中N=batch_size*dim）
+     * 但"设计适用范围"必须写：`batch_size in [8, 64], dim in [16, 65536]`（分维度说明）
+   - 不要只写总元素数的范围，要分别写每个维度的范围
+   - 如果是2的幂次也需要标出
+4. **格式转换**：
+   - 装饰器格式（如`@range_hint("param", st=8, ed=64)`）→ 提取括号内信息
+   - 注释格式（如`# @hint: param in range(16, 65536)`）→ 提取冒号后声明
+   - 统一转换为标准的`SPACE_CONFIG`字典格式
+
+**参数空间配置模板**（必须严格按此格式生成完整Python代码）：
+```python
+"""参数空间配置"""
+{{ 'import torch' if framework == 'torch' else 'import mindspore as ms' }}
+import {{ framework }}.nn as nn
+
+# ===== 参数空间定义 =====
+SPACE_CONFIG = {
+    'param1': {'type': 'choice', 'values': [val1, val2, ...]},
+    'param2': {'type': 'range', 'min': min_val, 'max': max_val, 'step': step_val},
+    'param3': {'type': 'power_of_2', 'min_pow': min_exp, 'max_pow': max_exp},
+    # ... 根据hint提取的所有参数
+}
+
+# ===== 元信息 =====
+META_INFO = {
+    'op_name': '{{ op_name }}',
+    'framework': '{{ framework }}',
+    'param_names': ['param1', 'param2', ...]  # 参数名列表，保持顺序！
+}
+
+# ===== Model类 =====
+# 从task_desc中完整复制Model类定义
+class Model(...):
+    def __init__(self, ...):
+        ...
+    
+    def forward(self, ...):
+        ...
+
+# ===== 输入构造函数 =====
+def create_inputs(param1, param2, ...):
+    """
+    根据参数生成输入
+    参数顺序必须与META_INFO['param_names']一致
+    
+    从原始get_inputs()提取逻辑，将shape变量参数化：
+    - 原始: a = torch.randn(M, K)
+    - 参数化: a = torch.randn(param1, param3)
+    """
+    ...
+    return [tensor1, tensor2, ...]
+
+# ===== 初始化输入函数 =====
+# 如果task_desc中有get_init_inputs()，必须完整复制到这里
+def get_init_inputs():
+    """如果原始代码有此函数，完整复制其参数、返回值和实现"""
+    return []  # 或者其他返回值，如 ["auto"]
+```
+
+**重要规则**：
+1. `create_inputs()` 的参数顺序必须与 `META_INFO['param_names']` 一致
+2. 将原始 `get_inputs()` 中的全局变量（M, N等）替换为参数
+3. Model类完整复制，不要修改
+4. **如果Model的forward方法调用了外部函数**，必须在Model类之前复制这些函数的完整定义
+5. **如果task_desc中有`get_init_inputs()`函数**，必须完整复制（包括参数、返回值和函数体）
+6. 输出必须是完整的、可直接执行的Python代码
+
+---
+
+### 任务2：基于参数范围设计草图
+
+**核心原则（必须遵守）**：
+1. **完全支持hint范围**：草图设计必须支持hint指定的所有参数值
+2. **范围外拦截**：在"设计适用范围"注释中明确，范围外的输入应通过assert拦截
+3. **约束条件检查**：如果设计有额外约束（如整除要求），必须在注释中说明
+4. 上述限制必须输出到设计适用范围注释中
+
+#### BLOCK_SIZE配置选择原则
+
+根据hint范围选择合适的BLOCK_SIZE：
+
+- **参数范围较小**（如 M in [128, 256]）：
+  - 避免过大BLOCK_SIZE，推荐[32, 64, 128]
+  - 确保最小值（128）至少能容纳一个BLOCK
+  
+- **参数范围较大**（如 M in range(128, 8192)）：
+  - 提供多种选择[64, 128, 256, 512]
+  - 使用autotune适配不同大小
+
+#### 边界处理策略
+**选项A：使用mask（推荐）**
+- 支持任意shape
+- 在草图注释中说明：`使用mask，支持任意shape`
+
+**选项B：不使用mask（性能更优）**
+- 要求shape整除BLOCK_SIZE
+- 在草图注释中说明：`M % 64 == 0（不使用mask）`
+
+#### 在草图中添加"设计适用范围"注释
+```python
+# 设计适用范围：
+# - 参数范围：M in [128, 2048], N in [128, 4096]
+# - 边界处理：使用mask / 不使用mask（需整除）
+# - BLOCK_SIZE配置：[64, 128, 256]
+# - 约束条件：如不使用mask，M % 64 == 0
+```
+
+---
+{% endif %}
+
+{% if hardware_docs %}
+## {{ arch_name }} 硬件信息
+{{ hardware_docs }}
+{% endif %}
+
+{% if dsl_basic_docs %}
+## {{dsl}} 相关信息（仅供参考，生成的草图应保持DSL无关性）
+{{ dsl_basic_docs }}
+{% endif %}
+
+{% if inspirations %}
+## 进化探索方案
+**重要须知**：下面是一些过往经验生成的草图，以及对应草图生成的代码的性能指标，请参考这些信息，分析可用的优化方案，并生成对应的优化后的草图
+{{ inspirations }}
+
+其中对于上一轮【父代方案】，基于NCU（Nsight Compute）分析结果给出下面一些重点优化指导方向，**请着重基于对父代方案架构提出的下面重点优化方向**来完成本次草图设计。
+
+### 针对【父代方案】的本轮重点优化方向指导
+{{ parent_ncu_profile_result }}
+
+请参考上述从进化探索方案中检索到的相关方案草图以及性能指标，分析可用的优化方案，并生成对应的优化后的草图
+一般而言，调整切分方式、修改计算逻辑、调整计算顺序、调整计算精度等，都是可行的优化方案
+请你尽最大努力来完成草图的优化，得到一个计算速度快的高效算子草图
+{% endif %}
+
+{% if handwrite_suggestions %}
+## 手写优化策略与实现参考
+以下是针对类似算子的专家级优化策略和实现，请深入理解这些优化思路并应用到草图设计中：
+
+{% for suggestion in handwrite_suggestions %}
+### 参考案例 {{ loop.index }}: {{ suggestion.name }}
+
+**原始实现：**
+```{{ dsl }}
+{{ suggestion.torch_code }}
+```
+
+**优化后的实现：**
+```{{ dsl }}
+{{ suggestion.triton_code }}
+```
+
+**优化策略与要点：**
+```markdown
+{{ suggestion.improvement }}
+```
+
+---
+{% endfor %}
+
+**重要提示**：请将上述优化策略融入到草图设计中
+{% endif %}
+
+{% if meta_prompts %}
+## 额外优化要点
+在设计草图中考虑以下优化建议：
+{{ meta_prompts }}
+{% endif %}
+
+{% if enable_llm_range_inference %}
+## 设计适用范围说明
+如果任务描述包含具体shape（如M=1024），在草图注释中说明本设计的适用输入范围：
+- **仔细分析**：不仅考虑显式的 shape 约束，还要分析隐含的逻辑约束
+  - 例如：如果代码中有 `indices[start:end]` 切片操作，确保 `end > start`
+  - 例如：如果有多个参数的关系（如 `topk * num_experts <= token_num`），必须明确
+- 推荐的shape范围（如：建议 128 <= M <= 8192）
+- 与BLOCK_SIZE配置的关系（如：M<256时某些大BLOCK配置可能不适用）
+- **重要**：确保任务描述中给出的输入shape在设计的适用范围内（如给出M=1024，则范围必须包含1024）
+- **边界处理**：
+  - 使用 mask：支持任意 shape
+  - 不使用 mask：必须说明整除约束（如 `M % 64 == 0`）
+- **最大值约束**：必须提供最大值，且建议的最大值不应超过 `max(65536, 原始输入的最大维度值)`
+  - 例如：原始输入是 (1024, 4096)，则建议范围最大值不超过 max(65536, 4096) = 65536
+  - 这样可以避免测试时生成过大的 tensor 导致内存或性能问题
+- **最小值约束**：不要盲目设置太小的最小值（如 16），要根据算法逻辑确定合理的最小值
+  - 建议最小值设为原始输入的 1/4 到 1/2，避免过小导致逻辑错误
+
+示例格式：
+```
+# 设计适用范围：
+# - 128 <= M <= 8192, 128 <= N <= 4096
+# - M % 64 == 0, N % 128 == 0（无mask，需整除）
+```
+{% endif %}
+
+
+请严格按照上述指南，为当前任务生成完整的算子设计草图。
+
+{% if enable_hint_mode and has_hint %}
+**请按照以下JSON格式输出（包含三个字段）**：
+```json
+{
+    "sketch": "草图代码（必须包含'设计适用范围'注释，说明支持的参数范围，BLOCK_SIZE等配置考虑了hint范围）",
+    "space_config": "参数空间配置（完整的Python代码，按上述模板，用于后续生成多case测试）",
+    "reasoning": "设计思路（说明如何根据hint范围选择BLOCK_SIZE和边界处理策略）"
+}
+```
+
+仅返回JSON，不要包含任何解释或额外内容。
+{% else %}
+**请按照以下格式输出你的结果，仅返回json格式，不要包含任何解释或额外内容：**
+
+{{ format_instructions }}
+{% endif %}
